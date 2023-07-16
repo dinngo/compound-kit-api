@@ -33,6 +33,7 @@ export interface MarketInfo {
   borrowCapacityValue: string;
   availableToBorrow: string;
   availableToBorrowValue: string;
+  liquidationLimit: string;
   liquidationThreshold: string;
   liquidationRisk: string;
   liquidationPoint: string;

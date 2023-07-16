@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import * as logics from '@protocolink/logics';
 import { newTestEvent, testContext, testHandler } from 'test/fixtures/api';
 
-describe('Test status api', function () {
+describe('Test get market api', function () {
   const testCases = [
     {
       title: '400.1: market does not exist',
@@ -60,12 +60,13 @@ describe('Test status api', function () {
           'borrowCapacityValue',
           'availableToBorrow',
           'availableToBorrowValue',
+          'liquidationLimit',
           'liquidationThreshold',
           'liquidationRisk',
           'liquidationPoint',
           'liquidationPointValue',
           'utilization',
-          'healthFactor',
+          'healthRate',
           'netApr',
           'collaterals',
         ]);

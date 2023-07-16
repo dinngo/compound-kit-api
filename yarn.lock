@@ -1777,6 +1777,26 @@
     bignumber.js "^9.0.2"
     ts-essentials "^9.1.2"
 
+"@protocolink/api@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@protocolink/api/-/api-0.2.3.tgz#d783c1040ec271dea4ee44d49dc43df7d9556554"
+  integrity sha512-aOdLKi7LQoOsjhKeXK6u7yL7b5P5X9qekyYJgNHAVw72W5AX/fJ/HcPWPyMKklkzsvwQdjAsIaj/NQ9U2V7dWA==
+  dependencies:
+    "@protocolink/common" "^0.2.10"
+    "@protocolink/core" "^0.2.11"
+    "@protocolink/logics" "^0.2.5"
+    "@types/lodash" "^4.14.195"
+    "@types/uuid" "^9.0.2"
+    "@uniswap/permit2-sdk" "^1.2.0"
+    axios "^1.3.6"
+    axios-retry "^3.5.1"
+    bignumber.js "^9.1.1"
+    ethers "^5.7.2"
+    lodash "^4.17.21"
+    tiny-invariant "^1.3.1"
+    type-fest "^3.12.0"
+    uuid "^9.0.0"
+
 "@protocolink/common@^0.2.10":
   version "0.2.10"
   resolved "https://registry.yarnpkg.com/@protocolink/common/-/common-0.2.10.tgz#9790afa190ebac259a1ac96a7db70556518dd9c1"
@@ -1800,7 +1820,7 @@
     tiny-invariant "^1.3.1"
     zksync-web3 "^0.14.3"
 
-"@protocolink/logics@^0.2.6":
+"@protocolink/logics@^0.2.5", "@protocolink/logics@^0.2.6":
   version "0.2.6"
   resolved "https://registry.yarnpkg.com/@protocolink/logics/-/logics-0.2.6.tgz#1e83c699a8cf7741986b9bc8a689855586c991b3"
   integrity sha512-zcrpw+c9MBPnM2DNbkxv9TtUXia+aVWWeb+ETEZbDQ9fnxA/eAQU0xj3ZNDXaBxkWr+4z2jJ9fIZKH8y27XzXg==
@@ -2646,6 +2666,11 @@
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-7.5.0.tgz#591c1ce3a702c45ee15f47a42ade72c2fd78978a"
   integrity sha512-G8hZ6XJiHnuhQKR7ZmysCeJWE08o8T0AXtk5darsCaTVsYZhhgUrq53jizaR2FvsoeCwJhlmwTjkXBY5Pn/ZHw==
 
+"@types/uuid@^9.0.2":
+  version "9.0.2"
+  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-9.0.2.tgz#ede1d1b1e451548d44919dc226253e32a6952c4b"
+  integrity sha512-kNnC1GFBLuhImSnV7w4njQkUiJi0ZXUycu1rUaouPqiKlXkh77JKgdRnTAp1x5eBwcIwbtI+3otwzuIDEuDoxQ==
+
 "@typescript-eslint/eslint-plugin@^5.61.0":
   version "5.61.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-5.61.0.tgz#a1a5290cf33863b4db3fb79350b3c5275a7b1223"
@@ -2743,10 +2768,22 @@
     ethers "^5.3.1"
     tiny-invariant "^1.3.1"
 
-"@uniswap/sdk-core@^3.0.1", "@uniswap/sdk-core@^3.2.6":
+"@uniswap/sdk-core@^3.2.6":
   version "3.2.6"
   resolved "https://registry.yarnpkg.com/@uniswap/sdk-core/-/sdk-core-3.2.6.tgz#1a652516fab0c6bc1420c2226648da967a10f52a"
   integrity sha512-MvH/3G0W0sM2g7XjaUy9qU7IabxL/KQp/ucU0AQGpVxiTaAhmVRtsjkkv9UDyzpIXVrmevl4kRgV7KKE29UuXA==
+  dependencies:
+    "@ethersproject/address" "^5.0.2"
+    big.js "^5.2.2"
+    decimal.js-light "^2.5.0"
+    jsbi "^3.1.4"
+    tiny-invariant "^1.1.0"
+    toformat "^2.0.0"
+
+"@uniswap/sdk-core@^4":
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/@uniswap/sdk-core/-/sdk-core-4.0.3.tgz#aa5a17c5c61f4ef9b7e042fa8798fa51951d7eab"
+  integrity sha512-OXO1BdwQ29LW1TEJyCw5imqIC8HHSDd8d9kGQd+AXMzKbMYeMzxTRZn2U/LboYHr9XnE2wgFO4LnrXGIUyZ7/g==
   dependencies:
     "@ethersproject/address" "^5.0.2"
     big.js "^5.2.2"
@@ -2806,13 +2843,13 @@
     base64-sol "1.0.1"
 
 "@uniswap/v3-sdk@^3.9.0":
-  version "3.9.0"
-  resolved "https://registry.yarnpkg.com/@uniswap/v3-sdk/-/v3-sdk-3.9.0.tgz#de93fa19f89c29d460996aa4d0b4bb6531641105"
-  integrity sha512-LuoF3UcY1DxSAQKJ3E4/1Eq4HaNp+x+7q9mvbpiu+/PBj+O1DjLforAMrKxu+RsA0aarmZtz7yBnAPy+akgfgQ==
+  version "3.10.0"
+  resolved "https://registry.yarnpkg.com/@uniswap/v3-sdk/-/v3-sdk-3.10.0.tgz#962c9e598250ced00702d944783c2d9ee3fa12f6"
+  integrity sha512-sbmSA1O+Ct960r66Ie/c1rOmVadpwRu8nQ79pGICv0pZJdnFIQ/SReG3F+iC2C2UNNjNP6aC2WDUggXrjyrgnA==
   dependencies:
     "@ethersproject/abi" "^5.0.12"
     "@ethersproject/solidity" "^5.0.9"
-    "@uniswap/sdk-core" "^3.0.1"
+    "@uniswap/sdk-core" "^4"
     "@uniswap/swap-router-contracts" "^1.2.1"
     "@uniswap/v3-periphery" "^1.1.1"
     "@uniswap/v3-staker" "1.0.0"

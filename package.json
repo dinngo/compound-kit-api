@@ -28,6 +28,7 @@
     "@middy/http-urlencode-path-parser": "^4.5.3",
     "@middy/input-output-logger": "^4.5.3",
     "@middy/util": "^4.5.3",
+    "@protocolink/api": "^0.2.3",
     "@protocolink/common": "^0.2.10",
     "@protocolink/logics": "^0.2.6",
     "@types/lodash": "^4.14.195",

@@ -1,0 +1,78 @@
+import { expect } from 'chai';
+import * as logics from '@protocolink/logics';
+import { newTestEvent, testContext, testHandler } from 'test/fixtures/api';
+
+describe('Test get leverage quotation api', function () {
+  const testCases = [
+    {
+      title: '400.1: market does not exist',
+      path: '/v1/markets/137/eth/leverage',
+      expected: { statusCode: 400, body: JSON.stringify({ code: '400.1', message: 'market does not exist' }) },
+    },
+    {
+      title: '400.2: body is invalid',
+      path: '/v1/markets/137/usdc/leverage',
+      expected: { statusCode: 400, body: JSON.stringify({ code: '400.2', message: 'body is invalid' }) },
+    },
+    {
+      title: `400.3: account can't be blank`,
+      path: '/v1/markets/137/usdc/leverage',
+      body: { chainId: '1' },
+      expected: { statusCode: 400, body: JSON.stringify({ code: '400.3', message: `account can't be blank` }) },
+    },
+    {
+      title: '400.4: account is invalid',
+      path: '/v1/markets/137/usdc/leverage',
+      body: { account: '0x0' },
+      expected: { statusCode: 400, body: JSON.stringify({ code: '400.4', message: 'account is invalid' }) },
+    },
+    {
+      title: '400.5: leverage token is not collateral',
+      path: '/v1/markets/137/usdc/leverage',
+      body: {
+        account: '0xa3C1C91403F0026b9dd086882aDbC8Cdbc3b3cfB',
+        token: logics.compoundv3.mainnetTokens.WETH,
+        amount: '1',
+        slippage: 100,
+      },
+      expected: {
+        statusCode: 400,
+        body: JSON.stringify({ code: '400.5', message: 'leverage token is not collateral' }),
+      },
+    },
+    {
+      title: '200: without token and amount',
+      path: '/v1/markets/137/usdc/leverage',
+      body: { account: '0xa3C1C91403F0026b9dd086882aDbC8Cdbc3b3cfB' },
+      expected: { statusCode: 200 },
+    },
+    {
+      title: '200: with token and amount',
+      path: '/v1/markets/137/usdc/leverage',
+      body: {
+        account: '0xa3C1C91403F0026b9dd086882aDbC8Cdbc3b3cfB',
+        token: logics.compoundv3.polygonTokens.WETH,
+        amount: '1',
+        slippage: 100,
+      },
+      expected: { statusCode: 200 },
+    },
+  ];
+
+  testCases.forEach(({ title, path, body, expected }) => {
+    it(title, async function () {
+      const event = newTestEvent('POST', path, { body });
+      const resp = await testHandler(event, testContext);
+      expect(resp.statusCode).to.eq(expected.statusCode);
+      if (resp.statusCode > 200) {
+        expect(resp.body).to.eq(expected.body);
+      } else {
+        const parsedBody = JSON.parse(resp.body);
+        expect(parsedBody).to.have.keys('quotation', 'approvals', 'logics');
+        expect(parsedBody.quotation).to.have.keys('leverageTimes', 'currentPosition', 'targetPosition');
+        expect(parsedBody.quotation.currentPosition).to.have.keys('utilization', 'healthRate', 'netApr', 'totalDebt');
+        expect(parsedBody.quotation.targetPosition).to.have.keys('utilization', 'healthRate', 'netApr', 'totalDebt');
+      }
+    });
+  });
+});

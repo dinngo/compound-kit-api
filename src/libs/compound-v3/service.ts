@@ -1,8 +1,9 @@
 import { BigNumber, providers } from 'ethers';
 import BigNumberJS from 'bignumber.js';
 import { CollateralInfo, MarketInfo } from './types';
-import { calcApr, calcNetApr, calcUtilization, calchealthRate, formatValue } from './utils';
+import { calcApr, calcHealthRate, calcNetApr, calcUtilization } from './utils';
 import * as common from '@protocolink/common';
+import { formatValue } from 'src/utils';
 import { getCustomBaseTokenPriceFeed } from './configs';
 import * as logics from '@protocolink/logics';
 
@@ -249,7 +250,7 @@ export class Service extends logics.compoundv3.Service {
 
     let totalCollateralValue = new BigNumberJS(0);
     let totalBorrowCapacityValue = new BigNumberJS(0);
-    let liquidationLimitValue = new BigNumberJS(0);
+    let liquidationLimit = new BigNumberJS(0);
     const collaterals: CollateralInfo[] = [];
     for (let i = 0; i < numAssets; i++) {
       const { asset, borrowCollateralFactor, liquidateCollateralFactor } = assets[i];
@@ -271,7 +272,7 @@ export class Service extends logics.compoundv3.Service {
           .decimalPlaces(baseToken.decimals, BigNumberJS.ROUND_FLOOR)
           .toFixed();
 
-        liquidationLimitValue = liquidationLimitValue.plus(collateralValue.times(liquidateCollateralFactor));
+        liquidationLimit = liquidationLimit.plus(collateralValue.times(liquidateCollateralFactor));
       }
 
       const collateralInfo: CollateralInfo = {
@@ -303,9 +304,9 @@ export class Service extends logics.compoundv3.Service {
     let liquidationRisk = new BigNumberJS(0);
     let liquidationPointValue = new BigNumberJS(0);
     let liquidationPoint = '0';
-    if (!liquidationLimitValue.isZero()) {
-      liquidationThreshold = liquidationLimitValue.div(totalCollateralValue).decimalPlaces(4).toFixed();
-      liquidationRisk = new BigNumberJS(borrowValue).div(liquidationLimitValue).decimalPlaces(2);
+    if (!liquidationLimit.isZero()) {
+      liquidationThreshold = liquidationLimit.div(totalCollateralValue).decimalPlaces(4).toFixed();
+      liquidationRisk = new BigNumberJS(borrowValue).div(liquidationLimit).decimalPlaces(2);
       liquidationPointValue = totalCollateralValue.times(liquidationRisk);
       liquidationPoint = liquidationPointValue
         .div(baseTokenPrice)
@@ -314,7 +315,7 @@ export class Service extends logics.compoundv3.Service {
     }
 
     const utilization = calcUtilization(totalBorrowCapacityValue, borrowValue);
-    const healthRate = calchealthRate(supplyValue, totalCollateralValue, borrowValue, liquidationThreshold);
+    const healthRate = calcHealthRate(supplyValue, totalCollateralValue, borrowValue, liquidationThreshold);
     const netApr = calcNetApr(supplyValue, supplyApr, totalCollateralValue, borrowValue, borrowApr);
 
     const marketInfo: MarketInfo = {
@@ -331,6 +332,7 @@ export class Service extends logics.compoundv3.Service {
       borrowCapacityValue: formatValue(totalBorrowCapacityValue),
       availableToBorrow: availableToBorrow.toFixed(),
       availableToBorrowValue,
+      liquidationLimit: formatValue(liquidationLimit),
       liquidationThreshold,
       liquidationRisk: liquidationRisk.toFixed(),
       liquidationPoint,

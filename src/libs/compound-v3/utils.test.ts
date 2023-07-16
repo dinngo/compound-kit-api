@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { calcApr, calcNetApr, calcUtilization, calchealthRate, formatValue, getMarketLabel } from './utils';
+import { calcApr, calcHealthRate, calcNetApr, calcUtilization, getMarketLabel } from './utils';
 import * as common from '@protocolink/common';
 import { expect } from 'chai';
 import * as logics from '@protocolink/logics';
@@ -31,29 +31,6 @@ describe('Test getMarketLabel', function () {
   testCases.forEach(({ chainId, marketId, expected }) => {
     it(`${common.toNetworkId(chainId)}: ${expected}`, async function () {
       expect(getMarketLabel(chainId, marketId)).to.eq(expected);
-    });
-  });
-});
-
-describe('Test formatValue', function () {
-  const testCases = [
-    {
-      value: '123.12345',
-      expected: '123.12',
-    },
-    {
-      value: '123.12567',
-      expected: '123.13',
-    },
-    {
-      value: '123.19567',
-      expected: '123.2',
-    },
-  ];
-
-  testCases.forEach(({ value, expected }, i) => {
-    it(`case ${i + 1}`, async function () {
-      expect(formatValue(value)).to.eq(expected);
     });
   });
 });
@@ -132,7 +109,7 @@ describe('Test calcUtilization', function () {
 
   testCases.forEach(({ supplyValue, collateralValue, borrowValue, liquidationThreshold, expected }, i) => {
     it(`case ${i + 1}`, async function () {
-      expect(calchealthRate(supplyValue, collateralValue, borrowValue, liquidationThreshold)).to.eq(expected);
+      expect(calcHealthRate(supplyValue, collateralValue, borrowValue, liquidationThreshold)).to.eq(expected);
     });
   });
 });

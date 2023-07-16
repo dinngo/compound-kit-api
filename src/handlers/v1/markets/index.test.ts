@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { newTestEvent, testContext, testHandler } from 'test/fixtures/api';
 
-describe('Test status api', function () {
+describe('Test get markets api', function () {
   const testCases = [{ path: '/v1/markets', expected: { statusCode: 200 } }];
 
   testCases.forEach((testCase) => {

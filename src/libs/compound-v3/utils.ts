@@ -11,10 +11,6 @@ export function getMarketLabel(chainId: number, marketId: string) {
   return marketId;
 }
 
-export function formatValue(value: string | BigNumberJS) {
-  return new BigNumberJS(value).decimalPlaces(2).toFixed();
-}
-
 export function calcApr(rate: BigNumber) {
   return common.toBigUnit(rate.mul(SECONDS_PER_YEAR), 18, { displayDecimals: 4 });
 }
@@ -29,7 +25,7 @@ export function calcUtilization(borrowCapacityValue: string | BigNumberJS, borro
   return utilization;
 }
 
-export function calchealthRate(
+export function calcHealthRate(
   supplyValue: string | BigNumberJS,
   collateralValue: string | BigNumberJS,
   borrowValue: string | BigNumberJS,
