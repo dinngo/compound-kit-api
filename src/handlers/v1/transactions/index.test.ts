@@ -4,7 +4,7 @@ import { newTestEvent, testContext, testHandler } from 'test/fixtures/api';
 describe('Test build transaction api', function () {
   const testCases = [
     {
-      title: `400.1: chainId can't be blank`,
+      title: `400.1: body is invalid`,
       expected: { statusCode: 400, body: JSON.stringify({ code: '400.1', message: 'body is invalid' }) },
     },
     {
@@ -29,7 +29,7 @@ describe('Test build transaction api', function () {
     },
     {
       title: '400.6: account is invalid',
-      body: { chainId: 1, account: '0x0' },
+      body: { chainId: 1, account: '0x123' },
       expected: { statusCode: 400, body: JSON.stringify({ code: '400.6', message: 'account is invalid' }) },
     },
     {

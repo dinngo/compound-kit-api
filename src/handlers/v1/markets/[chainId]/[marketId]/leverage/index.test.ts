@@ -17,13 +17,13 @@ describe('Test get leverage quotation api', function () {
     {
       title: `400.3: account can't be blank`,
       path: '/v1/markets/137/usdc/leverage',
-      body: { chainId: '1' },
+      body: {},
       expected: { statusCode: 400, body: JSON.stringify({ code: '400.3', message: `account can't be blank` }) },
     },
     {
       title: '400.4: account is invalid',
       path: '/v1/markets/137/usdc/leverage',
-      body: { account: '0x0' },
+      body: { account: '0x123' },
       expected: { statusCode: 400, body: JSON.stringify({ code: '400.4', message: 'account is invalid' }) },
     },
     {
@@ -31,7 +31,13 @@ describe('Test get leverage quotation api', function () {
       path: '/v1/markets/137/usdc/leverage',
       body: {
         account: '0xa3C1C91403F0026b9dd086882aDbC8Cdbc3b3cfB',
-        token: logics.compoundv3.mainnetTokens.WETH,
+        token: {
+          chainId: 137,
+          address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
+          decimals: 18,
+          symbol: 'USDT',
+          name: '(PoS) Tether USD',
+        },
         amount: '1',
         slippage: 100,
       },

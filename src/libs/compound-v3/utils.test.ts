@@ -75,7 +75,7 @@ describe('Test calcUtilization', function () {
   });
 });
 
-describe('Test calcUtilization', function () {
+describe('Test calcHealthRate', function () {
   const testCases = [
     {
       supplyValue: '0',

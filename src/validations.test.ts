@@ -18,7 +18,7 @@ describe('Validations', function () {
       },
       {
         chainId: common.ChainId.mainnet,
-        marketId: 'UNKNOW',
+        marketId: 'UNKNOWN',
         expected: false,
       },
       {
