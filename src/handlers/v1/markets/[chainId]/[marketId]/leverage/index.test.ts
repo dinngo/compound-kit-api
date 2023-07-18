@@ -30,7 +30,7 @@ describe('Test get leverage quotation api', function () {
       title: '400.5: leverage token is not collateral',
       path: '/v1/markets/137/usdc/leverage',
       body: {
-        account: '0xa3C1C91403F0026b9dd086882aDbC8Cdbc3b3cfB',
+        account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
         token: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
@@ -49,14 +49,14 @@ describe('Test get leverage quotation api', function () {
     {
       title: '200: without token and amount',
       path: '/v1/markets/137/usdc/leverage',
-      body: { account: '0xa3C1C91403F0026b9dd086882aDbC8Cdbc3b3cfB' },
+      body: { account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83' },
       expected: { statusCode: 200 },
     },
     {
       title: '200: with token and amount',
       path: '/v1/markets/137/usdc/leverage',
       body: {
-        account: '0xa3C1C91403F0026b9dd086882aDbC8Cdbc3b3cfB',
+        account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
         token: logics.compoundv3.polygonTokens.WETH,
         amount: '1',
         slippage: 100,

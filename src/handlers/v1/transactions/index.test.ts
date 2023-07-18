@@ -46,12 +46,12 @@ describe('Test build transaction api', function () {
       title: '200',
       body: {
         chainId: 137,
-        account: '0xa3C1C91403F0026b9dd086882aDbC8Cdbc3b3cfB',
+        account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
         logics: [
           {
             rid: 'balancer-v2:flash-loan',
             fields: {
-              id: '8d6c7384-2564-40d1-a7d7-e87435419098',
+              id: '3da63a84-a842-4e02-884b-a8c8fd27e980',
               outputs: [
                 {
                   token: {
@@ -95,7 +95,7 @@ describe('Test build transaction api', function () {
                   symbol: 'USDC',
                   name: 'USD Coin (PoS)',
                 },
-                amount: '1945.825687',
+                amount: '1912.05641',
               },
             },
           },
@@ -110,7 +110,7 @@ describe('Test build transaction api', function () {
                   symbol: 'USDC',
                   name: 'USD Coin (PoS)',
                 },
-                amount: '1945.825687',
+                amount: '1912.05641',
               },
               output: {
                 token: {
@@ -120,7 +120,7 @@ describe('Test build transaction api', function () {
                   symbol: 'WETH',
                   name: 'Wrapped Ether',
                 },
-                amount: '1.004727526209644276',
+                amount: '1.004343854634975344',
               },
               slippage: 100,
             },
@@ -128,7 +128,7 @@ describe('Test build transaction api', function () {
           {
             rid: 'balancer-v2:flash-loan',
             fields: {
-              id: '8d6c7384-2564-40d1-a7d7-e87435419098',
+              id: '3da63a84-a842-4e02-884b-a8c8fd27e980',
               outputs: [
                 {
                   token: {

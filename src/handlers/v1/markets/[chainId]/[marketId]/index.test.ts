@@ -28,7 +28,7 @@ describe('Test get market api', function () {
           {
             title: `200: ${common.toNetworkId(chainId)} ${market.id} market with account`,
             path: `/v1/markets/${chainId}/${market.id.toLowerCase()}`,
-            queryStringParameters: { account: '0xa3c1c91403f0026b9dd086882adbc8cdbc3b3cfb' },
+            queryStringParameters: { account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83' },
             expected: { statusCode: 200 },
           }
         );
