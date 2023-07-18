@@ -3,7 +3,6 @@ import BigNumberJS from 'bignumber.js';
 import { CollateralInfo, MarketInfo } from './types';
 import { calcApr, calcHealthRate, calcNetApr, calcUtilization } from './utils';
 import * as common from '@protocolink/common';
-import { formatValue } from 'src/utils';
 import { getCustomBaseTokenPriceFeed } from './configs';
 import * as logics from '@protocolink/logics';
 
@@ -240,12 +239,12 @@ export class Service extends logics.compoundv3.Service {
 
     let supplyValue = '0';
     if (supplyBalance !== '0') {
-      supplyValue = formatValue(new BigNumberJS(supplyBalance).times(baseTokenPrice));
+      supplyValue = common.formatBigUnit(new BigNumberJS(supplyBalance).times(baseTokenPrice), 2);
     }
 
     let borrowValue = '0';
     if (borrowBalance !== '0') {
-      borrowValue = formatValue(new BigNumberJS(borrowBalance).times(baseTokenPrice));
+      borrowValue = common.formatBigUnit(new BigNumberJS(borrowBalance).times(baseTokenPrice), 2);
     }
 
     let totalCollateralValue = new BigNumberJS(0);
@@ -267,11 +266,7 @@ export class Service extends logics.compoundv3.Service {
 
         borrowCapacityValue = collateralValue.times(borrowCollateralFactor);
         totalBorrowCapacityValue = totalBorrowCapacityValue.plus(borrowCapacityValue);
-        borrowCapacity = borrowCapacityValue
-          .div(baseTokenPrice)
-          .decimalPlaces(baseToken.decimals, BigNumberJS.ROUND_FLOOR)
-          .toFixed();
-
+        borrowCapacity = common.formatBigUnit(borrowCapacityValue.div(baseTokenPrice), baseToken.decimals, 'floor');
         liquidationLimit = liquidationLimit.plus(collateralValue.times(liquidateCollateralFactor));
       }
 
@@ -281,9 +276,9 @@ export class Service extends logics.compoundv3.Service {
         borrowCollateralFactor,
         liquidateCollateralFactor,
         collateralBalance,
-        collateralValue: formatValue(collateralValue),
+        collateralValue: common.formatBigUnit(collateralValue, 2),
         borrowCapacity,
-        borrowCapacityValue: formatValue(borrowCapacityValue),
+        borrowCapacityValue: common.formatBigUnit(borrowCapacityValue, 2),
       };
 
       collaterals.push(collateralInfo);
@@ -297,7 +292,7 @@ export class Service extends logics.compoundv3.Service {
         .div(baseTokenPrice)
         .decimalPlaces(baseToken.decimals, BigNumberJS.ROUND_FLOOR);
       availableToBorrow = borrowCapacity.minus(borrowBalance);
-      availableToBorrowValue = formatValue(availableToBorrow.times(baseTokenPrice));
+      availableToBorrowValue = common.formatBigUnit(availableToBorrow.times(baseTokenPrice), 2);
     }
 
     let liquidationThreshold = '0';
@@ -305,13 +300,10 @@ export class Service extends logics.compoundv3.Service {
     let liquidationPointValue = new BigNumberJS(0);
     let liquidationPoint = '0';
     if (!liquidationLimit.isZero()) {
-      liquidationThreshold = liquidationLimit.div(totalCollateralValue).decimalPlaces(4).toFixed();
+      liquidationThreshold = common.formatBigUnit(liquidationLimit.div(totalCollateralValue), 4);
       liquidationRisk = new BigNumberJS(borrowValue).div(liquidationLimit).decimalPlaces(2);
       liquidationPointValue = totalCollateralValue.times(liquidationRisk);
-      liquidationPoint = liquidationPointValue
-        .div(baseTokenPrice)
-        .decimalPlaces(baseToken.decimals, BigNumberJS.ROUND_FLOOR)
-        .toFixed();
+      liquidationPoint = common.formatBigUnit(liquidationPointValue.div(baseTokenPrice), baseToken.decimals, 'floor');
     }
 
     const utilization = calcUtilization(totalBorrowCapacityValue, borrowValue);
@@ -327,16 +319,16 @@ export class Service extends logics.compoundv3.Service {
       borrowApr,
       borrowBalance,
       borrowValue,
-      collateralValue: formatValue(totalCollateralValue),
+      collateralValue: common.formatBigUnit(totalCollateralValue, 2),
       borrowCapacity: borrowCapacity.toFixed(),
-      borrowCapacityValue: formatValue(totalBorrowCapacityValue),
+      borrowCapacityValue: common.formatBigUnit(totalBorrowCapacityValue, 2),
       availableToBorrow: availableToBorrow.toFixed(),
       availableToBorrowValue,
-      liquidationLimit: formatValue(liquidationLimit),
+      liquidationLimit: common.formatBigUnit(liquidationLimit, 2),
       liquidationThreshold,
       liquidationRisk: liquidationRisk.toFixed(),
       liquidationPoint,
-      liquidationPointValue: formatValue(liquidationPointValue),
+      liquidationPointValue: common.formatBigUnit(liquidationPointValue, 2),
       utilization,
       healthRate,
       netApr,

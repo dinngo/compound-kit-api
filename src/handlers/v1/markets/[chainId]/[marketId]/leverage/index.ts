@@ -12,7 +12,6 @@ import { LeverageQuotation, QuoteAPIResponseBody } from 'src/types';
 import { MarketInfo, Service, calcHealthRate, calcNetApr, calcUtilization } from 'src/libs/compound-v3';
 import * as apisdk from '@protocolink/api';
 import * as common from '@protocolink/common';
-import { formatValue } from 'src/utils';
 import { utils } from 'ethers';
 import { validateMarket } from 'src/validations';
 
@@ -99,10 +98,11 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
 
       // 3. new and append compound v3 borrow logic
       const leverageBorrowValue = leverageValue.times(LEVERAGE_BORROW_SCALE);
-      const leverageBorrowAmount = leverageBorrowValue
-        .div(baseTokenPrice)
-        .decimalPlaces(baseToken.decimals, BigNumberJS.ROUND_FLOOR)
-        .toFixed();
+      const leverageBorrowAmount = common.formatBigUnit(
+        leverageBorrowValue.div(baseTokenPrice),
+        baseToken.decimals,
+        'floor'
+      );
       logics.push(
         apisdk.protocols.compoundv3.newBorrowLogic({
           marketId,
@@ -126,7 +126,7 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       permitData = estimateResult.permitData;
 
       // 6. calc leverage times
-      leverageTimes = leverageValue.div(borrowCapacityValue).decimalPlaces(2).toFixed();
+      leverageTimes = common.formatBigUnit(leverageValue.div(borrowCapacityValue), 2);
 
       // 7. calc target position
       const targetBorrowValue = new BigNumberJS(borrowValue).plus(leverageBorrowValue);
@@ -137,12 +137,12 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       const targetLiquidationLimit = new BigNumberJS(liquidationLimit).plus(
         leverageValue.times(leverageCollateral.liquidateCollateralFactor)
       );
-      const targetLiquidationThreshold = targetLiquidationLimit.div(targetCollateralValue).decimalPlaces(4).toFixed();
+      const targetLiquidationThreshold = common.formatBigUnit(targetLiquidationLimit.div(targetCollateralValue), 4);
       targetPosition = {
         utilization: calcUtilization(targetBorrowCapacityValue, targetBorrowValue),
         healthRate: calcHealthRate(supplyValue, targetCollateralValue, targetBorrowValue, targetLiquidationThreshold),
         netApr: calcNetApr(supplyValue, supplyApr, targetCollateralValue, targetBorrowValue, borrowApr),
-        totalDebt: formatValue(targetBorrowValue),
+        totalDebt: common.formatBigUnit(targetBorrowValue, 2),
       };
     }
 

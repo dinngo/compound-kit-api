@@ -1438,66 +1438,66 @@
     tweetnacl "^1.0.3"
     tweetnacl-util "^0.15.1"
 
-"@middy/core@^4.5.3":
-  version "4.5.3"
-  resolved "https://registry.yarnpkg.com/@middy/core/-/core-4.5.3.tgz#55ef5d74f8db0536da1a9b3e365f621e76c71af5"
-  integrity sha512-S6dV1xpfMRTDa0xPKNUAloeo7ZFvUd5VrKu6eQ3r5k0umHeQCPO+37fuVOBzn3C0yY+wy4sdllcHsnQZcBOarg==
+"@middy/core@^4.5.5":
+  version "4.5.5"
+  resolved "https://registry.yarnpkg.com/@middy/core/-/core-4.5.5.tgz#a5769b79396d45bf212546b40b4667b9f47bbcb3"
+  integrity sha512-aufpLnrpIcGrpd1cjqWR1fc5iSbO2K63GPkUooT+jtI/M7mofqSkr1dtfPx7fRtAFlZVuAjHCF52wJxGgfj1Ng==
 
-"@middy/error-logger@^4.5.3":
-  version "4.5.3"
-  resolved "https://registry.yarnpkg.com/@middy/error-logger/-/error-logger-4.5.3.tgz#2cf98366867c3f9e57dd1fc5f9b104751151251e"
-  integrity sha512-aPKxHOpn1/i9a0y7uDumYg4oPp7JQME56+dWqWKNg6G27grRXT2VpoOExptC9eV46+6dd6EjOVsaUm1tHwjvlw==
+"@middy/error-logger@^4.5.5":
+  version "4.5.5"
+  resolved "https://registry.yarnpkg.com/@middy/error-logger/-/error-logger-4.5.5.tgz#30d25970ec03afd869a161cc6f915ea323a30278"
+  integrity sha512-yMcazafhBM2GUlJGUJylsXG7SQKIY/p1L2pVTEGiF4ACBp1aCd6299tG9gEJFWT2UIkE+viRY+bAnGiaM1BUcg==
 
-"@middy/http-error-handler@^4.5.3":
-  version "4.5.3"
-  resolved "https://registry.yarnpkg.com/@middy/http-error-handler/-/http-error-handler-4.5.3.tgz#44e9dd718fb4c8e5c65512b5a69b701864ede555"
-  integrity sha512-foQ3F2tbXcTxvGJ5hkvkP2GDdpHDh6PG1goAAwgA0pViUwnASWofBwRTr5F+gbuDr5CwE6uA71oNIFe1cN5/WA==
+"@middy/http-error-handler@^4.5.5":
+  version "4.5.5"
+  resolved "https://registry.yarnpkg.com/@middy/http-error-handler/-/http-error-handler-4.5.5.tgz#34a505db7dc77fccd7b153b8e855bd418cf641a5"
+  integrity sha512-l3H2HhKau6T6v5fRcXEg18CdYzxBIBfNAkhhT3EOSeeAHqRxzjljv+R/5fPVRIDKFSOOxajbIGwJI/x+w8t6uQ==
   dependencies:
-    "@middy/util" "4.5.3"
+    "@middy/util" "4.5.5"
 
-"@middy/http-header-normalizer@^4.5.3":
-  version "4.5.3"
-  resolved "https://registry.yarnpkg.com/@middy/http-header-normalizer/-/http-header-normalizer-4.5.3.tgz#b071fe4726601800aba5f1f2ac1508440567918e"
-  integrity sha512-jj2RX6ohB0JMwi3dbs+4rK9Lf1V4T+8MEHL/uFKl3sOcAFvZu40MUS7tLkB6RKh97M3FAOXOefXLZuQzQMBMdQ==
+"@middy/http-header-normalizer@^4.5.5":
+  version "4.5.5"
+  resolved "https://registry.yarnpkg.com/@middy/http-header-normalizer/-/http-header-normalizer-4.5.5.tgz#58ffe45f361e81405b60f6fd29699d2de8379334"
+  integrity sha512-+hR8YfsusbbYmxtQ6i2qGgudMKrN3/wwsVDfR0q1YjnxbzNnlNdjRLmTn++bAmpeGcRS0hBdDdHs5lceHvlSRw==
 
-"@middy/http-json-body-parser@^4.5.3":
-  version "4.5.3"
-  resolved "https://registry.yarnpkg.com/@middy/http-json-body-parser/-/http-json-body-parser-4.5.3.tgz#210f60ef4723e6d115fd1cd95a1da06cfd7f00c2"
-  integrity sha512-iioUqitxC4PDL7kBiepn66v7SlwY4eD+NqK8S1g4SynYcH57x9KhUTtc+F1bO9BFPsKzM9MZcMSHo7F2GAXdnw==
+"@middy/http-json-body-parser@^4.5.5":
+  version "4.5.5"
+  resolved "https://registry.yarnpkg.com/@middy/http-json-body-parser/-/http-json-body-parser-4.5.5.tgz#cb5e3abe5f11cbe2ba442189813ae4f5a1954a1d"
+  integrity sha512-B3mtKk07ubpmKQNLHXmgqpdoFkKarhyjFeI66jVQyWTTseDvXrqsJaNNV6fdf/3jJPdBwr14ck1Y5JKNVbVdoA==
   dependencies:
-    "@middy/util" "4.5.3"
+    "@middy/util" "4.5.5"
 
-"@middy/http-router@^4.5.3":
-  version "4.5.3"
-  resolved "https://registry.yarnpkg.com/@middy/http-router/-/http-router-4.5.3.tgz#c2d29811194ddc6cd3b3ff8e39ae73344b171f3e"
-  integrity sha512-SBmS5sez/4ZwG2WpjUTeTMbZh4r8H2RFXn7Z4VckwOdTKdHHAqNdnKaRS994BCDMwWwFueFMYlCRnCbQEiQKQw==
+"@middy/http-router@^4.5.5":
+  version "4.5.5"
+  resolved "https://registry.yarnpkg.com/@middy/http-router/-/http-router-4.5.5.tgz#fc0780a186584922d60b1272f071ae39beab816e"
+  integrity sha512-bBRfnPvrL/YExCUTCzxHAjy2dKLDt9OSC2sHi2jcIJ4H3DUFBb1R+qIEQoI7FQAAYol3sxZ+bd5Q3uGdAyz9PQ==
   dependencies:
-    "@middy/util" "4.5.3"
+    "@middy/util" "4.5.5"
 
-"@middy/http-urlencode-body-parser@^4.5.3":
-  version "4.5.3"
-  resolved "https://registry.yarnpkg.com/@middy/http-urlencode-body-parser/-/http-urlencode-body-parser-4.5.3.tgz#5f1cd255b54447766f2eaddc491a8790e91bfdc8"
-  integrity sha512-GDCKOFIMpO2C0Id/aqJ4acxuBpqv3aF+ntD9LokoD3i5M0uOPfjfgz8JkIgcVyak1EX7gYcq7mqpPf07CE8MoA==
+"@middy/http-urlencode-body-parser@^4.5.5":
+  version "4.5.5"
+  resolved "https://registry.yarnpkg.com/@middy/http-urlencode-body-parser/-/http-urlencode-body-parser-4.5.5.tgz#f263135889fd014eda102c5cc03abb08d5cbce0c"
+  integrity sha512-Qyec0ajZyzobhHkJRbCggppfwzrhRIV/Q+zQNoPpCVTfxnzW6XK3x2JtPnzFhfwzll7bxogIZvKiNUHuQfvJVQ==
   dependencies:
-    "@middy/util" "4.5.3"
+    "@middy/util" "4.5.5"
     qs "6.11.2"
 
-"@middy/http-urlencode-path-parser@^4.5.3":
-  version "4.5.3"
-  resolved "https://registry.yarnpkg.com/@middy/http-urlencode-path-parser/-/http-urlencode-path-parser-4.5.3.tgz#170ba85f34ebcf59d9dfe32a553af0ddf1e1a9ce"
-  integrity sha512-CLozc2e/d/rzdr1p/pAvsidnLmmsN8KmSPkvbL5CIfRC5jUYkLBF0Cnif3w9sW01hotWqT7B0HgbxAmbuH3vWA==
+"@middy/http-urlencode-path-parser@^4.5.5":
+  version "4.5.5"
+  resolved "https://registry.yarnpkg.com/@middy/http-urlencode-path-parser/-/http-urlencode-path-parser-4.5.5.tgz#79b233f913dfd51ddff8c04ea7207188c79aeec4"
+  integrity sha512-7UFn7qgzihimG7UhAK/7c9qoyH9ANeNvO2WA+mJiFOJAzd6XF8gtPY1NavAhyqxjZm0QRVyY6yUviu/HUlpSfA==
 
-"@middy/input-output-logger@^4.5.3":
-  version "4.5.3"
-  resolved "https://registry.yarnpkg.com/@middy/input-output-logger/-/input-output-logger-4.5.3.tgz#80a214d1012249641af228bfd45d081677031e49"
-  integrity sha512-Ar+JKGmeIZqokCtxchwlkeR9ro054VVZrrWwjh1TPRLN7JQu258SmAwqoxH+pE5LQTyt/jxRa3UwuKbH+Xgp6w==
+"@middy/input-output-logger@^4.5.5":
+  version "4.5.5"
+  resolved "https://registry.yarnpkg.com/@middy/input-output-logger/-/input-output-logger-4.5.5.tgz#9b19e335fa56bf0557f074043a57d3b3a64cb9e0"
+  integrity sha512-iA9X8aMrWiI5m8zARC+HfnBS+8gXQNqa1zQR3lS47wXc8LlgFVy82Wn2PDmLTu4Dc0gKzN4dKUqOTbRaPuEZyA==
   dependencies:
-    "@middy/util" "4.5.3"
+    "@middy/util" "4.5.5"
 
-"@middy/util@4.5.3", "@middy/util@^4.5.3":
-  version "4.5.3"
-  resolved "https://registry.yarnpkg.com/@middy/util/-/util-4.5.3.tgz#2c95bfa22290b06fba92282ef4865ab12bd94afb"
-  integrity sha512-IyMcXcrzztWzppc9rCYle3e5FR5hICiia0JfPPxM0CtS8eiqr/Wkf18IHjXh2XscmlrmBECfxp7JwfAzZtGxiQ==
+"@middy/util@4.5.5", "@middy/util@^4.5.5":
+  version "4.5.5"
+  resolved "https://registry.yarnpkg.com/@middy/util/-/util-4.5.5.tgz#0d141d7c35b074b75261de0b540efe547a57c3f4"
+  integrity sha512-Dx4L/8cAvKqHKo7VA2oS3fv5nvGsDgGsgFfsvMZ/1p7+WkPCCyS2tWD0o/aioZiuLy0DTq8u1W6U0+8k8nQgpQ==
 
 "@noble/hashes@1.2.0", "@noble/hashes@~1.2.0":
   version "1.2.0"
@@ -1777,30 +1777,25 @@
     bignumber.js "^9.0.2"
     ts-essentials "^9.1.2"
 
-"@protocolink/api@^0.2.3":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@protocolink/api/-/api-0.2.3.tgz#d783c1040ec271dea4ee44d49dc43df7d9556554"
-  integrity sha512-aOdLKi7LQoOsjhKeXK6u7yL7b5P5X9qekyYJgNHAVw72W5AX/fJ/HcPWPyMKklkzsvwQdjAsIaj/NQ9U2V7dWA==
+"@protocolink/api@^0.2.5":
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/@protocolink/api/-/api-0.2.5.tgz#e81911774b28c311eb6e0d6c039bbb0796b889ed"
+  integrity sha512-236uw0Ay0wtWO8BpNEuzU27aie2/RG+NQ8f2GZbKUlDdWozzh8SmLUoIXT/8OsRv2FmvgKAwmzevdxPpAGBP8Q==
   dependencies:
-    "@protocolink/common" "^0.2.10"
-    "@protocolink/core" "^0.2.11"
-    "@protocolink/logics" "^0.2.5"
+    "@protocolink/common" "^0.2.11"
+    "@protocolink/core" "^0.2.12"
+    "@protocolink/logics" "^0.2.7"
     "@types/lodash" "^4.14.195"
     "@types/uuid" "^9.0.2"
     "@uniswap/permit2-sdk" "^1.2.0"
     axios "^1.3.6"
     axios-retry "^3.5.1"
-    bignumber.js "^9.1.1"
-    ethers "^5.7.2"
-    lodash "^4.17.21"
-    tiny-invariant "^1.3.1"
-    type-fest "^3.12.0"
     uuid "^9.0.0"
 
-"@protocolink/common@^0.2.10":
-  version "0.2.10"
-  resolved "https://registry.yarnpkg.com/@protocolink/common/-/common-0.2.10.tgz#9790afa190ebac259a1ac96a7db70556518dd9c1"
-  integrity sha512-XLjkgSorMLVoDjim5qJghsYgla0fPx3uwg12Bm4GoEqNcichSxv7u4Y8hc2XK5vUO2MMSof0TnQ3KOcSBcgrrQ==
+"@protocolink/common@^0.2.11", "@protocolink/common@^0.2.12":
+  version "0.2.12"
+  resolved "https://registry.yarnpkg.com/@protocolink/common/-/common-0.2.12.tgz#b7f59fc804352b0cbef36e90e816db0b4dd2ddaf"
+  integrity sha512-gMkHR5YwRdZDdutxAgk0QFPRcP5nCEVO46Z5UnF00GaxU6fny2+4kBCa5e44vvLToK4jgOjEBz/p1hG8kB7tvA==
   dependencies:
     "@types/lodash" "^4.14.195"
     bignumber.js "^9.1.1"
@@ -1810,24 +1805,24 @@
     type-fest "^3.12.0"
     zksync-web3 "^0.14.3"
 
-"@protocolink/core@^0.2.11":
-  version "0.2.11"
-  resolved "https://registry.yarnpkg.com/@protocolink/core/-/core-0.2.11.tgz#feb28b109c90e0c23359eccc4d6330eebf551573"
-  integrity sha512-qkt69OFs00jaKsn3rHiZKtm2TQkk6DaPxKr/LnrRIe1kwH/ZrgSI443gGuDJvCMiNjnBXAmhIq0tSI2PxgH0Qg==
+"@protocolink/core@^0.2.12":
+  version "0.2.12"
+  resolved "https://registry.yarnpkg.com/@protocolink/core/-/core-0.2.12.tgz#a1658e7df07444a03bfc23c788e704b21b165af2"
+  integrity sha512-CaJ5T84/VLtmcNKgr73gl72dBhBjeYk0a/YyUB/2cGFPtUPpLNZKGuBgSCCzQmZ10QLrTwOfgvzEW3D9vV9Ugg==
   dependencies:
-    "@protocolink/common" "^0.2.10"
+    "@protocolink/common" "^0.2.11"
     ethers "^5.7.2"
     tiny-invariant "^1.3.1"
     zksync-web3 "^0.14.3"
 
-"@protocolink/logics@^0.2.5", "@protocolink/logics@^0.2.6":
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/@protocolink/logics/-/logics-0.2.6.tgz#1e83c699a8cf7741986b9bc8a689855586c991b3"
-  integrity sha512-zcrpw+c9MBPnM2DNbkxv9TtUXia+aVWWeb+ETEZbDQ9fnxA/eAQU0xj3ZNDXaBxkWr+4z2jJ9fIZKH8y27XzXg==
+"@protocolink/logics@^0.2.7":
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/@protocolink/logics/-/logics-0.2.7.tgz#1344ed0b2da7608160217d4e33f9ad857501db0f"
+  integrity sha512-9XopvT+j1N5ZuumZ7jZGU3K3TUTCnsTnGVlkPZ3nRU9IA1vabIAfPxTdSqwzFyd/4iSgNW4ADONq4K+Qdk9TlA==
   dependencies:
     "@paraswap/sdk" "^6.2.1"
-    "@protocolink/common" "^0.2.10"
-    "@protocolink/core" "^0.2.11"
+    "@protocolink/common" "^0.2.11"
+    "@protocolink/core" "^0.2.12"
     "@types/lodash" "^4.14.195"
     "@uniswap/permit2-sdk" "^1.2.0"
     "@uniswap/sdk-core" "^3.2.6"
@@ -1838,9 +1833,6 @@
     bignumber.js "^9.1.1"
     ethers "^5.7.2"
     lodash "^4.17.21"
-    tiny-invariant "^1.3.1"
-    type-fest "^3.12.0"
-    zksync-web3 "^0.14.3"
 
 "@scure/base@~1.1.0":
   version "1.1.1"

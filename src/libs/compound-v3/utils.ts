@@ -19,7 +19,7 @@ export function calcUtilization(borrowCapacityValue: string | BigNumberJS, borro
   let utilization = '0';
   borrowCapacityValue = new BigNumberJS(borrowCapacityValue);
   if (!borrowCapacityValue.isZero()) {
-    utilization = new BigNumberJS(borrowValue).div(borrowCapacityValue).decimalPlaces(4).toFixed();
+    utilization = common.formatBigUnit(new BigNumberJS(borrowValue).div(borrowCapacityValue), 4);
   }
 
   return utilization;
@@ -31,12 +31,10 @@ export function calcHealthRate(
   borrowValue: string | BigNumberJS,
   liquidationThreshold: string | BigNumberJS
 ) {
-  return new BigNumberJS(supplyValue)
-    .plus(collateralValue)
-    .times(liquidationThreshold)
-    .div(borrowValue)
-    .decimalPlaces(2)
-    .toFixed();
+  return common.formatBigUnit(
+    new BigNumberJS(supplyValue).plus(collateralValue).times(liquidationThreshold).div(borrowValue),
+    2
+  );
 }
 
 export function calcNetApr(
@@ -50,12 +48,13 @@ export function calcNetApr(
 
   let netApr = '0';
   if (!totalSupply.isZero()) {
-    netApr = new BigNumberJS(supplyValue)
-      .times(supplyApr)
-      .minus(new BigNumberJS(borrowValue).times(borrowApr))
-      .div(totalSupply)
-      .decimalPlaces(4)
-      .toFixed();
+    netApr = common.formatBigUnit(
+      new BigNumberJS(supplyValue)
+        .times(supplyApr)
+        .minus(new BigNumberJS(borrowValue).times(borrowApr))
+        .div(totalSupply),
+      4
+    );
   }
 
   return netApr;
