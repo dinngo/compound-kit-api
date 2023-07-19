@@ -1777,12 +1777,12 @@
     bignumber.js "^9.0.2"
     ts-essentials "^9.1.2"
 
-"@protocolink/api@^0.2.5":
-  version "0.2.5"
-  resolved "https://registry.yarnpkg.com/@protocolink/api/-/api-0.2.5.tgz#e81911774b28c311eb6e0d6c039bbb0796b889ed"
-  integrity sha512-236uw0Ay0wtWO8BpNEuzU27aie2/RG+NQ8f2GZbKUlDdWozzh8SmLUoIXT/8OsRv2FmvgKAwmzevdxPpAGBP8Q==
+"@protocolink/api@^0.2.6":
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/@protocolink/api/-/api-0.2.6.tgz#f003983e7aa9bc45602aec61ecbcde3677405826"
+  integrity sha512-oPk9h9oIO+FXStsxqLlWBA0sscV62QBqls4Y6uBoUaFItXECshqsQODOd/+ibKI1N9TnZjBIawxpMNsPsplxNg==
   dependencies:
-    "@protocolink/common" "^0.2.11"
+    "@protocolink/common" "^0.2.14"
     "@protocolink/core" "^0.2.12"
     "@protocolink/logics" "^0.2.7"
     "@types/lodash" "^4.14.195"
@@ -1792,10 +1792,10 @@
     axios-retry "^3.5.1"
     uuid "^9.0.0"
 
-"@protocolink/common@^0.2.11", "@protocolink/common@^0.2.12":
-  version "0.2.12"
-  resolved "https://registry.yarnpkg.com/@protocolink/common/-/common-0.2.12.tgz#b7f59fc804352b0cbef36e90e816db0b4dd2ddaf"
-  integrity sha512-gMkHR5YwRdZDdutxAgk0QFPRcP5nCEVO46Z5UnF00GaxU6fny2+4kBCa5e44vvLToK4jgOjEBz/p1hG8kB7tvA==
+"@protocolink/common@^0.2.11", "@protocolink/common@^0.2.14":
+  version "0.2.14"
+  resolved "https://registry.yarnpkg.com/@protocolink/common/-/common-0.2.14.tgz#a22775cdc6f4a9142b8af7b7b73424b38ed96216"
+  integrity sha512-MHdG+yMNmfRBsQ/kES70CgHsywLdmwTeVU6dpJ+bQwoVLMZ6+3IlYLXkDiPBanMAWY4p/PbOgcEoPzScvEco2Q==
   dependencies:
     "@types/lodash" "^4.14.195"
     bignumber.js "^9.1.1"
