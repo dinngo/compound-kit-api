@@ -4,7 +4,7 @@
 [![Unit Test](https://github.com/dinngo/compound-kit-api/actions/workflows/unit-test.yml/badge.svg)](https://github.com/dinngo/compound-kit-api/actions/workflows/unit-test.yml)
 [![E2E Test](https://github.com/dinngo/compound-kit-api/actions/workflows/e2e-test.yml/badge.svg)](https://github.com/dinngo/compound-kit-api/actions/workflows/e2e-test.yml)
 
-The API service for composable router
+The API service for CompoundKit
 
 ## Run Offline
 
