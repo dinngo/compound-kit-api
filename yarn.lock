@@ -1834,6 +1834,22 @@
     ethers "^5.7.2"
     lodash "^4.17.21"
 
+"@protocolink/test-helpers@^0.2.8":
+  version "0.2.8"
+  resolved "https://registry.yarnpkg.com/@protocolink/test-helpers/-/test-helpers-0.2.8.tgz#d9f9f89306ecf868ae36cb49819702ffec48d2c6"
+  integrity sha512-M1EsnVEZOX6D4KJgxlrvL029hJvmxEHTwYcdarxLUoTgDa7XrhPHtxdpErAmLOjnxQBF+VGZNVJwc0b45NRQpw==
+  dependencies:
+    "@nomicfoundation/hardhat-chai-matchers" "^1.0.6"
+    "@nomicfoundation/hardhat-network-helpers" "^1.0.8"
+    "@nomiclabs/hardhat-ethers" "^2.2.3"
+    "@protocolink/common" "^0.2.11"
+    "@types/chai" "^4.3.5"
+    "@types/mocha" "^10.0.1"
+    chai "^4.3.7"
+    ethers "^5.7.2"
+    hardhat "^2.15.0"
+    mocha "^10.2.0"
+
 "@scure/base@~1.1.0":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.1.1.tgz#ebb651ee52ff84f420097055f4bf46cfba403938"
