@@ -7,7 +7,7 @@ type BuildTransactionRouteParams = EventBody<Partial<apisdk.RouterData>>;
 
 export const v1BuildTransactionRoute: Route<BuildTransactionRouteParams> = {
   method: 'POST',
-  path: '/v1/transactions',
+  path: '/v1/transactions/build',
   handler: async (event) => {
     if (!event.body) {
       throw newHttpError(400, { code: '400.1', message: 'body is invalid' });

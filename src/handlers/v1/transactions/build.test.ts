@@ -152,7 +152,7 @@ describe('Test build transaction api', function () {
 
   testCases.forEach(({ title, body, expected }) => {
     it(title, async function () {
-      const event = newTestEvent('POST', '/v1/transactions', { body });
+      const event = newTestEvent('POST', '/v1/transactions/build', { body });
       const resp = await testHandler(event, testContext);
       expect(resp.statusCode).to.eq(expected.statusCode);
       if (resp.statusCode > 200) {
