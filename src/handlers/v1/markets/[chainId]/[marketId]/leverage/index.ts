@@ -58,7 +58,6 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
     let leverageTimes = '0';
     const logics: GetLeverageQuotationResponseBody['logics'] = [];
     let approvals: GetLeverageQuotationResponseBody['approvals'] = [];
-    let permitData: GetLeverageQuotationResponseBody['permitData'] = undefined;
     let targetPosition = currentPosition;
     if (event.body.token && event.body.amount && Number(event.body.amount) > 0) {
       const { token, amount, slippage } = event.body;
@@ -123,7 +122,6 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
 
       const estimateResult = await apisdk.estimateRouterData({ chainId, account, logics });
       approvals = estimateResult.approvals;
-      permitData = estimateResult.permitData;
 
       // 6. calc leverage times
       leverageTimes = common.formatBigUnit(leverageValue.div(borrowCapacityValue), 2);
@@ -150,7 +148,6 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       quotation: { leverageTimes, currentPosition, targetPosition },
       approvals,
       logics,
-      permitData,
     };
 
     return formatJSONResponse(responseBody);
