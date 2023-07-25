@@ -13,6 +13,12 @@ export interface LeverageQuotation {
   targetPosition: Position;
 }
 
+export interface CollateralSwapQuotation {
+  targetTokenAmount: string;
+  currentPosition: Position;
+  targetPosition: Position;
+}
+
 export type QuoteAPIResponseBody<T = any> = Pick<apisdk.RouterDataEstimateResult, 'approvals' | 'permitData'> &
   Pick<apisdk.RouterData, 'logics'> & {
     quotation: T;
