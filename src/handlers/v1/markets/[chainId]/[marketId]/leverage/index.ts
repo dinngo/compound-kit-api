@@ -138,7 +138,7 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       const targetLiquidationThreshold = common.formatBigUnit(targetLiquidationLimit.div(targetCollateralValue), 4);
       targetPosition = {
         utilization: calcUtilization(targetBorrowCapacityValue, targetBorrowValue),
-        healthRate: calcHealthRate(supplyValue, targetCollateralValue, targetBorrowValue, targetLiquidationThreshold),
+        healthRate: calcHealthRate(targetCollateralValue, targetBorrowValue, targetLiquidationThreshold),
         netApr: calcNetApr(supplyValue, supplyApr, targetCollateralValue, targetBorrowValue, borrowApr),
         totalDebt: common.formatBigUnit(targetBorrowValue, 2),
       };

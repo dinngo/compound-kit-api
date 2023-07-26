@@ -307,7 +307,7 @@ export class Service extends logics.compoundv3.Service {
     }
 
     const utilization = calcUtilization(totalBorrowCapacityValue, borrowValue);
-    const healthRate = calcHealthRate(supplyValue, totalCollateralValue, borrowValue, liquidationThreshold);
+    const healthRate = calcHealthRate(totalCollateralValue, borrowValue, liquidationThreshold);
     const netApr = calcNetApr(supplyValue, supplyApr, totalCollateralValue, borrowValue, borrowApr);
 
     const marketInfo: MarketInfo = {

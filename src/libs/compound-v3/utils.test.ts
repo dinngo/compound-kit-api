@@ -78,28 +78,24 @@ describe('Test calcUtilization', function () {
 describe('Test calcHealthRate', function () {
   const testCases = [
     {
-      supplyValue: '0',
       collateralValue: '0',
       borrowValue: '0',
       liquidationThreshold: '0',
       expected: 'NaN',
     },
     {
-      supplyValue: '0',
       collateralValue: '235.08',
       borrowValue: '102.2',
       liquidationThreshold: '0.8242',
       expected: '1.9',
     },
     {
-      supplyValue: '0',
       collateralValue: '120',
       borrowValue: '102.2',
       liquidationThreshold: '0.8242',
       expected: '0.97',
     },
     {
-      supplyValue: '0',
       collateralValue: '102.2',
       borrowValue: '102.2',
       liquidationThreshold: '0.8242',
@@ -107,9 +103,9 @@ describe('Test calcHealthRate', function () {
     },
   ];
 
-  testCases.forEach(({ supplyValue, collateralValue, borrowValue, liquidationThreshold, expected }, i) => {
+  testCases.forEach(({ collateralValue, borrowValue, liquidationThreshold, expected }, i) => {
     it(`case ${i + 1}`, async function () {
-      expect(calcHealthRate(supplyValue, collateralValue, borrowValue, liquidationThreshold)).to.eq(expected);
+      expect(calcHealthRate(collateralValue, borrowValue, liquidationThreshold)).to.eq(expected);
     });
   });
 });

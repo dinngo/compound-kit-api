@@ -26,15 +26,11 @@ export function calcUtilization(borrowCapacityValue: string | BigNumberJS, borro
 }
 
 export function calcHealthRate(
-  supplyValue: string | BigNumberJS,
   collateralValue: string | BigNumberJS,
   borrowValue: string | BigNumberJS,
   liquidationThreshold: string | BigNumberJS
 ) {
-  return common.formatBigUnit(
-    new BigNumberJS(supplyValue).plus(collateralValue).times(liquidationThreshold).div(borrowValue),
-    2
-  );
+  return common.formatBigUnit(new BigNumberJS(collateralValue).times(liquidationThreshold).div(borrowValue), 2);
 }
 
 export function calcNetApr(
