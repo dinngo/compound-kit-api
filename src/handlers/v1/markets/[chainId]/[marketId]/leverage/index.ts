@@ -52,7 +52,7 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
     } catch (err) {
       throw newInternalServerError(err);
     }
-    const { utilization, healthRate, netAPR: netAPR, borrowUSD } = marketInfo;
+    const { utilization, healthRate, netAPR, borrowUSD } = marketInfo;
     const currentPosition = { utilization, healthRate, netAPR, totalDebt: borrowUSD };
 
     let leverageTimes = '0';
