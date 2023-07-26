@@ -76,8 +76,8 @@ describe('Test get leverage quotation api', function () {
         const parsedBody = JSON.parse(resp.body);
         expect(parsedBody).to.have.keys('quotation', 'approvals', 'logics');
         expect(parsedBody.quotation).to.have.keys('leverageTimes', 'currentPosition', 'targetPosition');
-        expect(parsedBody.quotation.currentPosition).to.have.keys('utilization', 'healthRate', 'netApr', 'totalDebt');
-        expect(parsedBody.quotation.targetPosition).to.have.keys('utilization', 'healthRate', 'netApr', 'totalDebt');
+        expect(parsedBody.quotation.currentPosition).to.have.keys('utilization', 'healthRate', 'netAPR', 'totalDebt');
+        expect(parsedBody.quotation.targetPosition).to.have.keys('utilization', 'healthRate', 'netAPR', 'totalDebt');
       }
     });
   });

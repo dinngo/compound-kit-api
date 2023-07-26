@@ -9,7 +9,7 @@ import {
 } from 'src/libs/api';
 import { LEVERAGE_BORROW_SCALE } from 'src/constants';
 import { LeverageQuotation, QuoteAPIResponseBody } from 'src/types';
-import { MarketInfo, Service, calcHealthRate, calcNetApr, calcUtilization } from 'src/libs/compound-v3';
+import { MarketInfo, Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
 import * as apisdk from '@protocolink/api';
 import * as common from '@protocolink/common';
 import { utils } from 'ethers';
@@ -52,8 +52,8 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
     } catch (err) {
       throw newInternalServerError(err);
     }
-    const { utilization, healthRate, netApr, borrowValue } = marketInfo;
-    const currentPosition = { utilization, healthRate, netApr, totalDebt: borrowValue };
+    const { utilization, healthRate, netAPR: netAPR, borrowUSD } = marketInfo;
+    const currentPosition = { utilization, healthRate, netAPR, totalDebt: borrowUSD };
 
     let leverageTimes = '0';
     const logics: GetLeverageQuotationResponseBody['logics'] = [];
@@ -64,12 +64,12 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       const {
         baseToken,
         baseTokenPrice,
-        supplyApr,
-        supplyValue,
-        borrowApr,
-        borrowValue,
-        collateralValue,
-        borrowCapacityValue,
+        supplyAPR,
+        supplyUSD,
+        borrowAPR,
+        borrowUSD,
+        collateralUSD,
+        borrowCapacityUSD,
         liquidationLimit,
         collaterals,
       } = marketInfo;
@@ -79,7 +79,7 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       if (!leverageCollateral) {
         throw newHttpError(400, { code: '400.5', message: 'leverage token is not collateral' });
       }
-      const leverageValue = new BigNumberJS(amount).times(leverageCollateral.assetPrice);
+      const leverageUSD = new BigNumberJS(amount).times(leverageCollateral.assetPrice);
 
       // 1. new balancer flash loan logics and append loan logic
       const [flashLoanLoanLogic, flashLoanRepayLogic] = apisdk.protocols.balancerv2.newFlashLoanLogicPair([
@@ -96,9 +96,9 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       );
 
       // 3. new and append compound v3 borrow logic
-      const leverageBorrowValue = leverageValue.times(LEVERAGE_BORROW_SCALE);
+      const leverageBorrowUSD = leverageUSD.times(LEVERAGE_BORROW_SCALE);
       const leverageBorrowAmount = common.formatBigUnit(
-        leverageBorrowValue.div(baseTokenPrice),
+        leverageBorrowUSD.div(baseTokenPrice),
         baseToken.decimals,
         'floor'
       );
@@ -124,23 +124,23 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       approvals = estimateResult.approvals;
 
       // 6. calc leverage times
-      leverageTimes = common.formatBigUnit(leverageValue.div(borrowCapacityValue), 2);
+      leverageTimes = common.formatBigUnit(leverageUSD.div(borrowCapacityUSD), 2);
 
       // 7. calc target position
-      const targetBorrowValue = new BigNumberJS(borrowValue).plus(leverageBorrowValue);
-      const targetCollateralValue = new BigNumberJS(collateralValue).plus(leverageValue);
-      const targetBorrowCapacityValue = new BigNumberJS(borrowCapacityValue).plus(
-        leverageValue.times(leverageCollateral.borrowCollateralFactor)
+      const targetBorrowUSD = new BigNumberJS(borrowUSD).plus(leverageBorrowUSD);
+      const targetCollateralUSD = new BigNumberJS(collateralUSD).plus(leverageUSD);
+      const targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD).plus(
+        leverageUSD.times(leverageCollateral.borrowCollateralFactor)
       );
       const targetLiquidationLimit = new BigNumberJS(liquidationLimit).plus(
-        leverageValue.times(leverageCollateral.liquidateCollateralFactor)
+        leverageUSD.times(leverageCollateral.liquidateCollateralFactor)
       );
-      const targetLiquidationThreshold = common.formatBigUnit(targetLiquidationLimit.div(targetCollateralValue), 4);
+      const targetLiquidationThreshold = common.formatBigUnit(targetLiquidationLimit.div(targetCollateralUSD), 4);
       targetPosition = {
-        utilization: calcUtilization(targetBorrowCapacityValue, targetBorrowValue),
-        healthRate: calcHealthRate(targetCollateralValue, targetBorrowValue, targetLiquidationThreshold),
-        netApr: calcNetApr(supplyValue, supplyApr, targetCollateralValue, targetBorrowValue, borrowApr),
-        totalDebt: common.formatBigUnit(targetBorrowValue, 2),
+        utilization: calcUtilization(targetBorrowCapacityUSD, targetBorrowUSD),
+        healthRate: calcHealthRate(targetCollateralUSD, targetBorrowUSD, targetLiquidationThreshold),
+        netAPR: calcNetAPR(supplyUSD, supplyAPR, targetCollateralUSD, targetBorrowUSD, borrowAPR),
+        totalDebt: common.formatBigUnit(targetBorrowUSD, 2),
       };
     }
 
