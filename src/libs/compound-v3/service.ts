@@ -237,14 +237,18 @@ export class Service extends logics.compoundv3.Service {
     const { supplyAPR, borrowAPR } = await this.getAPRs(marketId);
     const { supplyBalance, borrowBalance, collateralBalances } = await this.getUserBalances(marketId, account);
 
-    let supplyUSD = '0';
+    let supplyUSD = new BigNumberJS(0);
+    let positiveProportion = new BigNumberJS(0);
     if (supplyBalance !== '0') {
-      supplyUSD = common.formatBigUnit(new BigNumberJS(supplyBalance).times(baseTokenPrice), 2);
+      supplyUSD = new BigNumberJS(supplyBalance).times(baseTokenPrice);
+      positiveProportion = supplyUSD.times(supplyAPR);
     }
 
-    let borrowUSD = '0';
+    let borrowUSD = new BigNumberJS(0);
+    let negativeProportion = new BigNumberJS(0);
     if (borrowBalance !== '0') {
-      borrowUSD = common.formatBigUnit(new BigNumberJS(borrowBalance).times(baseTokenPrice), 2);
+      borrowUSD = new BigNumberJS(borrowBalance).times(baseTokenPrice);
+      negativeProportion = borrowUSD.times(borrowAPR);
     }
 
     let totalCollateralUSD = new BigNumberJS(0);
@@ -308,17 +312,17 @@ export class Service extends logics.compoundv3.Service {
 
     const utilization = calcUtilization(totalBorrowCapacityUSD, borrowUSD);
     const healthRate = calcHealthRate(totalCollateralUSD, borrowUSD, liquidationThreshold);
-    const netAPR = calcNetAPR(supplyUSD, supplyAPR, totalCollateralUSD, borrowUSD, borrowAPR);
+    const netAPR = calcNetAPR(supplyUSD, positiveProportion, borrowUSD, negativeProportion, totalCollateralUSD);
 
     const marketInfo: MarketInfo = {
       baseToken: baseToken.unwrapped,
       baseTokenPrice,
       supplyAPR,
       supplyBalance,
-      supplyUSD,
+      supplyUSD: common.formatBigUnit(supplyUSD, 2),
       borrowAPR,
       borrowBalance,
-      borrowUSD,
+      borrowUSD: common.formatBigUnit(borrowUSD, 2),
       collateralUSD: common.formatBigUnit(totalCollateralUSD, 2),
       borrowCapacity: borrowCapacity.toFixed(),
       borrowCapacityUSD: common.formatBigUnit(totalBorrowCapacityUSD, 2),

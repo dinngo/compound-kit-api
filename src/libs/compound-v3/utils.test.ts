@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers';
+import BigNumberJS from 'bignumber.js';
 import { calcAPR, calcHealthRate, calcNetAPR, calcUtilization, getMarketLabel } from './utils';
 import * as common from '@protocolink/common';
 import { expect } from 'chai';
@@ -115,48 +116,50 @@ describe('Test calcNetAPR', function () {
     {
       supplyUSD: '0',
       supplyAPR: '0.0284',
-      collateralUSD: '0',
       borrowUSD: '0',
       borrowAPR: '0.0445',
+      collateralUSD: '0',
       expected: '0',
     },
     {
       supplyUSD: '100.12',
       supplyAPR: '0.0284',
-      collateralUSD: '0',
       borrowUSD: '0',
       borrowAPR: '0.0445',
+      collateralUSD: '0',
       expected: '0.0284',
     },
     {
       supplyUSD: '0',
       supplyAPR: '0.0284',
-      collateralUSD: '100.12',
       borrowUSD: '0',
       borrowAPR: '0.0445',
+      collateralUSD: '100.12',
       expected: '0',
     },
     {
       supplyUSD: '100.12',
       supplyAPR: '0.0284',
-      collateralUSD: '100.12',
       borrowUSD: '0',
       borrowAPR: '0.0445',
+      collateralUSD: '100.12',
       expected: '0.0142',
     },
     {
       supplyUSD: '0',
       supplyAPR: '0.0284',
-      collateralUSD: '200.24',
       borrowUSD: '100.12',
       borrowAPR: '0.0445',
-      expected: '-0.0223',
+      collateralUSD: '200.24',
+      expected: '-0.0445',
     },
   ];
 
-  testCases.forEach(({ supplyUSD, supplyAPR, collateralUSD, borrowUSD, borrowAPR, expected }, i) => {
+  testCases.forEach(({ supplyUSD, supplyAPR, borrowUSD, borrowAPR, collateralUSD, expected }, i) => {
     it(`case ${i + 1}`, async function () {
-      expect(calcNetAPR(supplyUSD, supplyAPR, collateralUSD, borrowUSD, borrowAPR)).to.eq(expected);
+      const positiveProportion = new BigNumberJS(supplyUSD).times(supplyAPR);
+      const negativeProportion = new BigNumberJS(borrowUSD).times(borrowAPR);
+      expect(calcNetAPR(supplyUSD, positiveProportion, borrowUSD, negativeProportion, collateralUSD)).to.eq(expected);
     });
   });
 });

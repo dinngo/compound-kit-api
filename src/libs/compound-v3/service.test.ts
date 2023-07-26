@@ -349,7 +349,7 @@ describe('Service', function () {
           liquidationPointUSD: '206.96',
           utilization: '0.629',
           healthRate: '1.69',
-          netAPR: '-0.0209',
+          netAPR: '-0.0407',
           collaterals: [
             {
               asset: {

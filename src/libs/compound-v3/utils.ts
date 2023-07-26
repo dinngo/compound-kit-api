@@ -35,20 +35,33 @@ export function calcHealthRate(
 
 export function calcNetAPR(
   supplyUSD: string | BigNumberJS,
-  supplyAPR: string | BigNumberJS,
-  collateralUSD: string | BigNumberJS,
+  positiveProportion: string | BigNumberJS,
   borrowUSD: string | BigNumberJS,
-  borrowAPR: string | BigNumberJS
+  negativeProportion: string | BigNumberJS,
+  collateralUSD: string | BigNumberJS
 ) {
-  const totalSupply = new BigNumberJS(supplyUSD).plus(collateralUSD);
+  const totalSupplyUSD = new BigNumberJS(supplyUSD).plus(collateralUSD);
+  borrowUSD = new BigNumberJS(borrowUSD);
 
-  let netAPR = '0';
-  if (!totalSupply.isZero()) {
-    netAPR = common.formatBigUnit(
-      new BigNumberJS(supplyUSD).times(supplyAPR).minus(new BigNumberJS(borrowUSD).times(borrowAPR)).div(totalSupply),
-      4
-    );
+  let earnedAPY = new BigNumberJS(0);
+  if (!totalSupplyUSD.isZero()) {
+    earnedAPY = new BigNumberJS(positiveProportion).div(totalSupplyUSD);
   }
 
-  return netAPR;
+  let debtAPY = new BigNumberJS(0);
+  if (!borrowUSD.isZero()) {
+    debtAPY = new BigNumberJS(negativeProportion).div(borrowUSD);
+  }
+
+  let netWorthUSD = new BigNumberJS(totalSupplyUSD).minus(borrowUSD);
+  if (netWorthUSD.isZero()) {
+    netWorthUSD = new BigNumberJS(1);
+  }
+
+  const netAPY = common.formatBigUnit(
+    earnedAPY.times(totalSupplyUSD).div(netWorthUSD).minus(debtAPY.times(borrowUSD).div(netWorthUSD)),
+    4
+  );
+
+  return netAPY;
 }
