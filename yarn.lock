@@ -1792,7 +1792,7 @@
     axios-retry "^3.5.1"
     uuid "^9.0.0"
 
-"@protocolink/common@^0.2.15":
+"@protocolink/common@^0.2.11", "@protocolink/common@^0.2.15":
   version "0.2.15"
   resolved "https://registry.yarnpkg.com/@protocolink/common/-/common-0.2.15.tgz#2e396f632ffe9ddd76edececfb3526d80f89bc2a"
   integrity sha512-+EA42/FHUPntVS0IzXuabtAqdK1oMQ4S10K8qSWsnPC6qm+84saxVT+UOy++8SyNuEzxEPuAo+/h08eiimQjLg==
@@ -1833,6 +1833,22 @@
     bignumber.js "^9.1.1"
     ethers "^5.7.2"
     lodash "^4.17.21"
+
+"@protocolink/test-helpers@^0.2.8":
+  version "0.2.8"
+  resolved "https://registry.yarnpkg.com/@protocolink/test-helpers/-/test-helpers-0.2.8.tgz#d9f9f89306ecf868ae36cb49819702ffec48d2c6"
+  integrity sha512-M1EsnVEZOX6D4KJgxlrvL029hJvmxEHTwYcdarxLUoTgDa7XrhPHtxdpErAmLOjnxQBF+VGZNVJwc0b45NRQpw==
+  dependencies:
+    "@nomicfoundation/hardhat-chai-matchers" "^1.0.6"
+    "@nomicfoundation/hardhat-network-helpers" "^1.0.8"
+    "@nomiclabs/hardhat-ethers" "^2.2.3"
+    "@protocolink/common" "^0.2.11"
+    "@types/chai" "^4.3.5"
+    "@types/mocha" "^10.0.1"
+    chai "^4.3.7"
+    ethers "^5.7.2"
+    hardhat "^2.15.0"
+    mocha "^10.2.0"
 
 "@scure/base@~1.1.0":
   version "1.1.1"

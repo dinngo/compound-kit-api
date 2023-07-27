@@ -1,5 +1,8 @@
 import type { APIGatewayProxyEventHeaders, APIGatewayProxyEventQueryStringParameters, Context } from 'aws-lambda';
 import { Event } from 'src/libs/api';
+import * as apisdk from '@protocolink/api';
+import * as common from '@protocolink/common';
+import { expect } from 'chai';
 import httpErrorHandler from '@middy/http-error-handler';
 import httpHeaderNormalizer from '@middy/http-header-normalizer';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
@@ -87,3 +90,24 @@ export const testHandler = middy(httpRouterHandler(routes))
   .use(httpJsonBodyParser())
   // response transformation
   .use(httpErrorHandler({ logger: false }));
+
+export async function quote<Params = any, ResponseBody = any>(
+  chainId: number,
+  marketId: string,
+  operation: string,
+  params: Params
+): Promise<ResponseBody> {
+  const event = newTestEvent('POST', `/v1/markets/${chainId}/${marketId}/${operation}`, { body: params });
+  const resp = await testHandler(event, testContext);
+  expect(resp.statusCode).to.eq(200);
+
+  return JSON.parse(resp.body);
+}
+
+export async function buildRouterTransactionRequest(routerData: apisdk.RouterData): Promise<common.TransactionRequest> {
+  const event = newTestEvent('POST', '/v1/transactions/build', { body: routerData });
+  const resp = await testHandler(event, testContext);
+  expect(resp.statusCode).to.eq(200);
+
+  return JSON.parse(resp.body);
+}

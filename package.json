@@ -42,6 +42,7 @@
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.6",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.8",
     "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@protocolink/test-helpers": "^0.2.8",
     "@serverless/typescript": "^3.30.1",
     "@types/aws-lambda": "^8.10.119",
     "@types/chai": "^4.3.5",
