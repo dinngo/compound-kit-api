@@ -7,7 +7,6 @@ import {
   newHttpError,
   newInternalServerError,
 } from 'src/libs/api';
-import { LEVERAGE_BORROW_SCALE } from 'src/constants';
 import { LeverageQuotation, QuoteAPIResponseBody } from 'src/types';
 import { MarketInfo, Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
 import * as apisdk from '@protocolink/api';
@@ -81,53 +80,51 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       }
       const leverageUSD = new BigNumberJS(amount).times(leverageCollateral.assetPrice);
 
-      // 1. new balancer flash loan logics and append loan logic
+      // 1. get the quotation for swaping the base token into amount of leverage token.
+      const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
+        tokenIn: baseToken,
+        output: { token: leverageToken, amount: amount },
+        slippage,
+      });
+      const borrowAmount = quotation.input.amount;
+
+      // 2. new balancer flash loan logics and append loan logic
       const [flashLoanLoanLogic, flashLoanRepayLogic] = apisdk.protocols.balancerv2.newFlashLoanLogicPair([
-        { token: leverageToken, amount },
+        { token: baseToken, amount: borrowAmount },
       ]);
       logics.push(flashLoanLoanLogic);
 
-      // 2. new and append compound v3 supply collateral logic
+      // 3. new and append paraswap swap token logic
+      logics.push(apisdk.protocols.paraswapv5.newSwapTokenLogic(quotation));
+
+      // 4. new and append compound v3 supply collateral logic, and use 100% of the balance.
       logics.push(
         apisdk.protocols.compoundv3.newSupplyCollateralLogic({
           marketId,
           input: { token: leverageToken, amount },
+          balanceBps: common.BPS_BASE,
         })
       );
 
-      // 3. new and append compound v3 borrow logic
-      const leverageBorrowUSD = leverageUSD.times(LEVERAGE_BORROW_SCALE);
-      const leverageBorrowAmount = common.formatBigUnit(
-        leverageBorrowUSD.div(baseTokenPrice),
-        baseToken.decimals,
-        'floor'
-      );
+      // 5. new and append compound v3 borrow logic
       logics.push(
         apisdk.protocols.compoundv3.newBorrowLogic({
           marketId,
-          output: { token: baseToken, amount: leverageBorrowAmount },
+          output: { token: baseToken, amount: borrowAmount },
         })
       );
 
-      // 4. new and append paraswap swap token logic
-      const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
-        input: { token: baseToken, amount: leverageBorrowAmount },
-        tokenOut: leverageToken,
-        slippage,
-      });
-      logics.push(apisdk.protocols.paraswapv5.newSwapTokenLogic(quotation));
-
-      // 5. append balancer flash loan replay logic
+      // 6. append balancer flash loan replay logic
       logics.push(flashLoanRepayLogic);
 
       const estimateResult = await apisdk.estimateRouterData({ chainId, account, logics });
       approvals = estimateResult.approvals;
 
-      // 6. calc leverage times
+      // 7. calc leverage times
       leverageTimes = common.formatBigUnit(leverageUSD.div(borrowCapacityUSD), 2);
 
-      // 7. calc target position
-      const targetBorrowUSD = new BigNumberJS(borrowUSD).plus(leverageBorrowUSD);
+      // 8. calc target position
+      const targetBorrowUSD = new BigNumberJS(borrowUSD).plus(new BigNumberJS(borrowAmount).times(baseTokenPrice));
       const targetCollateralUSD = new BigNumberJS(collateralUSD).plus(leverageUSD);
       const targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD).plus(
         leverageUSD.times(leverageCollateral.borrowCollateralFactor)
