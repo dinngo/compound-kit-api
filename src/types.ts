@@ -13,6 +13,11 @@ export interface LeverageQuotation {
   targetPosition: Position;
 }
 
+export interface DeleverageQuotation {
+  currentPosition: Position;
+  targetPosition: Position;
+}
+
 export type QuoteAPIResponseBody<T = any> = Pick<apisdk.RouterDataEstimateResult, 'approvals' | 'permitData'> &
   Pick<apisdk.RouterData, 'logics'> & {
     quotation: T;
