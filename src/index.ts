@@ -8,11 +8,13 @@ import httpUrlEncodePathParser from '@middy/http-urlencode-path-parser';
 import inputOutputLogger from '@middy/input-output-logger';
 import middy from '@middy/core';
 import { routes } from './routes';
+import warmup from '@middy/warmup';
 
 export const handler = middy(httpRouterHandler(routes))
   // misc
   .use(inputOutputLogger())
   .use(errorLogger())
+  .use(warmup())
   // request transformation
   .use(httpHeaderNormalizer())
   .use(httpUrlEncodePathParser())

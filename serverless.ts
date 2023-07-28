@@ -3,7 +3,7 @@ import type { AWS } from '@serverless/typescript';
 const serverlessConfiguration: AWS = {
   service: 'compound-kit-api',
   frameworkVersion: '3',
-  plugins: ['serverless-esbuild', 'serverless-offline'],
+  plugins: ['serverless-esbuild', 'serverless-offline', 'serverless-plugin-warmup'],
   provider: {
     name: 'aws',
     runtime: 'nodejs16.x',
@@ -30,6 +30,13 @@ const serverlessConfiguration: AWS = {
       define: { 'require.resolve': undefined },
       platform: 'node',
       concurrency: 10,
+    },
+    warmup: {
+      default: {
+        enabled: true,
+        timeout: 60,
+        prewarm: true,
+      },
     },
   },
   functions: {
