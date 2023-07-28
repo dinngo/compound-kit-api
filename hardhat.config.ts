@@ -1,5 +1,4 @@
 import '@nomicfoundation/hardhat-chai-matchers';
-import '@protocolink/test-helpers';
 
 import { HardhatUserConfig } from 'hardhat/config';
 import { setup } from 'test/hooks';

@@ -114,7 +114,7 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
         })
       );
 
-      // 6. append balancer flash loan replay logic
+      // 6. append balancer flash loan repay logic
       logics.push(flashLoanRepayLogic);
 
       const estimateResult = await apisdk.estimateRouterData({ chainId, account, logics });
