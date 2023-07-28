@@ -1,5 +1,5 @@
 {
-  "name": "commpound-kit-api",
+  "name": "compound-kit-api",
   "version": "0.1.0",
   "description": "The API service for CompoundKit",
   "keywords": [
@@ -28,9 +28,9 @@
     "@middy/http-urlencode-path-parser": "^4.5.5",
     "@middy/input-output-logger": "^4.5.5",
     "@middy/util": "^4.5.5",
-    "@protocolink/api": "^0.2.8",
+    "@protocolink/api": "^0.2.10",
     "@protocolink/common": "^0.2.15",
-    "@protocolink/logics": "^0.2.9",
+    "@protocolink/logics": "^0.2.10",
     "@types/lodash": "^4.14.195",
     "bignumber.js": "^9.1.1",
     "ethers": "^5.7.2",
@@ -42,6 +42,7 @@
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.6",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.8",
     "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@protocolink/test-helpers": "^0.2.8",
     "@serverless/typescript": "^3.30.1",
     "@types/aws-lambda": "^8.10.119",
     "@types/chai": "^4.3.5",

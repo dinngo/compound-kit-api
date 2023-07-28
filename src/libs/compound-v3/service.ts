@@ -1,7 +1,7 @@
 import { BigNumber, providers } from 'ethers';
 import BigNumberJS from 'bignumber.js';
 import { CollateralInfo, MarketInfo } from './types';
-import { calcApr, calcHealthRate, calcNetApr, calcUtilization } from './utils';
+import { calcAPR, calcHealthRate, calcNetAPR, calcUtilization } from './utils';
 import * as common from '@protocolink/common';
 import { getCustomBaseTokenPriceFeed } from './configs';
 import * as logics from '@protocolink/logics';
@@ -111,7 +111,7 @@ export class Service extends logics.compoundv3.Service {
     return this._marketMap[marketId];
   }
 
-  async getAprs(marketId: string) {
+  async getAPRs(marketId: string) {
     const { cometAddress, utilization } = await this.getMarket(marketId);
 
     const iface = logics.compoundv3.Comet__factory.createInterface();
@@ -128,12 +128,12 @@ export class Service extends logics.compoundv3.Service {
     const { returnData } = await this.multicall2.callStatic.aggregate(calls, { blockTag: this.blockTag });
 
     const [supplyRate] = iface.decodeFunctionResult('getSupplyRate', returnData[0]);
-    const supplyApr = calcApr(supplyRate);
+    const supplyAPR = calcAPR(supplyRate);
 
     const [borrowRate] = iface.decodeFunctionResult('getBorrowRate', returnData[1]);
-    const borrowApr = calcApr(borrowRate);
+    const borrowAPR = calcAPR(borrowRate);
 
-    return { supplyApr, borrowApr };
+    return { supplyAPR, borrowAPR };
   }
 
   async getPrices(marketId: string) {
@@ -234,21 +234,25 @@ export class Service extends logics.compoundv3.Service {
   async getMarketInfo(marketId: string, account?: string) {
     const { baseToken, numAssets, assets } = await this.getMarket(marketId);
     const { baseTokenPrice, assetPrices } = await this.getPrices(marketId);
-    const { supplyApr, borrowApr } = await this.getAprs(marketId);
+    const { supplyAPR, borrowAPR } = await this.getAPRs(marketId);
     const { supplyBalance, borrowBalance, collateralBalances } = await this.getUserBalances(marketId, account);
 
-    let supplyValue = '0';
+    let supplyUSD = new BigNumberJS(0);
+    let positiveProportion = new BigNumberJS(0);
     if (supplyBalance !== '0') {
-      supplyValue = common.formatBigUnit(new BigNumberJS(supplyBalance).times(baseTokenPrice), 2);
+      supplyUSD = new BigNumberJS(supplyBalance).times(baseTokenPrice);
+      positiveProportion = supplyUSD.times(supplyAPR);
     }
 
-    let borrowValue = '0';
+    let borrowUSD = new BigNumberJS(0);
+    let negativeProportion = new BigNumberJS(0);
     if (borrowBalance !== '0') {
-      borrowValue = common.formatBigUnit(new BigNumberJS(borrowBalance).times(baseTokenPrice), 2);
+      borrowUSD = new BigNumberJS(borrowBalance).times(baseTokenPrice);
+      negativeProportion = borrowUSD.times(borrowAPR);
     }
 
-    let totalCollateralValue = new BigNumberJS(0);
-    let totalBorrowCapacityValue = new BigNumberJS(0);
+    let totalCollateralUSD = new BigNumberJS(0);
+    let totalBorrowCapacityUSD = new BigNumberJS(0);
     let liquidationLimit = new BigNumberJS(0);
     const collaterals: CollateralInfo[] = [];
     for (let i = 0; i < numAssets; i++) {
@@ -257,17 +261,17 @@ export class Service extends logics.compoundv3.Service {
 
       const collateralBalance = collateralBalances[i];
 
-      let collateralValue = new BigNumberJS(0);
-      let borrowCapacityValue = new BigNumberJS(0);
+      let collateralUSD = new BigNumberJS(0);
+      let borrowCapacityUSD = new BigNumberJS(0);
       let borrowCapacity = '0';
       if (collateralBalance !== '0') {
-        collateralValue = new BigNumberJS(collateralBalance).times(assetPrice);
-        totalCollateralValue = totalCollateralValue.plus(collateralValue);
+        collateralUSD = new BigNumberJS(collateralBalance).times(assetPrice);
+        totalCollateralUSD = totalCollateralUSD.plus(collateralUSD);
 
-        borrowCapacityValue = collateralValue.times(borrowCollateralFactor);
-        totalBorrowCapacityValue = totalBorrowCapacityValue.plus(borrowCapacityValue);
-        borrowCapacity = common.formatBigUnit(borrowCapacityValue.div(baseTokenPrice), baseToken.decimals, 'floor');
-        liquidationLimit = liquidationLimit.plus(collateralValue.times(liquidateCollateralFactor));
+        borrowCapacityUSD = collateralUSD.times(borrowCollateralFactor);
+        totalBorrowCapacityUSD = totalBorrowCapacityUSD.plus(borrowCapacityUSD);
+        borrowCapacity = common.formatBigUnit(borrowCapacityUSD.div(baseTokenPrice), baseToken.decimals, 'floor');
+        liquidationLimit = liquidationLimit.plus(collateralUSD.times(liquidateCollateralFactor));
       }
 
       const collateralInfo: CollateralInfo = {
@@ -276,9 +280,9 @@ export class Service extends logics.compoundv3.Service {
         borrowCollateralFactor,
         liquidateCollateralFactor,
         collateralBalance,
-        collateralValue: common.formatBigUnit(collateralValue, 2),
+        collateralUSD: common.formatBigUnit(collateralUSD, 2),
         borrowCapacity,
-        borrowCapacityValue: common.formatBigUnit(borrowCapacityValue, 2),
+        borrowCapacityUSD: common.formatBigUnit(borrowCapacityUSD, 2),
       };
 
       collaterals.push(collateralInfo);
@@ -286,52 +290,52 @@ export class Service extends logics.compoundv3.Service {
 
     let borrowCapacity = new BigNumberJS('0');
     let availableToBorrow = new BigNumberJS('0');
-    let availableToBorrowValue = '0';
-    if (!totalBorrowCapacityValue.isZero()) {
-      borrowCapacity = totalBorrowCapacityValue
+    let availableToBorrowUSD = '0';
+    if (!totalBorrowCapacityUSD.isZero()) {
+      borrowCapacity = totalBorrowCapacityUSD
         .div(baseTokenPrice)
         .decimalPlaces(baseToken.decimals, BigNumberJS.ROUND_FLOOR);
       availableToBorrow = borrowCapacity.minus(borrowBalance);
-      availableToBorrowValue = common.formatBigUnit(availableToBorrow.times(baseTokenPrice), 2);
+      availableToBorrowUSD = common.formatBigUnit(availableToBorrow.times(baseTokenPrice), 2);
     }
 
     let liquidationThreshold = '0';
     let liquidationRisk = new BigNumberJS(0);
-    let liquidationPointValue = new BigNumberJS(0);
+    let liquidationPointUSD = new BigNumberJS(0);
     let liquidationPoint = '0';
     if (!liquidationLimit.isZero()) {
-      liquidationThreshold = common.formatBigUnit(liquidationLimit.div(totalCollateralValue), 4);
-      liquidationRisk = new BigNumberJS(borrowValue).div(liquidationLimit).decimalPlaces(2);
-      liquidationPointValue = totalCollateralValue.times(liquidationRisk);
-      liquidationPoint = common.formatBigUnit(liquidationPointValue.div(baseTokenPrice), baseToken.decimals, 'floor');
+      liquidationThreshold = common.formatBigUnit(liquidationLimit.div(totalCollateralUSD), 4);
+      liquidationRisk = new BigNumberJS(borrowUSD).div(liquidationLimit).decimalPlaces(2);
+      liquidationPointUSD = totalCollateralUSD.times(liquidationRisk);
+      liquidationPoint = common.formatBigUnit(liquidationPointUSD.div(baseTokenPrice), baseToken.decimals, 'floor');
     }
 
-    const utilization = calcUtilization(totalBorrowCapacityValue, borrowValue);
-    const healthRate = calcHealthRate(supplyValue, totalCollateralValue, borrowValue, liquidationThreshold);
-    const netApr = calcNetApr(supplyValue, supplyApr, totalCollateralValue, borrowValue, borrowApr);
+    const utilization = calcUtilization(totalBorrowCapacityUSD, borrowUSD);
+    const healthRate = calcHealthRate(totalCollateralUSD, borrowUSD, liquidationThreshold);
+    const netAPR = calcNetAPR(supplyUSD, positiveProportion, borrowUSD, negativeProportion, totalCollateralUSD);
 
     const marketInfo: MarketInfo = {
       baseToken: baseToken.unwrapped,
       baseTokenPrice,
-      supplyApr,
+      supplyAPR,
       supplyBalance,
-      supplyValue,
-      borrowApr,
+      supplyUSD: common.formatBigUnit(supplyUSD, 2),
+      borrowAPR,
       borrowBalance,
-      borrowValue,
-      collateralValue: common.formatBigUnit(totalCollateralValue, 2),
+      borrowUSD: common.formatBigUnit(borrowUSD, 2),
+      collateralUSD: common.formatBigUnit(totalCollateralUSD, 2),
       borrowCapacity: borrowCapacity.toFixed(),
-      borrowCapacityValue: common.formatBigUnit(totalBorrowCapacityValue, 2),
+      borrowCapacityUSD: common.formatBigUnit(totalBorrowCapacityUSD, 2),
       availableToBorrow: availableToBorrow.toFixed(),
-      availableToBorrowValue,
+      availableToBorrowUSD,
       liquidationLimit: common.formatBigUnit(liquidationLimit, 2),
       liquidationThreshold,
       liquidationRisk: liquidationRisk.toFixed(),
       liquidationPoint,
-      liquidationPointValue: common.formatBigUnit(liquidationPointValue, 2),
+      liquidationPointUSD: common.formatBigUnit(liquidationPointUSD, 2),
       utilization,
       healthRate,
-      netApr,
+      netAPR,
       collaterals,
     };
 

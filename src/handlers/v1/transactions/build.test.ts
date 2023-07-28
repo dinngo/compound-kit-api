@@ -51,20 +51,46 @@ describe('Test build transaction api', function () {
           {
             rid: 'balancer-v2:flash-loan',
             fields: {
-              id: '3da63a84-a842-4e02-884b-a8c8fd27e980',
+              id: 'a02181cf-51dd-4242-b12c-37fe98e5c62b',
               outputs: [
                 {
                   token: {
                     chainId: 137,
-                    address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
-                    decimals: 18,
-                    symbol: 'WETH',
-                    name: 'Wrapped Ether',
+                    address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
+                    decimals: 6,
+                    symbol: 'USDC',
+                    name: 'USD Coin (PoS)',
                   },
-                  amount: '1',
+                  amount: '1853.605677',
                 },
               ],
               isLoan: true,
+            },
+          },
+          {
+            rid: 'paraswap-v5:swap-token',
+            fields: {
+              input: {
+                token: {
+                  chainId: 137,
+                  address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
+                  decimals: 6,
+                  symbol: 'USDC',
+                  name: 'USD Coin (PoS)',
+                },
+                amount: '1853.605677',
+              },
+              output: {
+                token: {
+                  chainId: 137,
+                  address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
+                  decimals: 18,
+                  symbol: 'WETH',
+                  name: 'Wrapped Ether',
+                },
+                amount: '1',
+              },
+              slippage: 100,
             },
           },
           {
@@ -81,6 +107,7 @@ describe('Test build transaction api', function () {
                 },
                 amount: '1',
               },
+              balanceBps: 10000,
             },
           },
           {
@@ -95,50 +122,24 @@ describe('Test build transaction api', function () {
                   symbol: 'USDC',
                   name: 'USD Coin (PoS)',
                 },
-                amount: '1912.05641',
+                amount: '1853.605677',
               },
-            },
-          },
-          {
-            rid: 'paraswap-v5:swap-token',
-            fields: {
-              input: {
-                token: {
-                  chainId: 137,
-                  address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
-                  decimals: 6,
-                  symbol: 'USDC',
-                  name: 'USD Coin (PoS)',
-                },
-                amount: '1912.05641',
-              },
-              output: {
-                token: {
-                  chainId: 137,
-                  address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
-                  decimals: 18,
-                  symbol: 'WETH',
-                  name: 'Wrapped Ether',
-                },
-                amount: '1.004343854634975344',
-              },
-              slippage: 100,
             },
           },
           {
             rid: 'balancer-v2:flash-loan',
             fields: {
-              id: '3da63a84-a842-4e02-884b-a8c8fd27e980',
+              id: 'a02181cf-51dd-4242-b12c-37fe98e5c62b',
               outputs: [
                 {
                   token: {
                     chainId: 137,
-                    address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
-                    decimals: 18,
-                    symbol: 'WETH',
-                    name: 'Wrapped Ether',
+                    address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
+                    decimals: 6,
+                    symbol: 'USDC',
+                    name: 'USD Coin (PoS)',
                   },
-                  amount: '1',
+                  amount: '1853.605677',
                 },
               ],
               isLoan: false,

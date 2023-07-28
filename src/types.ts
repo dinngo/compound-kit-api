@@ -3,7 +3,7 @@ import * as apisdk from '@protocolink/api';
 export interface Position {
   utilization: string;
   healthRate: string;
-  netApr: string;
+  netAPR: string;
   totalDebt: string;
 }
 

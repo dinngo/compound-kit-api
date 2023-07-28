@@ -11,51 +11,57 @@ export function getMarketLabel(chainId: number, marketId: string) {
   return marketId;
 }
 
-export function calcApr(rate: BigNumber) {
+export function calcAPR(rate: BigNumber) {
   return common.toBigUnit(rate.mul(SECONDS_PER_YEAR), 18, { displayDecimals: 4 });
 }
 
-export function calcUtilization(borrowCapacityValue: string | BigNumberJS, borrowValue: string | BigNumberJS) {
+export function calcUtilization(borrowCapacityUSD: string | BigNumberJS, borrowUSD: string | BigNumberJS) {
   let utilization = '0';
-  borrowCapacityValue = new BigNumberJS(borrowCapacityValue);
-  if (!borrowCapacityValue.isZero()) {
-    utilization = common.formatBigUnit(new BigNumberJS(borrowValue).div(borrowCapacityValue), 4);
+  borrowCapacityUSD = new BigNumberJS(borrowCapacityUSD);
+  if (!borrowCapacityUSD.isZero()) {
+    utilization = common.formatBigUnit(new BigNumberJS(borrowUSD).div(borrowCapacityUSD), 4);
   }
 
   return utilization;
 }
 
 export function calcHealthRate(
-  supplyValue: string | BigNumberJS,
-  collateralValue: string | BigNumberJS,
-  borrowValue: string | BigNumberJS,
+  collateralUSD: string | BigNumberJS,
+  borrowUSD: string | BigNumberJS,
   liquidationThreshold: string | BigNumberJS
 ) {
-  return common.formatBigUnit(
-    new BigNumberJS(supplyValue).plus(collateralValue).times(liquidationThreshold).div(borrowValue),
-    2
-  );
+  return common.formatBigUnit(new BigNumberJS(collateralUSD).times(liquidationThreshold).div(borrowUSD), 2);
 }
 
-export function calcNetApr(
-  supplyValue: string | BigNumberJS,
-  supplyApr: string | BigNumberJS,
-  collateralValue: string | BigNumberJS,
-  borrowValue: string | BigNumberJS,
-  borrowApr: string | BigNumberJS
+export function calcNetAPR(
+  supplyUSD: string | BigNumberJS,
+  positiveProportion: string | BigNumberJS,
+  borrowUSD: string | BigNumberJS,
+  negativeProportion: string | BigNumberJS,
+  collateralUSD: string | BigNumberJS
 ) {
-  const totalSupply = new BigNumberJS(supplyValue).plus(collateralValue);
+  const totalSupplyUSD = new BigNumberJS(supplyUSD).plus(collateralUSD);
+  borrowUSD = new BigNumberJS(borrowUSD);
 
-  let netApr = '0';
-  if (!totalSupply.isZero()) {
-    netApr = common.formatBigUnit(
-      new BigNumberJS(supplyValue)
-        .times(supplyApr)
-        .minus(new BigNumberJS(borrowValue).times(borrowApr))
-        .div(totalSupply),
-      4
-    );
+  let earnedAPY = new BigNumberJS(0);
+  if (!totalSupplyUSD.isZero()) {
+    earnedAPY = new BigNumberJS(positiveProportion).div(totalSupplyUSD);
   }
 
-  return netApr;
+  let debtAPY = new BigNumberJS(0);
+  if (!borrowUSD.isZero()) {
+    debtAPY = new BigNumberJS(negativeProportion).div(borrowUSD);
+  }
+
+  let netWorthUSD = new BigNumberJS(totalSupplyUSD).minus(borrowUSD);
+  if (netWorthUSD.isZero()) {
+    netWorthUSD = new BigNumberJS(1);
+  }
+
+  const netAPY = common.formatBigUnit(
+    earnedAPY.times(totalSupplyUSD).div(netWorthUSD).minus(debtAPY.times(borrowUSD).div(netWorthUSD)),
+    4
+  );
+
+  return netAPY;
 }

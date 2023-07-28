@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import * as logics from '@protocolink/logics';
 
 describe('Service', function () {
-  context('Test getMarket, gerAprs, getPrices, getUserBalances', function () {
+  context('Test getMarket, gerAPRs, getPrices, getUserBalances', function () {
     const testCases = [
       {
         chainId: common.ChainId.mainnet,
@@ -87,7 +87,7 @@ describe('Service', function () {
               },
             ],
           },
-          aprs: { supplyApr: '0.0524', borrowApr: '0.0399' },
+          aprs: { supplyAPR: '0.0524', borrowAPR: '0.0399' },
           prices: {
             baseTokenPrice: '1',
             assetPrices: ['75.002', '30298.95', '1933.940035', '5.8920278', '6.96700785'],
@@ -144,7 +144,7 @@ describe('Service', function () {
               },
             ],
           },
-          aprs: { supplyApr: '0.0126', borrowApr: '0.0329' },
+          aprs: { supplyAPR: '0.0126', borrowAPR: '0.0329' },
           prices: { baseTokenPrice: '1933.940035', assetPrices: ['2016.13917792', '2188.89305168'] },
           userBalances: { supplyBalance: '4.636625160941150824', borrowBalance: '0', collateralBalances: ['0', '0'] },
         },
@@ -206,7 +206,7 @@ describe('Service', function () {
               },
             ],
           },
-          aprs: { supplyApr: '0.0258', borrowApr: '0.0428' },
+          aprs: { supplyAPR: '0.0258', borrowAPR: '0.0428' },
           prices: { baseTokenPrice: '0.99995719', assetPrices: ['1901.797', '30035.14459631', '0.75599807'] },
           userBalances: {
             supplyBalance: '0',
@@ -221,7 +221,7 @@ describe('Service', function () {
       it(`${common.toNetworkId(chainId)} ${marketId} market`, async function () {
         const service = new Service(chainId, blockTag);
         const market = await service.getMarket(marketId);
-        const aprs = await service.getAprs(marketId);
+        const aprs = await service.getAPRs(marketId);
         const prices = await service.getPrices(marketId);
         const userBalances = await service.getUserBalances(marketId, account);
         expect(JSON.stringify({ market, aprs, prices, userBalances })).to.eq(JSON.stringify(expected));
@@ -245,25 +245,25 @@ describe('Service', function () {
             name: 'USD Coin (PoS)',
           },
           baseTokenPrice: '0.99994868',
-          supplyApr: '0.0179',
+          supplyAPR: '0.0179',
           supplyBalance: '0',
-          supplyValue: '0',
-          borrowApr: '0.0343',
+          supplyUSD: '0',
+          borrowAPR: '0.0343',
           borrowBalance: '0',
-          borrowValue: '0',
-          collateralValue: '0',
+          borrowUSD: '0',
+          collateralUSD: '0',
           borrowCapacity: '0',
-          borrowCapacityValue: '0',
+          borrowCapacityUSD: '0',
           availableToBorrow: '0',
-          availableToBorrowValue: '0',
+          availableToBorrowUSD: '0',
           liquidationLimit: '0',
           liquidationThreshold: '0',
           liquidationRisk: '0',
           liquidationPoint: '0',
-          liquidationPointValue: '0',
+          liquidationPointUSD: '0',
           utilization: '0',
           healthRate: 'NaN',
-          netApr: '0',
+          netAPR: '0',
           collaterals: [
             {
               asset: {
@@ -277,9 +277,9 @@ describe('Service', function () {
               borrowCollateralFactor: '0.775',
               liquidateCollateralFactor: '0.825',
               collateralBalance: '0',
-              collateralValue: '0',
+              collateralUSD: '0',
               borrowCapacity: '0',
-              borrowCapacityValue: '0',
+              borrowCapacityUSD: '0',
             },
             {
               asset: {
@@ -293,9 +293,9 @@ describe('Service', function () {
               borrowCollateralFactor: '0.7',
               liquidateCollateralFactor: '0.75',
               collateralBalance: '0',
-              collateralValue: '0',
+              collateralUSD: '0',
               borrowCapacity: '0',
-              borrowCapacityValue: '0',
+              borrowCapacityUSD: '0',
             },
             {
               asset: {
@@ -309,9 +309,9 @@ describe('Service', function () {
               borrowCollateralFactor: '0.65',
               liquidateCollateralFactor: '0.7',
               collateralBalance: '0',
-              collateralValue: '0',
+              collateralUSD: '0',
               borrowCapacity: '0',
-              borrowCapacityValue: '0',
+              borrowCapacityUSD: '0',
             },
           ],
         },
@@ -331,25 +331,25 @@ describe('Service', function () {
             name: 'USD Coin (PoS)',
           },
           baseTokenPrice: '0.99995719',
-          supplyApr: '0.0258',
+          supplyAPR: '0.0258',
           supplyBalance: '0',
-          supplyValue: '0',
-          borrowApr: '0.0428',
+          supplyUSD: '0',
+          borrowAPR: '0.0428',
           borrowBalance: '171.00092',
-          borrowValue: '170.99',
-          collateralValue: '350.78',
+          borrowUSD: '170.99',
+          collateralUSD: '350.78',
           borrowCapacity: '271.863264',
-          borrowCapacityValue: '271.85',
+          borrowCapacityUSD: '271.85',
           availableToBorrow: '100.862344',
-          availableToBorrowValue: '100.86',
+          availableToBorrowUSD: '100.86',
           liquidationLimit: '289.39',
           liquidationThreshold: '0.825',
           liquidationRisk: '0.59',
           liquidationPoint: '206.966872',
-          liquidationPointValue: '206.96',
+          liquidationPointUSD: '206.96',
           utilization: '0.629',
           healthRate: '1.69',
-          netApr: '-0.0209',
+          netAPR: '-0.0407',
           collaterals: [
             {
               asset: {
@@ -363,9 +363,9 @@ describe('Service', function () {
               borrowCollateralFactor: '0.775',
               liquidateCollateralFactor: '0.825',
               collateralBalance: '0.184444655243193813',
-              collateralValue: '350.78',
+              collateralUSD: '350.78',
               borrowCapacity: '271.863264',
-              borrowCapacityValue: '271.85',
+              borrowCapacityUSD: '271.85',
             },
             {
               asset: {
@@ -379,9 +379,9 @@ describe('Service', function () {
               borrowCollateralFactor: '0.7',
               liquidateCollateralFactor: '0.75',
               collateralBalance: '0',
-              collateralValue: '0',
+              collateralUSD: '0',
               borrowCapacity: '0',
-              borrowCapacityValue: '0',
+              borrowCapacityUSD: '0',
             },
             {
               asset: {
@@ -395,9 +395,9 @@ describe('Service', function () {
               borrowCollateralFactor: '0.65',
               liquidateCollateralFactor: '0.7',
               collateralBalance: '0',
-              collateralValue: '0',
+              collateralUSD: '0',
               borrowCapacity: '0',
-              borrowCapacityValue: '0',
+              borrowCapacityUSD: '0',
             },
           ],
         },
@@ -417,25 +417,25 @@ describe('Service', function () {
             name: 'USD Coin (PoS)',
           },
           baseTokenPrice: '0.99994868',
-          supplyApr: '0.0179',
+          supplyAPR: '0.0179',
           supplyBalance: '0',
-          supplyValue: '0',
-          borrowApr: '0.0343',
+          supplyUSD: '0',
+          borrowAPR: '0.0343',
           borrowBalance: '0',
-          borrowValue: '0',
-          collateralValue: '0',
+          borrowUSD: '0',
+          collateralUSD: '0',
           borrowCapacity: '0',
-          borrowCapacityValue: '0',
+          borrowCapacityUSD: '0',
           availableToBorrow: '0',
-          availableToBorrowValue: '0',
+          availableToBorrowUSD: '0',
           liquidationLimit: '0',
           liquidationThreshold: '0',
           liquidationRisk: '0',
           liquidationPoint: '0',
-          liquidationPointValue: '0',
+          liquidationPointUSD: '0',
           utilization: '0',
           healthRate: 'NaN',
-          netApr: '0',
+          netAPR: '0',
           collaterals: [
             {
               asset: {
@@ -449,9 +449,9 @@ describe('Service', function () {
               borrowCollateralFactor: '0.775',
               liquidateCollateralFactor: '0.825',
               collateralBalance: '0',
-              collateralValue: '0',
+              collateralUSD: '0',
               borrowCapacity: '0',
-              borrowCapacityValue: '0',
+              borrowCapacityUSD: '0',
             },
             {
               asset: {
@@ -465,9 +465,9 @@ describe('Service', function () {
               borrowCollateralFactor: '0.7',
               liquidateCollateralFactor: '0.75',
               collateralBalance: '0',
-              collateralValue: '0',
+              collateralUSD: '0',
               borrowCapacity: '0',
-              borrowCapacityValue: '0',
+              borrowCapacityUSD: '0',
             },
             {
               asset: {
@@ -481,9 +481,9 @@ describe('Service', function () {
               borrowCollateralFactor: '0.65',
               liquidateCollateralFactor: '0.7',
               collateralBalance: '0',
-              collateralValue: '0',
+              collateralUSD: '0',
               borrowCapacity: '0',
-              borrowCapacityValue: '0',
+              borrowCapacityUSD: '0',
             },
           ],
         },
