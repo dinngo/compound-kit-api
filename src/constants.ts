@@ -1,1 +1,0 @@
-export const LEVERAGE_BORROW_SCALE = 1.005;

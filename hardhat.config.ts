@@ -1,11 +1,12 @@
 import '@nomicfoundation/hardhat-chai-matchers';
 
 import { HardhatUserConfig } from 'hardhat/config';
+import { setup } from 'test/hooks';
 
 const config: HardhatUserConfig = {
   networks: {
     hardhat: {
-      chainId: process.env.CHAIN_ID ? parseInt(process.env.CHAIN_ID) : 1,
+      chainId: process.env.CHAIN_ID ? parseInt(process.env.CHAIN_ID) : 137,
       gasPrice: 0,
       initialBaseFeePerGas: 0,
       accounts: {
@@ -14,13 +15,13 @@ const config: HardhatUserConfig = {
         initialIndex: 0,
       },
       forking: {
-        url: process.env.HTTP_RPC_URL ?? 'https://rpc.ankr.com/eth',
+        url: process.env.HTTP_RPC_URL ?? 'https://rpc.ankr.com/polygon',
       },
     },
   },
   mocha: {
     timeout: 1200000,
-    retries: 3,
+    rootHooks: { beforeAll: [setup] },
   },
 };
 
