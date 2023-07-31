@@ -8,9 +8,7 @@ import {
   newHttpError,
   newInternalServerError,
 } from 'src/libs/api';
-// TODO: remove this when slippage value is confirmed
-// import { LEVERAGE_BORROW_SCALE } from 'src/constants';
-import { MarketInfo, Service, calcHealthRate, calcNetApr, calcUtilization } from 'src/libs/compound-v3';
+import { MarketInfo, Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
 import * as apisdk from '@protocolink/api';
 import * as common from '@protocolink/common';
 import { utils } from 'ethers';
@@ -67,7 +65,6 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
     let approvals: GetCollateralSwapQuotationResponseBody['approvals'] = [];
     let targetPosition = currentPosition;
     if (event.body.withdrawalToken && event.body.targetToken && event.body.amount && Number(event.body.amount) > 0) {
-      // TODO: do we need to sanitize slippage value due to 0.5% assumption?
       const { withdrawalToken, targetToken, amount, slippage } = event.body;
       const { supplyApr, supplyValue, borrowApr, collateralValue, borrowCapacityValue, liquidationLimit, collaterals } =
         marketInfo;
@@ -84,39 +81,36 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
         throw newHttpError(400, { code: '400.5', message: 'target token is not collateral' });
       }
 
-      const _withdrawalValue = new BigNumberJS(amount).times(withdrawalCollateral.assetPrice);
-      const targetValue = _withdrawalValue.times(0.995); // max slippage = 0.5%
-      const targetAmount = targetValue.div(targetCollateral.assetPrice).toString();
-
       // 1. new balancer flash loan logics and append loan logic
       const [flashLoanLoanLogic, flashLoanRepayLogic] = apisdk.protocols.balancerv2.newFlashLoanLogicPair([
-        { token: _targetToken, amount: targetAmount },
+        { token: _withdrawalToken, amount: amount },
       ]);
       logics.push(flashLoanLoanLogic);
 
-      // 2. new and append compound v3 supply collateral logic
-      logics.push(
-        apisdk.protocols.compoundv3.newSupplyCollateralLogic({
-          marketId,
-          input: { token: _targetToken, amount: targetAmount },
-        })
-      );
-
-      // 3. new and append compound v3 withdraw logic
-      logics.push(
-        apisdk.protocols.compoundv3.newWithdrawCollateralLogic({
-          marketId,
-          output: { token: _withdrawalToken, amount: amount },
-        })
-      );
-
-      // 4. new and append paraswap swap token logic
+      // 2. new and append paraswap swap token logic
       const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
         input: { token: _withdrawalToken, amount: amount },
         tokenOut: _targetToken,
         slippage,
       });
       logics.push(apisdk.protocols.paraswapv5.newSwapTokenLogic(quotation));
+
+      // 3. new and append compound v3 supply collateral logic
+      logics.push(
+        apisdk.protocols.compoundv3.newSupplyCollateralLogic({
+          marketId,
+          input: { token: _targetToken, amount: quotation.output.amount },
+          balanceBps: common.BPS_BASE,
+        })
+      );
+
+      // 4. new and append compound v3 withdraw logic
+      logics.push(
+        apisdk.protocols.compoundv3.newWithdrawCollateralLogic({
+          marketId,
+          output: { token: _withdrawalToken, amount: amount },
+        })
+      );
 
       // 5. append balancer flash loan replay logic
       logics.push(flashLoanRepayLogic);
@@ -125,6 +119,8 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
       approvals = estimateResult.approvals;
 
       // 6. calc target position
+      const _withdrawalValue = new BigNumberJS(amount).times(withdrawalCollateral.assetPrice);
+      const targetValue = new BigNumberJS(quotation.output.amount).times(targetCollateral.assetPrice);
       const targetBorrowValue = new BigNumberJS(borrowValue);
       const targetCollateralValue = new BigNumberJS(collateralValue).minus(_withdrawalValue).plus(targetValue);
       const targetBorrowCapacityValue = new BigNumberJS(borrowCapacityValue);
@@ -138,7 +134,7 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
       targetPosition = {
         utilization: calcUtilization(targetBorrowCapacityValue, targetBorrowValue),
         healthRate: calcHealthRate(supplyValue, targetCollateralValue, targetBorrowValue, targetLiquidationThreshold),
-        netApr: calcNetApr(supplyValue, supplyApr, targetCollateralValue, targetBorrowValue, borrowApr),
+        netApr: calcNetAPR(supplyValue, supplyApr, targetCollateralValue, targetBorrowValue, borrowApr),
         totalDebt: common.formatBigUnit(targetBorrowValue, 2),
       };
     }
