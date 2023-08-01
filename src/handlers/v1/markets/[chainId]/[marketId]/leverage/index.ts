@@ -83,7 +83,7 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       // 1. get the quotation for swapping the base token into amount of leverage token.
       const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
         tokenIn: baseToken,
-        output: { token: leverageToken, amount: amount },
+        output: { token: leverageToken, amount },
         slippage,
       });
       const borrowAmount = quotation.input.amount;
