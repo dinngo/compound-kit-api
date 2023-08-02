@@ -1,4 +1,5 @@
 import BigNumberJS from 'bignumber.js';
+import { DeleverageQuotation, QuoteAPIResponseBody } from 'src/types';
 import {
   EventBody,
   EventPathParameters,
@@ -7,21 +8,20 @@ import {
   newHttpError,
   newInternalServerError,
 } from 'src/libs/api';
-import { LeverageQuotation, QuoteAPIResponseBody } from 'src/types';
 import { MarketInfo, Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
 import * as apisdk from '@protocolink/api';
 import * as common from '@protocolink/common';
 import { utils } from 'ethers';
 import { validateMarket } from 'src/validations';
 
-type GetLeverageQuotationRouteParams = EventPathParameters<{ chainId: string; marketId: string }> &
+type GetDeleverageQuotationRouteParams = EventPathParameters<{ chainId: string; marketId: string }> &
   EventBody<{ account?: string; token?: common.TokenObject; amount?: string; slippage?: number }>;
 
-type GetLeverageQuotationResponseBody = QuoteAPIResponseBody<LeverageQuotation>;
+type GetDeleverageQuotationResponseBody = QuoteAPIResponseBody<DeleverageQuotation>;
 
-export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams> = {
+export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRouteParams> = {
   method: 'POST',
-  path: '/v1/markets/{chainId}/{marketId}/leverage',
+  path: '/v1/markets/{chainId}/{marketId}/deleverage',
   handler: async (event) => {
     const chainId = Number(event.pathParameters.chainId);
     const marketId = event.pathParameters.marketId.toUpperCase();
@@ -54,9 +54,8 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
     const { utilization, healthRate, netAPR, borrowUSD } = marketInfo;
     const currentPosition = { utilization, healthRate, netAPR, totalDebt: borrowUSD };
 
-    let leverageTimes = '0';
-    const logics: GetLeverageQuotationResponseBody['logics'] = [];
-    let approvals: GetLeverageQuotationResponseBody['approvals'] = [];
+    const logics: GetDeleverageQuotationResponseBody['logics'] = [];
+    let approvals: GetDeleverageQuotationResponseBody['approvals'] = [];
     let targetPosition = currentPosition;
     if (event.body.token && event.body.amount && Number(event.body.amount) > 0) {
       const { token, amount, slippage } = event.body;
@@ -73,44 +72,53 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
         collaterals,
       } = marketInfo;
 
-      const leverageToken = common.Token.from(token);
-      const leverageCollateral = collaterals.find(({ asset }) => asset.is(leverageToken.unwrapped));
-      if (!leverageCollateral) {
-        throw newHttpError(400, { code: '400.5', message: 'leverage token is not collateral' });
+      const deleverageCollateralToken = common.Token.from(token);
+      const deleverageCollateral = collaterals.find(({ asset }) => asset.is(deleverageCollateralToken.unwrapped));
+      if (!deleverageCollateral) {
+        throw newHttpError(400, { code: '400.5', message: 'deleverage token is not collateral' });
       }
-      const leverageUSD = new BigNumberJS(amount).times(leverageCollateral.assetPrice);
+      const deleverageDebtUSD = new BigNumberJS(amount).times(baseTokenPrice);
 
-      // 1. get the quotation for swapping the base token into amount of leverage token.
+      // 1. get the quotation for swapping the deleverage token into amount of the base token.
       const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
-        tokenIn: baseToken,
-        output: { token: leverageToken, amount },
+        tokenIn: deleverageCollateralToken,
+        output: { token: baseToken, amount },
         slippage,
       });
+
+      if (
+        quotation.input.gt(new common.TokenAmount(deleverageCollateralToken, deleverageCollateral.collateralBalance))
+      ) {
+        throw newHttpError(400, { code: '400.6', message: 'insufficient collateral for deleverage' });
+      }
+
       const borrowAmount = quotation.input.amount;
+      const deleverageCollateralUSD = new BigNumberJS(borrowAmount).times(deleverageCollateral.assetPrice);
 
       // 2. new balancer flash loan logics and append loan logic
       const [flashLoanLoanLogic, flashLoanRepayLogic] = apisdk.protocols.balancerv2.newFlashLoanLogicPair([
-        { token: baseToken, amount: borrowAmount },
+        { token: deleverageCollateralToken, amount: borrowAmount },
       ]);
       logics.push(flashLoanLoanLogic);
 
       // 3. new and append paraswap swap token logic
       logics.push(apisdk.protocols.paraswapv5.newSwapTokenLogic(quotation));
 
-      // 4. new and append compound v3 supply collateral logic, and use 100% of the balance.
+      // 4. new and append compound v3 repay collateral logic, and use 100% of the balance.
       logics.push(
-        apisdk.protocols.compoundv3.newSupplyCollateralLogic({
+        apisdk.protocols.compoundv3.newRepayLogic({
           marketId,
-          input: { token: leverageToken, amount },
+          borrower: account,
+          input: { token: baseToken, amount },
           balanceBps: common.BPS_BASE,
         })
       );
 
-      // 5. new and append compound v3 borrow logic
+      // 5. new and append compound v3 withdraw logic
       logics.push(
-        apisdk.protocols.compoundv3.newBorrowLogic({
+        apisdk.protocols.compoundv3.newWithdrawCollateralLogic({
           marketId,
-          output: { token: baseToken, amount: borrowAmount },
+          output: { token: deleverageCollateralToken, amount: borrowAmount },
         })
       );
 
@@ -120,17 +128,16 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       const estimateResult = await apisdk.estimateRouterData({ chainId, account, logics });
       approvals = estimateResult.approvals;
 
-      // 7. calc leverage times
-      leverageTimes = common.formatBigUnit(leverageUSD.div(borrowCapacityUSD), 2);
-
-      // 8. calc target position
-      const targetBorrowUSD = new BigNumberJS(borrowUSD).plus(new BigNumberJS(borrowAmount).times(baseTokenPrice));
-      const targetCollateralUSD = new BigNumberJS(collateralUSD).plus(leverageUSD);
-      const targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD).plus(
-        leverageUSD.times(leverageCollateral.borrowCollateralFactor)
+      // 7. calc target position
+      const targetBorrowUSD = new BigNumberJS(borrowUSD).gt(deleverageDebtUSD)
+        ? new BigNumberJS(borrowUSD).minus(deleverageDebtUSD)
+        : new BigNumberJS(0);
+      const targetCollateralUSD = new BigNumberJS(collateralUSD).minus(deleverageCollateralUSD);
+      const targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD).minus(
+        deleverageCollateralUSD.times(deleverageCollateral.borrowCollateralFactor)
       );
-      const targetLiquidationLimit = new BigNumberJS(liquidationLimit).plus(
-        leverageUSD.times(leverageCollateral.liquidateCollateralFactor)
+      const targetLiquidationLimit = new BigNumberJS(liquidationLimit).minus(
+        deleverageCollateralUSD.times(deleverageCollateral.liquidateCollateralFactor)
       );
       const targetLiquidationThreshold = common.formatBigUnit(targetLiquidationLimit.div(targetCollateralUSD), 4);
       targetPosition = {
@@ -141,8 +148,8 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       };
     }
 
-    const responseBody: GetLeverageQuotationResponseBody = {
-      quotation: { leverageTimes, currentPosition, targetPosition },
+    const responseBody: GetDeleverageQuotationResponseBody = {
+      quotation: { currentPosition, targetPosition },
       approvals,
       logics,
     };
