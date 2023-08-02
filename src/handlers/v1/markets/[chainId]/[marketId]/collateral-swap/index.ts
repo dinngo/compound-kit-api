@@ -78,7 +78,7 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
       const _targetToken = common.Token.from(targetToken);
       const targetCollateral = collaterals.find(({ asset }) => asset.is(_targetToken.unwrapped));
       if (!targetCollateral) {
-        throw newHttpError(400, { code: '400.5', message: 'target token is not collateral' });
+        throw newHttpError(400, { code: '400.6', message: 'target token is not collateral' });
       }
 
       // 1. new balancer flash loan logics and append loan logic
@@ -119,14 +119,14 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
       approvals = estimateResult.approvals;
 
       // 6. calc target position
-      const _withdrawalUSD = new BigNumberJS(amount).times(withdrawalCollateral.assetPrice);
+      const withdrawalUSD = new BigNumberJS(amount).times(withdrawalCollateral.assetPrice);
       const targetUSD = new BigNumberJS(quotation.output.amount).times(targetCollateral.assetPrice);
       const targetBorrowUSD = new BigNumberJS(borrowUSD);
-      const targetCollateralUSD = new BigNumberJS(collateralUSD).minus(_withdrawalUSD).plus(targetUSD);
+      const targetCollateralUSD = new BigNumberJS(collateralUSD).minus(withdrawalUSD).plus(targetUSD);
       const targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD);
 
       const targetLiquidationLimit = new BigNumberJS(liquidationLimit).minus(
-        _withdrawalUSD
+        withdrawalUSD
           .times(withdrawalCollateral.liquidateCollateralFactor)
           .plus(targetUSD.times(targetCollateral.liquidateCollateralFactor))
       );

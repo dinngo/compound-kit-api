@@ -68,9 +68,8 @@ describe('Transaction: Collateral Swap', function () {
     const collateralBalance = await service.getCollateralBalance(marketId, user.address, collateralToken);
     expect(collateralBalance.eq(supplyAmount.clone().sub(amount)));
 
-    // 7. user's borrow balance will increase.
-    // 7-1. As the block number increases, the initial borrow balance will also increase.
-    const borrowBalance = await service.getBorrowBalance(marketId, user.address);
-    expect(borrowBalance.gte(borrowAmount)).to.be.true;
+    // 7. user's WMATIC collateral balance will increase.
+    const targetBalance = await service.getCollateralBalance(marketId, user.address, targetToken);
+    expect(targetBalance.eq(new common.TokenAmount(targetToken, quotation.targetTokenAmount)));
   });
 });

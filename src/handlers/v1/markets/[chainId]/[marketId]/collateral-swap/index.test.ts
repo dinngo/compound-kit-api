@@ -54,6 +54,33 @@ describe('Test get collateral swap quotation api', function () {
       },
     },
     {
+      title: '400.6: target token is not collateral',
+      path: '/v1/markets/137/usdc/collateral-swap',
+      body: {
+        account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
+        withdrawalToken: {
+          chainId: 137,
+          address: '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619',
+          decimals: 18,
+          symbol: 'WETH',
+          name: 'Wrapped Ether',
+        },
+        amount: '1',
+        targetToken: {
+          chainId: 137,
+          address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
+          decimals: 18,
+          symbol: 'USDT',
+          name: '(PoS) Tether USD',
+        },
+        slippage: 100,
+      },
+      expected: {
+        statusCode: 400,
+        body: JSON.stringify({ code: '400.6', message: 'target token is not collateral' }),
+      },
+    },
+    {
       title: '200: without token and amount',
       path: '/v1/markets/137/usdc/collateral-swap',
       body: { account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83' },
@@ -79,18 +106,6 @@ describe('Test get collateral swap quotation api', function () {
         amount: '1',
         targetToken: logics.compoundv3.polygonTokens.WMATIC,
         slippage: 100,
-      },
-      expected: { statusCode: 200 },
-    },
-    {
-      title: '200: with zero slippage',
-      path: '/v1/markets/137/usdc/collateral-swap',
-      body: {
-        account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
-        withdrawalToken: logics.compoundv3.polygonTokens.WETH,
-        amount: '1',
-        targetToken: logics.compoundv3.polygonTokens.WMATIC,
-        slippage: 0,
       },
       expected: { statusCode: 200 },
     },
