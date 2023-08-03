@@ -79,8 +79,22 @@ describe('Test get deleverage quotation api', function () {
         const parsedBody = JSON.parse(resp.body);
         expect(parsedBody).to.have.keys('quotation', 'approvals', 'logics');
         expect(parsedBody.quotation).to.have.keys('currentPosition', 'targetPosition');
-        expect(parsedBody.quotation.currentPosition).to.have.keys('utilization', 'healthRate', 'netAPR', 'totalDebt');
-        expect(parsedBody.quotation.targetPosition).to.have.keys('utilization', 'healthRate', 'netAPR', 'totalDebt');
+        expect(parsedBody.quotation.currentPosition).to.have.keys(
+          'utilization',
+          'healthRate',
+          'liquidationThreshold',
+          'borrowUSD',
+          'collateralUSD',
+          'netAPR'
+        );
+        expect(parsedBody.quotation.targetPosition).to.have.keys(
+          'utilization',
+          'healthRate',
+          'liquidationThreshold',
+          'borrowUSD',
+          'collateralUSD',
+          'netAPR'
+        );
       }
     });
   });

@@ -3,8 +3,10 @@ import * as apisdk from '@protocolink/api';
 export interface Position {
   utilization: string;
   healthRate: string;
+  liquidationThreshold: string;
+  borrowUSD: string;
+  collateralUSD: string;
   netAPR: string;
-  totalDebt: string;
 }
 
 export interface LeverageQuotation {
