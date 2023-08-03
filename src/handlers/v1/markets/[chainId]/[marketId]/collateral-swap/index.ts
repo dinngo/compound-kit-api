@@ -60,7 +60,7 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
     const { utilization, healthRate, netAPR, borrowUSD } = marketInfo;
     const currentPosition = { utilization, healthRate, netAPR, totalDebt: borrowUSD };
 
-    let targetAmount = '0';
+    let targetTokenAmount = '0';
     const logics: GetCollateralSwapQuotationResponseBody['logics'] = [];
     let approvals: GetCollateralSwapQuotationResponseBody['approvals'] = [];
     let targetPosition = currentPosition;
@@ -96,10 +96,11 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
       logics.push(apisdk.protocols.paraswapv5.newSwapTokenLogic(quotation));
 
       // 3. new and append compound v3 supply collateral logic
+      targetTokenAmount = quotation.output.amount;
       logics.push(
         apisdk.protocols.compoundv3.newSupplyCollateralLogic({
           marketId,
-          input: { token: _targetToken, amount: quotation.output.amount },
+          input: { token: _targetToken, amount: targetTokenAmount },
           balanceBps: common.BPS_BASE,
         })
       );
@@ -140,7 +141,7 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
     }
 
     const responseBody: GetCollateralSwapQuotationResponseBody = {
-      quotation: { targetTokenAmount: targetAmount, currentPosition, targetPosition },
+      quotation: { targetTokenAmount, currentPosition, targetPosition },
       approvals,
       logics,
     };

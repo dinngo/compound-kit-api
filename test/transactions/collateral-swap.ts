@@ -62,14 +62,14 @@ describe('Transaction: Collateral Swap', function () {
     });
     await expect(user.sendTransaction(transactionRequest)).to.not.be.reverted;
 
-    const service = new logics.compoundv3.Service(chainId, hre.ethers.provider);
-
     // 6. user's WETH collateral balance will decrease.
+    const service = new logics.compoundv3.Service(chainId, hre.ethers.provider);
     const collateralBalance = await service.getCollateralBalance(marketId, user.address, collateralToken);
-    expect(collateralBalance.eq(supplyAmount.clone().sub(amount)));
+    expect(collateralBalance.eq(supplyAmount.clone().sub(amount))).to.be.true;
 
     // 7. user's WMATIC collateral balance will increase.
     const targetBalance = await service.getCollateralBalance(marketId, user.address, targetToken);
-    expect(targetBalance.eq(new common.TokenAmount(targetToken, quotation.targetTokenAmount)));
+    const quoteTargetAmount = new common.TokenAmount(targetToken, quotation.quotation.targetTokenAmount);
+    expect(targetBalance.eq(quoteTargetAmount)).to.be.true;
   });
 });
