@@ -136,7 +136,7 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
         healthRate: calcHealthRate(targetCollateralUSD, targetBorrowUSD, targetLiquidationThreshold),
         liquidationThreshold: targetLiquidationThreshold,
         borrowUSD: common.formatBigUnit(targetBorrowUSD, 2),
-        collateralUSD: targetCollateralUSD.toString(),
+        collateralUSD: common.formatBigUnit(targetCollateralUSD, 2),
         netAPR: calcNetAPR(supplyUSD, supplyAPR, targetCollateralUSD, targetBorrowUSD, borrowAPR),
       };
     }
