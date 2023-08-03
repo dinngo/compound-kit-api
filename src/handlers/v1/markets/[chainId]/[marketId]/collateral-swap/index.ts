@@ -57,8 +57,8 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
     } catch (err) {
       throw newInternalServerError(err);
     }
-    const { utilization, healthRate, netAPR, borrowUSD } = marketInfo;
-    const currentPosition = { utilization, healthRate, netAPR, totalDebt: borrowUSD };
+    const { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR } = marketInfo;
+    const currentPosition = { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR };
 
     let targetTokenAmount = '0';
     const logics: GetCollateralSwapQuotationResponseBody['logics'] = [];
@@ -66,8 +66,7 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
     let targetPosition = currentPosition;
     if (event.body.withdrawalToken && event.body.targetToken && event.body.amount && Number(event.body.amount) > 0) {
       const { withdrawalToken, targetToken, amount, slippage } = event.body;
-      const { supplyAPR, supplyUSD, borrowAPR, collateralUSD, borrowCapacityUSD, liquidationLimit, collaterals } =
-        marketInfo;
+      const { supplyAPR, supplyUSD, borrowAPR, borrowCapacityUSD, liquidationLimit, collaterals } = marketInfo;
 
       // Verify token input
       const _withdrawalToken = common.Token.from(withdrawalToken);
@@ -135,8 +134,10 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
       targetPosition = {
         utilization: calcUtilization(targetBorrowCapacityUSD, targetBorrowUSD),
         healthRate: calcHealthRate(targetCollateralUSD, targetBorrowUSD, targetLiquidationThreshold),
+        liquidationThreshold: targetLiquidationThreshold,
+        borrowUSD: common.formatBigUnit(targetBorrowUSD, 2),
+        collateralUSD: common.formatBigUnit(targetCollateralUSD, 2),
         netAPR: calcNetAPR(supplyUSD, supplyAPR, targetCollateralUSD, targetBorrowUSD, borrowAPR),
-        totalDebt: common.formatBigUnit(targetBorrowUSD, 2),
       };
     }
 

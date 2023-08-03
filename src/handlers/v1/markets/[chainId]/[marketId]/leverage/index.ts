@@ -51,8 +51,8 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
     } catch (err) {
       throw newInternalServerError(err);
     }
-    const { utilization, healthRate, netAPR, borrowUSD } = marketInfo;
-    const currentPosition = { utilization, healthRate, netAPR, totalDebt: borrowUSD };
+    const { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR } = marketInfo;
+    const currentPosition = { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR };
 
     let leverageTimes = '0';
     const logics: GetLeverageQuotationResponseBody['logics'] = [];
@@ -66,8 +66,6 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
         supplyAPR,
         supplyUSD,
         borrowAPR,
-        borrowUSD,
-        collateralUSD,
         borrowCapacityUSD,
         liquidationLimit,
         collaterals,
@@ -136,8 +134,10 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       targetPosition = {
         utilization: calcUtilization(targetBorrowCapacityUSD, targetBorrowUSD),
         healthRate: calcHealthRate(targetCollateralUSD, targetBorrowUSD, targetLiquidationThreshold),
+        liquidationThreshold: targetLiquidationThreshold,
+        borrowUSD: common.formatBigUnit(targetBorrowUSD, 2),
+        collateralUSD: common.formatBigUnit(targetCollateralUSD, 2),
         netAPR: calcNetAPR(supplyUSD, supplyAPR, targetCollateralUSD, targetBorrowUSD, borrowAPR),
-        totalDebt: common.formatBigUnit(targetBorrowUSD, 2),
       };
     }
 
