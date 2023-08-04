@@ -119,9 +119,9 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
       approvals = estimateResult.approvals;
 
       // 6. calc target position
-      const targetSupplyUSD = new BigNumberJS(supplyUSD);
       const withdrawalUSD = new BigNumberJS(amount).times(withdrawalCollateral.assetPrice);
-      const targetUSD = new BigNumberJS(quotation.output.amount).times(targetCollateral.assetPrice);
+      const targetUSD = new BigNumberJS(targetTokenAmount).times(targetCollateral.assetPrice);
+      const targetSupplyUSD = new BigNumberJS(supplyUSD);
       const targetBorrowUSD = new BigNumberJS(borrowUSD);
       const targetCollateralUSD = new BigNumberJS(collateralUSD).minus(withdrawalUSD).plus(targetUSD);
       const targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD);
