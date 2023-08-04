@@ -1810,24 +1810,24 @@
     type-fest "^3.12.0"
     zksync-web3 "^0.14.3"
 
-"@protocolink/core@^0.2.16", "@protocolink/core@^0.2.17":
-  version "0.2.17"
-  resolved "https://registry.yarnpkg.com/@protocolink/core/-/core-0.2.17.tgz#61b33307621707fe57969137fe9db94301247f4f"
-  integrity sha512-jJzk4agtTfy2CpQSl9rMGKFwrXfblSDJnoO11CcmQpMzrTPqpzPDa76/S0+6pn/Gb/SbgNPaqv1yZl8yeeNIvg==
+"@protocolink/core@^0.2.16", "@protocolink/core@^0.2.19":
+  version "0.2.19"
+  resolved "https://registry.yarnpkg.com/@protocolink/core/-/core-0.2.19.tgz#cda24bbe0cb3c0eda13f312d3b4b21e1190314b8"
+  integrity sha512-CufmUBF+OTY3XErhp+hNBwqDYzBtEXRpk1eHa7EgxzOep1uyHbyljDIpwV9qktizDPlvCaTiD675d8kOCvr6oQ==
   dependencies:
     "@protocolink/common" "^0.2.15"
     ethers "^5.7.2"
     tiny-invariant "^1.3.1"
     zksync-web3 "^0.14.3"
 
-"@protocolink/logics@^0.2.10", "@protocolink/logics@^0.2.11":
-  version "0.2.11"
-  resolved "https://registry.yarnpkg.com/@protocolink/logics/-/logics-0.2.11.tgz#277c7eaf352d1a81c470f88f39bec13af558c08d"
-  integrity sha512-vPy6LE8zDsomLaSxHvv0c4UcKaJSA8M9GJBEsqvw6NBBoREdCWPpe5KJmZWZ4SJ5RPnzszjdhAubh/qrrRzzoQ==
+"@protocolink/logics@^0.2.10", "@protocolink/logics@^0.2.12":
+  version "0.2.12"
+  resolved "https://registry.yarnpkg.com/@protocolink/logics/-/logics-0.2.12.tgz#96e433ae7b039ad436da9589e165a36ef87e7338"
+  integrity sha512-bvr0im7yNqttW21+c607XBkjAeyEdbwl7W5yWtbxm+VdQj14nGP8xFnsAONlTE9226aKqftHE7q9HcTQqboVoA==
   dependencies:
     "@paraswap/sdk" "^6.2.1"
     "@protocolink/common" "^0.2.15"
-    "@protocolink/core" "^0.2.17"
+    "@protocolink/core" "^0.2.19"
     "@types/lodash" "^4.14.195"
     "@uniswap/permit2-sdk" "^1.2.0"
     "@uniswap/sdk-core" "^3.2.6"
@@ -1838,6 +1838,7 @@
     bignumber.js "^9.1.1"
     ethers "^5.7.2"
     lodash "^4.17.21"
+    tiny-invariant "^1.3.1"
 
 "@protocolink/test-helpers@^0.2.8":
   version "0.2.8"

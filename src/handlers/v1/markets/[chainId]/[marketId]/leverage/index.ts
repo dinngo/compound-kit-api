@@ -122,6 +122,7 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       leverageTimes = common.formatBigUnit(leverageUSD.div(borrowCapacityUSD), 2);
 
       // 8. calc target position
+      const targetSupplyUSD = new BigNumberJS(supplyUSD);
       const targetBorrowUSD = new BigNumberJS(borrowUSD).plus(new BigNumberJS(borrowAmount).times(baseTokenPrice));
       const targetCollateralUSD = new BigNumberJS(collateralUSD).plus(leverageUSD);
       const targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD).plus(
@@ -131,13 +132,21 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
         leverageUSD.times(leverageCollateral.liquidateCollateralFactor)
       );
       const targetLiquidationThreshold = common.formatBigUnit(targetLiquidationLimit.div(targetCollateralUSD), 4);
+      const targetPositiveProportion = targetSupplyUSD.times(supplyAPR);
+      const targetNegativeProportion = targetBorrowUSD.times(borrowAPR);
       targetPosition = {
         utilization: calcUtilization(targetBorrowCapacityUSD, targetBorrowUSD),
         healthRate: calcHealthRate(targetCollateralUSD, targetBorrowUSD, targetLiquidationThreshold),
         liquidationThreshold: targetLiquidationThreshold,
         borrowUSD: common.formatBigUnit(targetBorrowUSD, 2),
         collateralUSD: common.formatBigUnit(targetCollateralUSD, 2),
-        netAPR: calcNetAPR(supplyUSD, supplyAPR, targetCollateralUSD, targetBorrowUSD, borrowAPR),
+        netAPR: calcNetAPR(
+          targetSupplyUSD,
+          targetPositiveProportion,
+          targetBorrowUSD,
+          targetNegativeProportion,
+          targetCollateralUSD
+        ),
       };
     }
 
