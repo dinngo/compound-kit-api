@@ -31,7 +31,7 @@
     "@middy/warmup": "^4.5.5",
     "@protocolink/api": "^0.2.10",
     "@protocolink/common": "^0.2.15",
-    "@protocolink/logics": "^0.2.11",
+    "@protocolink/logics": "^0.2.12",
     "@types/lodash": "^4.14.195",
     "bignumber.js": "^9.1.1",
     "ethers": "^5.7.2",

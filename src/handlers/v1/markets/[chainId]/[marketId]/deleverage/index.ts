@@ -127,6 +127,7 @@ export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRoutePar
       approvals = estimateResult.approvals;
 
       // 7. calc target position
+      const targetSupplyUSD = new BigNumberJS(supplyUSD);
       const targetBorrowUSD = new BigNumberJS(borrowUSD).gt(deleverageDebtUSD)
         ? new BigNumberJS(borrowUSD).minus(deleverageDebtUSD)
         : new BigNumberJS(0);
@@ -138,13 +139,21 @@ export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRoutePar
         deleverageCollateralUSD.times(deleverageCollateral.liquidateCollateralFactor)
       );
       const targetLiquidationThreshold = common.formatBigUnit(targetLiquidationLimit.div(targetCollateralUSD), 4);
+      const targetPositiveProportion = targetSupplyUSD.times(supplyAPR);
+      const targetNegativeProportion = targetBorrowUSD.times(borrowAPR);
       targetPosition = {
         utilization: calcUtilization(targetBorrowCapacityUSD, targetBorrowUSD),
         healthRate: calcHealthRate(targetCollateralUSD, targetBorrowUSD, targetLiquidationThreshold),
         liquidationThreshold: targetLiquidationThreshold,
         borrowUSD: common.formatBigUnit(targetBorrowUSD, 2),
         collateralUSD: common.formatBigUnit(targetCollateralUSD, 2),
-        netAPR: calcNetAPR(supplyUSD, supplyAPR, targetCollateralUSD, targetBorrowUSD, borrowAPR),
+        netAPR: calcNetAPR(
+          targetSupplyUSD,
+          targetPositiveProportion,
+          targetBorrowUSD,
+          targetNegativeProportion,
+          targetCollateralUSD
+        ),
       };
     }
 
