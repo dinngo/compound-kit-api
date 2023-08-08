@@ -79,8 +79,8 @@ export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRoutePar
 
       // 1. get the quotation for swapping the deleverage token into amount of the base token.
       const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
-        tokenIn: deleverageCollateralToken,
-        output: { token: baseToken, amount },
+        tokenIn: deleverageCollateralToken.wrapped,
+        output: { token: baseToken.wrapped, amount },
         slippage,
       });
 
@@ -90,43 +90,48 @@ export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRoutePar
         throw newHttpError(400, { code: '400.6', message: 'insufficient collateral for deleverage' });
       }
 
-      const borrowAmount = quotation.input.amount;
+      // 2. get flash loan aggregator quotation
+      const { protocolId, loans, repays } = await apisdk.protocols.utility.getFlashLoanAggregatorQuotation(chainId, {
+        outputs: [{ token: deleverageCollateralToken.wrapped, amount: quotation.input.amount }],
+      });
+      const borrowAmount = repays.at(0).amount;
       const deleverageCollateralUSD = new BigNumberJS(borrowAmount).times(deleverageCollateral.assetPrice);
 
-      // 2. new balancer flash loan logics and append loan logic
-      const [flashLoanLoanLogic, flashLoanRepayLogic] = apisdk.protocols.balancerv2.newFlashLoanLogicPair([
-        { token: deleverageCollateralToken, amount: borrowAmount },
-      ]);
+      // 3. new flash loan aggregator logics and append loan logic
+      const [flashLoanLoanLogic, flashLoanRepayLogic] = apisdk.protocols.utility.newFlashLoanAggregatorLogicPair(
+        protocolId,
+        loans.toArray()
+      );
       logics.push(flashLoanLoanLogic);
 
-      // 3. new and append paraswap swap token logic
+      // 4. new and append paraswap swap token logic
       logics.push(apisdk.protocols.paraswapv5.newSwapTokenLogic(quotation));
 
-      // 4. new and append compound v3 repay collateral logic, and use 100% of the balance.
+      // 5. new and append compound v3 repay collateral logic, and use 100% of the balance.
       logics.push(
         apisdk.protocols.compoundv3.newRepayLogic({
           marketId,
           borrower: account,
-          input: { token: baseToken, amount },
+          input: { token: baseToken.wrapped, amount },
           balanceBps: common.BPS_BASE,
         })
       );
 
-      // 5. new and append compound v3 withdraw logic
+      // 6. new and append compound v3 withdraw logic
       logics.push(
         apisdk.protocols.compoundv3.newWithdrawCollateralLogic({
           marketId,
-          output: { token: deleverageCollateralToken, amount: borrowAmount },
+          output: { token: deleverageCollateralToken.wrapped, amount: borrowAmount },
         })
       );
 
-      // 6. append balancer flash loan repay logic
+      // 7. append balancer flash loan repay logic
       logics.push(flashLoanRepayLogic);
 
       const estimateResult = await apisdk.estimateRouterData({ chainId, account, logics });
       approvals = estimateResult.approvals;
 
-      // 7. calc target position
+      // 8. calc target position
       const targetSupplyUSD = new BigNumberJS(supplyUSD);
       const targetBorrowUSD = new BigNumberJS(borrowUSD).gt(deleverageDebtUSD)
         ? new BigNumberJS(borrowUSD).minus(deleverageDebtUSD)

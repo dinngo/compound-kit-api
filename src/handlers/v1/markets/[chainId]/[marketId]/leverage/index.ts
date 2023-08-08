@@ -80,26 +80,32 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
 
       // 1. get the quotation for swapping the base token into amount of leverage token.
       const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
-        tokenIn: baseToken,
-        output: { token: leverageToken, amount },
+        tokenIn: baseToken.wrapped,
+        output: { token: leverageToken.wrapped, amount },
         slippage,
       });
-      const borrowAmount = quotation.input.amount;
 
-      // 2. new balancer flash loan logics and append loan logic
-      const [flashLoanLoanLogic, flashLoanRepayLogic] = apisdk.protocols.balancerv2.newFlashLoanLogicPair([
-        { token: baseToken, amount: borrowAmount },
-      ]);
+      // 2. get flash loan aggregator quotation
+      const { protocolId, loans, repays } = await apisdk.protocols.utility.getFlashLoanAggregatorQuotation(chainId, {
+        outputs: [{ token: baseToken.wrapped, amount: quotation.input.amount }],
+      });
+      const borrowAmount = repays.at(0).amount;
+
+      // 3. new flash loan aggregator logics and append loan logic
+      const [flashLoanLoanLogic, flashLoanRepayLogic] = apisdk.protocols.utility.newFlashLoanAggregatorLogicPair(
+        protocolId,
+        loans.toArray()
+      );
       logics.push(flashLoanLoanLogic);
 
-      // 3. new and append paraswap swap token logic
+      // 4. new and append paraswap swap token logic
       logics.push(apisdk.protocols.paraswapv5.newSwapTokenLogic(quotation));
 
-      // 4. new and append compound v3 supply collateral logic, and use 100% of the balance.
+      // 5. new and append compound v3 supply collateral logic, and use 100% of the balance.
       logics.push(
         apisdk.protocols.compoundv3.newSupplyCollateralLogic({
           marketId,
-          input: { token: leverageToken, amount },
+          input: { token: leverageToken.wrapped, amount },
           balanceBps: common.BPS_BASE,
         })
       );
@@ -108,7 +114,7 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       logics.push(
         apisdk.protocols.compoundv3.newBorrowLogic({
           marketId,
-          output: { token: baseToken, amount: borrowAmount },
+          output: { token: baseToken.wrapped, amount: borrowAmount },
         })
       );
 

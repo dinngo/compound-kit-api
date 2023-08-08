@@ -65,60 +65,76 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
     let approvals: GetCollateralSwapQuotationResponseBody['approvals'] = [];
     let targetPosition = currentPosition;
     if (event.body.withdrawalToken && event.body.targetToken && event.body.amount && Number(event.body.amount) > 0) {
-      const { withdrawalToken, targetToken, amount, slippage } = event.body;
+      const { amount, slippage } = event.body;
       const { supplyAPR, supplyUSD, borrowAPR, borrowCapacityUSD, liquidationLimit, collaterals } = marketInfo;
 
       // Verify token input
-      const _withdrawalToken = common.Token.from(withdrawalToken);
-      const withdrawalCollateral = collaterals.find(({ asset }) => asset.is(_withdrawalToken.unwrapped));
+      const withdrawalToken = common.Token.from(event.body.withdrawalToken);
+      const withdrawalCollateral = collaterals.find(({ asset }) => asset.is(withdrawalToken.unwrapped));
       if (!withdrawalCollateral) {
         throw newHttpError(400, { code: '400.5', message: 'withdrawal token is not collateral' });
       }
-      const _targetToken = common.Token.from(targetToken);
-      const targetCollateral = collaterals.find(({ asset }) => asset.is(_targetToken.unwrapped));
+      const targetToken = common.Token.from(event.body.targetToken);
+      const targetCollateral = collaterals.find(({ asset }) => asset.is(targetToken.unwrapped));
       if (!targetCollateral) {
         throw newHttpError(400, { code: '400.6', message: 'target token is not collateral' });
       }
 
-      // 1. new balancer flash loan logics and append loan logic
-      const [flashLoanLoanLogic, flashLoanRepayLogic] = apisdk.protocols.balancerv2.newFlashLoanLogicPair([
-        { token: _withdrawalToken, amount: amount },
-      ]);
+      // 1. get flash loan aggregator quotation
+      const flashLoanBorrow = { token: withdrawalToken.wrapped, amount };
+      const { protocolId, feeBps } = await apisdk.protocols.utility.getFlashLoanAggregatorQuotation(chainId, {
+        outputs: [flashLoanBorrow],
+      });
+      // 1-1. when feeBps > 0, it's necessary to reverse-calculate the borrowing amount for the flash loan.
+      // the withdrawal amount will be the repayment amount with the fee.
+      if (feeBps > 0) {
+        flashLoanBorrow.amount = common.formatBigUnit(
+          new BigNumberJS(amount).times(common.BPS_BASE).div(common.BPS_BASE + feeBps),
+          withdrawalToken.decimals,
+          'floor'
+        );
+      }
+
+      // 2. new flash loan aggregator logics and append loan logic
+      const [flashLoanLoanLogic, flashLoanRepayLogic] = apisdk.protocols.utility.newFlashLoanAggregatorLogicPair(
+        protocolId,
+        [flashLoanBorrow]
+      );
       logics.push(flashLoanLoanLogic);
 
-      // 2. new and append paraswap swap token logic
+      // 3. new and append paraswap swap token logic
       const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
-        input: { token: _withdrawalToken, amount: amount },
-        tokenOut: _targetToken,
+        input: { token: withdrawalToken.wrapped, amount: flashLoanBorrow.amount },
+        tokenOut: targetToken.wrapped,
         slippage,
       });
       logics.push(apisdk.protocols.paraswapv5.newSwapTokenLogic(quotation));
 
-      // 3. new and append compound v3 supply collateral logic
+      // 4. new and append compound v3 supply collateral logic
       targetTokenAmount = quotation.output.amount;
       logics.push(
         apisdk.protocols.compoundv3.newSupplyCollateralLogic({
           marketId,
-          input: { token: _targetToken, amount: targetTokenAmount },
+          input: { token: targetToken.wrapped, amount: targetTokenAmount },
           balanceBps: common.BPS_BASE,
         })
       );
 
-      // 4. new and append compound v3 withdraw logic
+      // 5. new and append compound v3 withdraw logic
       logics.push(
         apisdk.protocols.compoundv3.newWithdrawCollateralLogic({
           marketId,
-          output: { token: _withdrawalToken, amount: amount },
+          output: { token: withdrawalToken.wrapped, amount },
         })
       );
 
-      // 5. append balancer flash loan replay logic
+      // 6. append balancer flash loan replay logic
       logics.push(flashLoanRepayLogic);
 
       const estimateResult = await apisdk.estimateRouterData({ chainId, account, logics });
       approvals = estimateResult.approvals;
 
-      // 6. calc target position
+      // 7. calc target position
       const withdrawalUSD = new BigNumberJS(amount).times(withdrawalCollateral.assetPrice);
       const targetUSD = new BigNumberJS(targetTokenAmount).times(targetCollateral.assetPrice);
       const targetSupplyUSD = new BigNumberJS(supplyUSD);
