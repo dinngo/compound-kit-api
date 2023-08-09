@@ -85,7 +85,9 @@ export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRoutePar
       });
 
       if (
-        quotation.input.gt(new common.TokenAmount(deleverageCollateralToken, deleverageCollateral.collateralBalance))
+        quotation.input.gt(
+          new common.TokenAmount(deleverageCollateralToken.wrapped, deleverageCollateral.collateralBalance)
+        )
       ) {
         throw newHttpError(400, { code: '400.6', message: 'insufficient collateral for deleverage' });
       }
