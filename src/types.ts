@@ -26,6 +26,12 @@ export interface CollateralSwapQuotation {
   targetPosition: Position;
 }
 
+export interface ZapSupplyQuotation {
+  targetTokenAmount: string;
+  currentPosition: Position;
+  targetPosition: Position;
+}
+
 export type QuoteAPIResponseBody<T = any> = Pick<apisdk.RouterDataEstimateResult, 'approvals' | 'permitData'> &
   Pick<apisdk.RouterData, 'logics'> & {
     quotation: T;
