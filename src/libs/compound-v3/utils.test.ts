@@ -82,7 +82,7 @@ describe('Test calcHealthRate', function () {
       collateralUSD: '0',
       borrowUSD: '0',
       liquidationThreshold: '0',
-      expected: 'NaN',
+      expected: 'Infinity',
     },
     {
       collateralUSD: '235.08',

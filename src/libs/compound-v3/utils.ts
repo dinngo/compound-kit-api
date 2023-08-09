@@ -30,7 +30,14 @@ export function calcHealthRate(
   borrowUSD: string | BigNumberJS,
   liquidationThreshold: string | BigNumberJS
 ) {
-  return common.formatBigUnit(new BigNumberJS(collateralUSD).times(liquidationThreshold).div(borrowUSD), 2);
+  borrowUSD = new BigNumberJS(borrowUSD);
+
+  let healthRate = 'Infinity';
+  if (!borrowUSD.isZero()) {
+    healthRate = common.formatBigUnit(new BigNumberJS(collateralUSD).times(liquidationThreshold).div(borrowUSD), 2);
+  }
+
+  return healthRate;
 }
 
 export function calcNetAPR(
@@ -58,10 +65,13 @@ export function calcNetAPR(
     netWorthUSD = new BigNumberJS(1);
   }
 
-  const netAPY = common.formatBigUnit(
-    earnedAPY.times(totalSupplyUSD).div(netWorthUSD).minus(debtAPY.times(borrowUSD).div(netWorthUSD)),
-    4
-  );
+  let netAPY = '0';
+  if (netWorthUSD.gt(0)) {
+    netAPY = common.formatBigUnit(
+      earnedAPY.times(totalSupplyUSD).div(netWorthUSD).minus(debtAPY.times(borrowUSD).div(netWorthUSD)),
+      4
+    );
+  }
 
   return netAPY;
 }

@@ -262,7 +262,7 @@ describe('Service', function () {
           liquidationPoint: '0',
           liquidationPointUSD: '0',
           utilization: '0',
-          healthRate: 'NaN',
+          healthRate: 'Infinity',
           netAPR: '0',
           collaterals: [
             {
@@ -434,7 +434,7 @@ describe('Service', function () {
           liquidationPoint: '0',
           liquidationPointUSD: '0',
           utilization: '0',
-          healthRate: 'NaN',
+          healthRate: 'Infinity',
           netAPR: '0',
           collaterals: [
             {
