@@ -54,6 +54,27 @@ describe('Test get zap supply quotation api', function () {
       },
     },
     {
+      title: '400.6: borrow USD is not zero',
+      path: '/v1/markets/137/usdc/zap-supply',
+      body: {
+        account: '0xf6da9e9d73d7893223578d32a95d6d7de5522767',
+        sourceToken: {
+          chainId: 137,
+          address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
+          decimals: 6,
+          symbol: 'USDT',
+          name: '(PoS) Tether USD',
+        },
+        amount: '1',
+        targetToken: logics.compoundv3.polygonTokens.USDC,
+        slippage: 100,
+      },
+      expected: {
+        statusCode: 400,
+        body: JSON.stringify({ code: '400.6', message: 'borrow USD is not zero' }),
+      },
+    },
+    {
       title: '200: without source token and amount',
       path: '/v1/markets/137/usdc/zap-supply',
       body: { account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83' },
