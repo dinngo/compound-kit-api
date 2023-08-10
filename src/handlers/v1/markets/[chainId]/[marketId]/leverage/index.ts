@@ -87,7 +87,7 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
 
       // 2. get flash loan aggregator quotation
       const { protocolId, loans, repays } = await apisdk.protocols.utility.getFlashLoanAggregatorQuotation(chainId, {
-        outputs: [{ token: baseToken.wrapped, amount: quotation.input.amount }],
+        loans: [{ token: baseToken.wrapped, amount: quotation.input.amount }],
       });
       const borrowAmount = repays.at(0).amount;
 

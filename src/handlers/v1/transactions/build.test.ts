@@ -49,10 +49,11 @@ describe('Test build transaction api', function () {
         account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
         logics: [
           {
-            rid: 'balancer-v2:flash-loan',
+            rid: 'utility:flash-loan-aggregator',
             fields: {
-              id: 'a02181cf-51dd-4242-b12c-37fe98e5c62b',
-              outputs: [
+              id: '884af393-5463-40a8-92dc-3e66bbf0387a',
+              protocolId: 'balancer-v2',
+              loans: [
                 {
                   token: {
                     chainId: 137,
@@ -61,7 +62,7 @@ describe('Test build transaction api', function () {
                     symbol: 'USDC',
                     name: 'USD Coin (PoS)',
                   },
-                  amount: '1853.605677',
+                  amount: '1852.34189',
                 },
               ],
               isLoan: true,
@@ -78,7 +79,7 @@ describe('Test build transaction api', function () {
                   symbol: 'USDC',
                   name: 'USD Coin (PoS)',
                 },
-                amount: '1853.605677',
+                amount: '1852.34189',
               },
               output: {
                 token: {
@@ -122,15 +123,16 @@ describe('Test build transaction api', function () {
                   symbol: 'USDC',
                   name: 'USD Coin (PoS)',
                 },
-                amount: '1853.605677',
+                amount: '1852.34189',
               },
             },
           },
           {
-            rid: 'balancer-v2:flash-loan',
+            rid: 'utility:flash-loan-aggregator',
             fields: {
-              id: 'a02181cf-51dd-4242-b12c-37fe98e5c62b',
-              outputs: [
+              id: '884af393-5463-40a8-92dc-3e66bbf0387a',
+              protocolId: 'balancer-v2',
+              loans: [
                 {
                   token: {
                     chainId: 137,
@@ -139,7 +141,7 @@ describe('Test build transaction api', function () {
                     symbol: 'USDC',
                     name: 'USD Coin (PoS)',
                   },
-                  amount: '1853.605677',
+                  amount: '1852.34189',
                 },
               ],
               isLoan: false,

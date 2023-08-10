@@ -80,31 +80,23 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
         throw newHttpError(400, { code: '400.6', message: 'target token is not collateral' });
       }
 
-      // 1. get flash loan aggregator quotation
-      const flashLoanBorrow = { token: withdrawalToken.wrapped, amount };
-      const { protocolId, feeBps } = await apisdk.protocols.utility.getFlashLoanAggregatorQuotation(chainId, {
-        outputs: [flashLoanBorrow],
+      const withdrawal = { token: withdrawalToken.wrapped, amount };
+
+      // 1. get flash loan aggregator quotation with repays
+      const { protocolId, loans } = await apisdk.protocols.utility.getFlashLoanAggregatorQuotation(chainId, {
+        repays: [withdrawal],
       });
-      // 1-1. when feeBps > 0, it's necessary to reverse-calculate the borrowing amount for the flash loan.
-      // the withdrawal amount will be the repayment amount with the fee.
-      if (feeBps > 0) {
-        flashLoanBorrow.amount = common.formatBigUnit(
-          new BigNumberJS(amount).times(common.BPS_BASE).div(common.BPS_BASE + feeBps),
-          withdrawalToken.decimals,
-          'floor'
-        );
-      }
 
       // 2. new flash loan aggregator logics and append loan logic
       const [flashLoanLoanLogic, flashLoanRepayLogic] = apisdk.protocols.utility.newFlashLoanAggregatorLogicPair(
         protocolId,
-        [flashLoanBorrow]
+        loans.toArray()
       );
       logics.push(flashLoanLoanLogic);
 
       // 3. new and append paraswap swap token logic
       const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
-        input: { token: withdrawalToken.wrapped, amount: flashLoanBorrow.amount },
+        input: loans.at(0),
         tokenOut: targetToken.wrapped,
         slippage,
       });
@@ -124,7 +116,7 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
       logics.push(
         apisdk.protocols.compoundv3.newWithdrawCollateralLogic({
           marketId,
-          output: { token: withdrawalToken.wrapped, amount },
+          output: withdrawal,
         })
       );
 

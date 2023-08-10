@@ -94,7 +94,7 @@ export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRoutePar
 
       // 2. get flash loan aggregator quotation
       const { protocolId, loans, repays } = await apisdk.protocols.utility.getFlashLoanAggregatorQuotation(chainId, {
-        outputs: [{ token: deleverageCollateralToken.wrapped, amount: quotation.input.amount }],
+        loans: [{ token: deleverageCollateralToken.wrapped, amount: quotation.input.amount }],
       });
       const borrowAmount = repays.at(0).amount;
       const deleverageCollateralUSD = new BigNumberJS(borrowAmount).times(deleverageCollateral.assetPrice);
