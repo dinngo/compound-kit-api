@@ -9,8 +9,8 @@ import * as logics from '@protocolink/logics';
 import * as utils from 'test/utils';
 
 describe('Transaction: Collateral Swap', function () {
-  const collateralToken: common.Token = polygonTokens.WETH;
-  const collateralTokenInitBalance: string = '5';
+  const collateralToken = polygonTokens.WETH;
+  const collateralTokenInitBalance = '5';
 
   let chainId: number;
   let user: SignerWithAddress;
@@ -31,20 +31,20 @@ describe('Transaction: Collateral Swap', function () {
     await utils.supply(chainId, user, marketId, supplyAmount);
 
     // 2. user has borrowed 2000 USDC
-    const baseToken: common.Token = polygonTokens.USDC;
-    const baseTokenBorrowAmount: string = '2000';
+    const baseToken = polygonTokens.USDC;
+    const baseTokenBorrowAmount = '2000';
     const borrowAmount = new common.TokenAmount(baseToken, baseTokenBorrowAmount);
     await utils.borrow(chainId, user, marketId, borrowAmount);
 
     // 3. user obtains a quotation for collateral swap 3 WETH through the collateral swap API
     const amount = '3';
     const slippage = 100;
-    const targetToken: common.Token = polygonTokens.WMATIC;
+    const targetToken = polygonTokens.WMATIC;
     const quotation = await api.quote(chainId, marketId, 'collateral-swap', {
       account: user.address,
       withdrawalToken: collateralToken,
-      amount: amount,
-      targetToken: targetToken,
+      amount,
+      targetToken,
       slippage,
     });
 
