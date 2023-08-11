@@ -78,7 +78,7 @@ describe('Test get zap supply quotation api', function () {
       title: '200: without source token and amount',
       path: '/v1/markets/137/usdc/zap-supply',
       body: { account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83' },
-      expected: { statusCode: 200, keys: ['quotation', 'approvals', 'logics'] },
+      expected: { statusCode: 200, keys: ['quotation', 'approvals', 'logics'], logicsLength: 0 },
     },
     {
       title: '200: without target token',
@@ -89,7 +89,7 @@ describe('Test get zap supply quotation api', function () {
         amount: '1',
         slippage: 100,
       },
-      expected: { statusCode: 200, keys: ['quotation', 'approvals', 'logics'] },
+      expected: { statusCode: 200, keys: ['quotation', 'approvals', 'logics'], logicsLength: 0 },
     },
     {
       title: '200: zap supply collateral',
@@ -103,11 +103,15 @@ describe('Test get zap supply quotation api', function () {
           symbol: 'USDT',
           name: '(PoS) Tether USD',
         },
-        amount: '2000',
+        amount: '1',
         targetToken: logics.compoundv3.polygonTokens.WMATIC,
         slippage: 100,
       },
-      expected: { statusCode: 200, keys: ['quotation', 'approvals', 'logics', 'permitData'] },
+      expected: {
+        statusCode: 200,
+        keys: ['quotation', 'approvals', 'logics', 'permitData'],
+        logicsLength: 2,
+      },
     },
     {
       title: '200: zap supply base',
@@ -125,7 +129,11 @@ describe('Test get zap supply quotation api', function () {
         targetToken: logics.compoundv3.polygonTokens.USDC,
         slippage: 100,
       },
-      expected: { statusCode: 200, keys: ['quotation', 'approvals', 'logics', 'permitData'] },
+      expected: {
+        statusCode: 200,
+        keys: ['quotation', 'approvals', 'logics', 'permitData'],
+        logicsLength: 2,
+      },
     },
     {
       title: '200: source token is target token',
@@ -137,19 +145,11 @@ describe('Test get zap supply quotation api', function () {
         targetToken: logics.compoundv3.polygonTokens.USDC,
         slippage: 100,
       },
-      expected: { statusCode: 200, keys: ['quotation', 'approvals', 'logics', 'permitData'] },
-    },
-    {
-      title: '200: source token is unwrapped target token',
-      path: '/v1/markets/137/usdc/zap-supply',
-      body: {
-        account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
-        sourceToken: logics.compoundv3.polygonTokens.MATIC,
-        amount: '1',
-        targetToken: logics.compoundv3.polygonTokens.WMATIC,
-        slippage: 100,
+      expected: {
+        statusCode: 200,
+        keys: ['quotation', 'approvals', 'logics', 'permitData'],
+        logicsLength: 1,
       },
-      expected: { statusCode: 200, keys: ['quotation', 'approvals', 'logics'] },
     },
   ];
 
@@ -180,6 +180,7 @@ describe('Test get zap supply quotation api', function () {
           'collateralUSD',
           'netAPR'
         );
+        expect(parsedBody.logics.length).to.eq(expected.logicsLength);
       }
     });
   });

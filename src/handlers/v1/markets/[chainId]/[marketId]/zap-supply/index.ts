@@ -1,5 +1,4 @@
 import BigNumberJS from 'bignumber.js';
-import { CollateralInfo, MarketInfo, Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
 import {
   EventBody,
   EventPathParameters,
@@ -8,7 +7,8 @@ import {
   newHttpError,
   newInternalServerError,
 } from 'src/libs/api';
-import { QuoteAPIResponseBody, ZapSupplyQuotation } from 'src/types';
+import { MarketInfo, Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
+import { QuoteAPIResponseBody, ZapQuotation } from 'src/types';
 import * as apisdk from '@protocolink/api';
 import * as common from '@protocolink/common';
 import { utils } from 'ethers';
@@ -23,7 +23,7 @@ type GetZapSupplyQuotationRouteParams = EventPathParameters<{ chainId: string; m
     slippage?: number;
   }>;
 
-type GetZapSupplyQuotationResponseBody = QuoteAPIResponseBody<ZapSupplyQuotation>;
+type GetZapSupplyQuotationResponseBody = QuoteAPIResponseBody<ZapQuotation>;
 
 export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParams> = {
   method: 'POST',
@@ -87,30 +87,29 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
       }
 
       // 2. new and append swap token logic
-      if (!sourceToken.is(targetToken)) {
+      if (sourceToken.is(targetToken)) {
+        targetTokenAmount = amount;
+      } else {
         const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
           input: { token: sourceToken, amount },
           tokenOut: targetToken,
           slippage,
         });
-        logics.push(apisdk.protocols.paraswapv5.newSwapTokenLogic(quotation));
         targetTokenAmount = quotation.output.amount;
-      } else {
-        targetTokenAmount = amount;
+        logics.push(apisdk.protocols.paraswapv5.newSwapTokenLogic(quotation));
       }
 
       // 3. new and append compound v3 supply logic
-      if (targetCollateral === undefined) {
+      if (targetToken.is(baseToken)) {
         if (!new BigNumberJS(borrowUSD).isZero()) {
           throw newHttpError(400, { code: '400.6', message: 'borrow USD is not zero' });
         }
-        const tokenList = await apisdk.protocols.compoundv3.getSupplyBaseTokenList(chainId);
-        const cToken = tokenList[marketId][0][1];
+        const cToken = await service.getCToken(marketId);
         const supplyBaseQuotation = await apisdk.protocols.compoundv3.getSupplyBaseQuotation(chainId, {
           marketId,
           input: {
             token: targetToken,
-            amount: amount,
+            amount: targetTokenAmount,
           },
           tokenOut: cToken,
         });
@@ -137,7 +136,7 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
       permitData = estimateResult.permitData;
 
       // 4. calc target position
-      if (targetCollateral === undefined) {
+      if (targetToken.is(baseToken)) {
         const targetUSD = new BigNumberJS(amount).times(baseTokenPrice);
         const targetSupplyUSD = new BigNumberJS(supplyUSD).plus(targetUSD);
         const targetBorrowUSD = new BigNumberJS(borrowUSD);
@@ -164,15 +163,15 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
           ),
         };
       } else {
-        const targetUSD = new BigNumberJS(amount).times(targetCollateral.assetPrice);
+        const targetUSD = new BigNumberJS(amount).times(targetCollateral!.assetPrice);
         const targetSupplyUSD = new BigNumberJS(supplyUSD);
         const targetBorrowUSD = new BigNumberJS(borrowUSD);
         const targetCollateralUSD = new BigNumberJS(collateralUSD).plus(targetUSD);
         const targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD).plus(
-          targetUSD.times(targetCollateral.borrowCollateralFactor)
+          targetUSD.times(targetCollateral!.borrowCollateralFactor)
         );
         const targetLiquidationLimit = new BigNumberJS(liquidationLimit).plus(
-          targetUSD.times(targetCollateral.liquidateCollateralFactor)
+          targetUSD.times(targetCollateral!.liquidateCollateralFactor)
         );
 
         const targetLiquidationThreshold = common.formatBigUnit(targetLiquidationLimit.div(targetCollateralUSD), 4);

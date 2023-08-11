@@ -26,7 +26,7 @@ export interface CollateralSwapQuotation {
   targetPosition: Position;
 }
 
-export interface ZapSupplyQuotation {
+export interface ZapQuotation {
   targetTokenAmount: string;
   currentPosition: Position;
   targetPosition: Position;
