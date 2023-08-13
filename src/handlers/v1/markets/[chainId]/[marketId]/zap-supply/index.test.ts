@@ -77,7 +77,10 @@ describe('Test get zap supply quotation api', function () {
     {
       title: '200: without source token and amount',
       path: '/v1/markets/137/usdc/zap-supply',
-      body: { account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83' },
+      body: {
+        account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
+        targetToken: logics.compoundv3.polygonTokens.USDC,
+      },
       expected: { statusCode: 200, keys: ['quotation', 'approvals', 'logics'], logicsLength: 0 },
     },
     {

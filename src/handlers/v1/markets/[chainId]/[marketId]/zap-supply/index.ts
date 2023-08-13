@@ -82,7 +82,7 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
 
       // 1. check supply collateral or base token
       const targetCollateral = collaterals.find(({ asset }) => asset.is(targetToken.unwrapped));
-      if (!targetCollateral && !targetToken.is(baseToken)) {
+      if (!targetCollateral && !targetToken.unwrapped.is(baseToken)) {
         throw newHttpError(400, { code: '400.5', message: 'target token is not collateral nor base' });
       }
 
@@ -92,7 +92,7 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
       } else {
         const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
           input: { token: sourceToken, amount },
-          tokenOut: targetToken,
+          tokenOut: targetToken.unwrapped.is(baseToken) ? targetToken.unwrapped : targetToken,
           slippage,
         });
         targetTokenAmount = quotation.output.amount;
@@ -100,7 +100,7 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
       }
 
       // 3. new and append compound v3 supply logic
-      if (targetToken.is(baseToken)) {
+      if (targetToken.unwrapped.is(baseToken)) {
         if (!new BigNumberJS(borrowUSD).isZero()) {
           throw newHttpError(400, { code: '400.6', message: 'borrow USD is not zero' });
         }
@@ -108,16 +108,14 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
         const supplyBaseQuotation = await apisdk.protocols.compoundv3.getSupplyBaseQuotation(chainId, {
           marketId,
           input: {
-            token: targetToken,
+            token: targetToken.unwrapped,
             amount: targetTokenAmount,
           },
           tokenOut: cToken,
         });
         logics.push(
           apisdk.protocols.compoundv3.newSupplyBaseLogic({
-            input: supplyBaseQuotation.input,
-            output: supplyBaseQuotation.output,
-            marketId: supplyBaseQuotation.marketId,
+            ...supplyBaseQuotation,
             balanceBps: common.BPS_BASE,
           })
         );
@@ -136,63 +134,42 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
       permitData = estimateResult.permitData;
 
       // 4. calc target position
-      if (targetToken.is(baseToken)) {
-        const targetUSD = new BigNumberJS(amount).times(baseTokenPrice);
-        const targetSupplyUSD = new BigNumberJS(supplyUSD).plus(targetUSD);
-        const targetBorrowUSD = new BigNumberJS(borrowUSD);
-        const targetCollateralUSD = new BigNumberJS(collateralUSD);
-        const targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD);
-        const targetLiquidationLimit = new BigNumberJS(liquidationLimit);
-
-        const targetLiquidationThreshold = common.formatBigUnit(targetLiquidationLimit.div(targetCollateralUSD), 4);
-        const targetPositiveProportion = targetSupplyUSD.times(supplyAPR);
-        const targetNegativeProportion = targetBorrowUSD.times(borrowAPR);
-
-        targetPosition = {
-          utilization: calcUtilization(targetBorrowCapacityUSD, targetBorrowUSD),
-          healthRate: calcHealthRate(targetCollateralUSD, targetBorrowUSD, targetLiquidationThreshold),
-          liquidationThreshold: targetLiquidationThreshold,
-          borrowUSD: common.formatBigUnit(targetBorrowUSD, 2),
-          collateralUSD: common.formatBigUnit(targetCollateralUSD, 2),
-          netAPR: calcNetAPR(
-            targetSupplyUSD,
-            targetPositiveProportion,
-            targetBorrowUSD,
-            targetNegativeProportion,
-            targetCollateralUSD
-          ),
-        };
+      if (targetToken.unwrapped.is(baseToken)) {
+        var targetUSD = new BigNumberJS(targetTokenAmount).times(baseTokenPrice);
+        var targetSupplyUSD = new BigNumberJS(supplyUSD).plus(targetUSD);
+        var targetCollateralUSD = new BigNumberJS(collateralUSD);
+        var targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD);
+        var targetLiquidationLimit = new BigNumberJS(liquidationLimit);
       } else {
-        const targetUSD = new BigNumberJS(amount).times(targetCollateral!.assetPrice);
-        const targetSupplyUSD = new BigNumberJS(supplyUSD);
-        const targetBorrowUSD = new BigNumberJS(borrowUSD);
-        const targetCollateralUSD = new BigNumberJS(collateralUSD).plus(targetUSD);
-        const targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD).plus(
+        var targetUSD = new BigNumberJS(targetTokenAmount).times(targetCollateral!.assetPrice);
+        var targetSupplyUSD = new BigNumberJS(supplyUSD);
+        var targetCollateralUSD = new BigNumberJS(collateralUSD).plus(targetUSD);
+        var targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD).plus(
           targetUSD.times(targetCollateral!.borrowCollateralFactor)
         );
-        const targetLiquidationLimit = new BigNumberJS(liquidationLimit).plus(
+        var targetLiquidationLimit = new BigNumberJS(liquidationLimit).plus(
           targetUSD.times(targetCollateral!.liquidateCollateralFactor)
         );
-
-        const targetLiquidationThreshold = common.formatBigUnit(targetLiquidationLimit.div(targetCollateralUSD), 4);
-        const targetPositiveProportion = targetSupplyUSD.times(supplyAPR);
-        const targetNegativeProportion = targetBorrowUSD.times(borrowAPR);
-
-        targetPosition = {
-          utilization: calcUtilization(targetBorrowCapacityUSD, targetBorrowUSD),
-          healthRate: calcHealthRate(targetCollateralUSD, targetBorrowUSD, targetLiquidationThreshold),
-          liquidationThreshold: targetLiquidationThreshold,
-          borrowUSD: common.formatBigUnit(targetBorrowUSD, 2),
-          collateralUSD: common.formatBigUnit(targetCollateralUSD, 2),
-          netAPR: calcNetAPR(
-            targetSupplyUSD,
-            targetPositiveProportion,
-            targetBorrowUSD,
-            targetNegativeProportion,
-            targetCollateralUSD
-          ),
-        };
       }
+      const targetBorrowUSD = new BigNumberJS(borrowUSD);
+      const targetLiquidationThreshold = common.formatBigUnit(targetLiquidationLimit.div(targetCollateralUSD), 4);
+      const targetPositiveProportion = targetSupplyUSD.times(supplyAPR);
+      const targetNegativeProportion = targetBorrowUSD.times(borrowAPR);
+
+      targetPosition = {
+        utilization: calcUtilization(targetBorrowCapacityUSD, targetBorrowUSD),
+        healthRate: calcHealthRate(targetCollateralUSD, targetBorrowUSD, targetLiquidationThreshold),
+        liquidationThreshold: targetLiquidationThreshold,
+        borrowUSD: common.formatBigUnit(targetBorrowUSD, 2),
+        collateralUSD: common.formatBigUnit(targetCollateralUSD, 2),
+        netAPR: calcNetAPR(
+          targetSupplyUSD,
+          targetPositiveProportion,
+          targetBorrowUSD,
+          targetNegativeProportion,
+          targetCollateralUSD
+        ),
+      };
     }
 
     const responseBody: GetZapSupplyQuotationResponseBody = {
