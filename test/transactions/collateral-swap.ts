@@ -1,4 +1,3 @@
-import BigNumberJS from 'bignumber.js';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import * as api from 'test/fixtures/api';
 import { claimToken, getChainId, polygonTokens, snapshotAndRevertEach } from '@protocolink/test-helpers';
@@ -73,19 +72,11 @@ describe('Transaction: Collateral Swap', function () {
     const quoteTargetAmount = new common.TokenAmount(targetToken, quotation.quotation.targetTokenAmount);
 
     // 7-1. rate may change when the block of getting api data is different from the block of executing tx
-    const [min, max] = bpsBound(quoteTargetAmount.amount);
+    const [min, max] = utils.bpsBound(quoteTargetAmount.amount);
     const maxTargetAmount = quoteTargetAmount.clone().set(max);
     const minTargetAmount = quoteTargetAmount.clone().set(min);
 
     expect(targetBalance.lte(maxTargetAmount)).to.be.true;
     expect(targetBalance.gte(minTargetAmount)).to.be.true;
   });
-
-  function bpsBound(amount: string, bps = 100, bpsBase = 10000): [string, string] {
-    const amountBigNum = BigNumberJS(amount);
-    const offset = amountBigNum.times(bps).div(bpsBase);
-    const max = amountBigNum.plus(offset);
-    const min = amountBigNum.minus(offset);
-    return [min.toString(), max.toString()];
-  }
 });

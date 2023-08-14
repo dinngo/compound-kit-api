@@ -34,7 +34,7 @@ describe('Test get deleverage quotation api', function () {
         token: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
-          decimals: 18,
+          decimals: 6,
           symbol: 'USDT',
           name: '(PoS) Tether USD',
         },

@@ -8,6 +8,7 @@ import { v1GetDeleverageQuotationRoute } from 'src/handlers/v1/markets/[chainId]
 import { v1GetLeverageQuotationRoute } from 'src/handlers/v1/markets/[chainId]/[marketId]/leverage';
 import { v1GetMarketRoute } from 'src/handlers/v1/markets/[chainId]/[marketId]';
 import { v1GetMarketsRoute } from 'src/handlers/v1/markets';
+import { v1GetZapSupplyQuotationRoute } from 'src/handlers/v1/markets/[chainId]/[marketId]/zap-supply';
 
 export const routes: Route<api.Event>[] = [
   statusRoute,
@@ -17,5 +18,6 @@ export const routes: Route<api.Event>[] = [
   v1GetLeverageQuotationRoute,
   v1GetDeleverageQuotationRoute,
   v1GetCollateralSwapQuotationRoute,
+  v1GetZapSupplyQuotationRoute,
   v1BuildTransactionRoute,
 ];
