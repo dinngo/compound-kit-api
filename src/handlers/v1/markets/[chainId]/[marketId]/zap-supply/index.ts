@@ -92,7 +92,7 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
       } else {
         const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
           input: { token: sourceToken, amount },
-          tokenOut: targetToken.unwrapped.is(baseToken) ? targetToken.unwrapped : targetToken,
+          tokenOut: targetToken.wrapped,
           slippage,
         });
         targetTokenAmount = quotation.output.amount;
@@ -108,7 +108,7 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
         const supplyBaseQuotation = await apisdk.protocols.compoundv3.getSupplyBaseQuotation(chainId, {
           marketId,
           input: {
-            token: targetToken.unwrapped,
+            token: targetToken.wrapped,
             amount: targetTokenAmount,
           },
           tokenOut: cToken,
@@ -123,7 +123,7 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
         logics.push(
           apisdk.protocols.compoundv3.newSupplyCollateralLogic({
             marketId,
-            input: { token: targetToken, amount: targetTokenAmount },
+            input: { token: targetToken.wrapped, amount: targetTokenAmount },
             balanceBps: common.BPS_BASE,
           })
         );
@@ -134,20 +134,21 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
       permitData = estimateResult.permitData;
 
       // 4. calc target position
+      let targetSupplyUSD, targetCollateralUSD, targetBorrowCapacityUSD, targetLiquidationLimit;
       if (targetToken.unwrapped.is(baseToken)) {
-        var targetUSD = new BigNumberJS(targetTokenAmount).times(baseTokenPrice);
-        var targetSupplyUSD = new BigNumberJS(supplyUSD).plus(targetUSD);
-        var targetCollateralUSD = new BigNumberJS(collateralUSD);
-        var targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD);
-        var targetLiquidationLimit = new BigNumberJS(liquidationLimit);
+        const targetUSD = new BigNumberJS(targetTokenAmount).times(baseTokenPrice);
+        targetSupplyUSD = new BigNumberJS(supplyUSD).plus(targetUSD);
+        targetCollateralUSD = new BigNumberJS(collateralUSD);
+        targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD);
+        targetLiquidationLimit = new BigNumberJS(liquidationLimit);
       } else {
-        var targetUSD = new BigNumberJS(targetTokenAmount).times(targetCollateral!.assetPrice);
-        var targetSupplyUSD = new BigNumberJS(supplyUSD);
-        var targetCollateralUSD = new BigNumberJS(collateralUSD).plus(targetUSD);
-        var targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD).plus(
+        const targetUSD = new BigNumberJS(targetTokenAmount).times(targetCollateral!.assetPrice);
+        targetSupplyUSD = new BigNumberJS(supplyUSD);
+        targetCollateralUSD = new BigNumberJS(collateralUSD).plus(targetUSD);
+        targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD).plus(
           targetUSD.times(targetCollateral!.borrowCollateralFactor)
         );
-        var targetLiquidationLimit = new BigNumberJS(liquidationLimit).plus(
+        targetLiquidationLimit = new BigNumberJS(liquidationLimit).plus(
           targetUSD.times(targetCollateral!.liquidateCollateralFactor)
         );
       }
