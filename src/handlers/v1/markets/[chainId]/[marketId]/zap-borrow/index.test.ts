@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import * as logics from '@protocolink/logics';
 import { newTestEvent, testContext, testHandler } from 'test/fixtures/api';
-import { polygonTokens } from '@protocolink/logics/dist/logics/compound-v3';
 
 describe('Test get zap borrow quotation api', function () {
   const testCases = [
@@ -67,7 +66,7 @@ describe('Test get zap borrow quotation api', function () {
       body: {
         account: '0x34693b4b0e8237854cee68251441a0bf301c4d65',
         amount: '1',
-        targetToken: polygonTokens.USDC,
+        targetToken: logics.compoundv3.polygonTokens.USDC,
         slippage: 100,
       },
       expected: { statusCode: 200, logicsLength: 1 },

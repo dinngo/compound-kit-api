@@ -99,7 +99,7 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
       );
 
       // 4. new and append swap token logic
-      if (targetToken.unwrapped.is(baseToken)) {
+      if (targetToken.is(baseToken.wrapped)) {
         targetTokenAmount = amount;
       } else {
         const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {

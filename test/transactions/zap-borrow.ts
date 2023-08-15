@@ -65,8 +65,8 @@ describe('Transaction: Zap Borrow', function () {
     expect(borrowDifference.gte(quoteTargetAmount)).to.be.true;
 
     // 5. user's USDC balance should increase
-    const targetBal = await getBalance(user.address, targetToken);
-    expect(targetBal.clone().sub(initTargetBalance).eq(quoteTargetAmount)).to.be.true;
+    const targetBalance = await getBalance(user.address, targetToken);
+    expect(targetBalance.clone().sub(initTargetBalance).eq(quoteTargetAmount)).to.be.true;
   });
 
   it('user zap borrow USDT in USDC market', async function () {
@@ -110,8 +110,8 @@ describe('Transaction: Zap Borrow', function () {
 
     // 5. user's USDT balance should increase
     // 5-1. rate may change when the block of getting api data is different from the block of executing tx
-    const targetBal = await getBalance(user.address, targetToken);
-    const targetDifference = targetBal.clone().sub(initTargetBalance);
+    const targetBalance = await getBalance(user.address, targetToken);
+    const targetDifference = targetBalance.clone().sub(initTargetBalance);
     const quoteTargetAmount = new common.TokenAmount(targetToken, quotation.quotation.targetTokenAmount);
     const [minTarget, maxTarget] = utils.bpsBound(quoteTargetAmount.amount);
     const minTargetAmount = quoteTargetAmount.clone().set(minTarget);
