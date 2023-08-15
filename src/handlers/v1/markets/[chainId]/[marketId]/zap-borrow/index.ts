@@ -92,14 +92,14 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
         apisdk.protocols.compoundv3.newBorrowLogic({
           marketId,
           output: {
-            token: baseToken.wrapped,
+            token: targetToken.unwrapped.is(baseToken) ? targetToken : baseToken.wrapped,
             amount,
           },
         })
       );
 
       // 4. new and append swap token logic
-      if (targetToken.is(baseToken.wrapped)) {
+      if (targetToken.unwrapped.is(baseToken)) {
         targetTokenAmount = amount;
       } else {
         const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
