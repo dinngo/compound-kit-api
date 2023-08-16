@@ -81,6 +81,10 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
         throw newHttpError(400, { code: '400.6', message: 'target token is not collateral' });
       }
 
+      if (new BigNumberJS(amount).gt(withdrawalCollateral.collateralBalance)) {
+        throw newHttpError(400, { code: '400.7', message: 'withdrawal amount is greater than available amount' });
+      }
+
       const withdrawal = { token: withdrawalToken.wrapped, amount };
 
       // 1. get flash loan aggregator quotation with repays

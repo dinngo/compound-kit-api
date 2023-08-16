@@ -39,13 +39,7 @@ describe('Test get collateral swap quotation api', function () {
           name: '(PoS) Tether USD',
         },
         amount: '1',
-        targetToken: {
-          chainId: 137,
-          address: '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619',
-          decimals: 18,
-          symbol: 'WETH',
-          name: 'Wrapped Ether',
-        },
+        targetToken: logics.compoundv3.polygonTokens.WETH,
         slippage: 100,
       },
       expected: {
@@ -58,13 +52,7 @@ describe('Test get collateral swap quotation api', function () {
       path: '/v1/markets/137/usdc/collateral-swap',
       body: {
         account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
-        withdrawalToken: {
-          chainId: 137,
-          address: '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619',
-          decimals: 18,
-          symbol: 'WETH',
-          name: 'Wrapped Ether',
-        },
+        withdrawalToken: logics.compoundv3.polygonTokens.WETH,
         amount: '1',
         targetToken: {
           chainId: 137,
@@ -78,6 +66,21 @@ describe('Test get collateral swap quotation api', function () {
       expected: {
         statusCode: 400,
         body: JSON.stringify({ code: '400.6', message: 'target token is not collateral' }),
+      },
+    },
+    {
+      title: '400.7: withdrawal amount is greater than available amount',
+      path: '/v1/markets/137/usdc/collateral-swap',
+      body: {
+        account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
+        withdrawalToken: logics.compoundv3.polygonTokens.WETH,
+        amount: '1',
+        targetToken: logics.compoundv3.polygonTokens.WMATIC,
+        slippage: 100,
+      },
+      expected: {
+        statusCode: 400,
+        body: JSON.stringify({ code: '400.7', message: 'withdrawal amount is greater than available amount' }),
       },
     },
     {
@@ -101,9 +104,9 @@ describe('Test get collateral swap quotation api', function () {
       title: '200: with token and amount',
       path: '/v1/markets/137/usdc/collateral-swap',
       body: {
-        account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
+        account: '0xb72c8bf1ca1714753ab376b53000db917964dc28',
         withdrawalToken: logics.compoundv3.polygonTokens.WETH,
-        amount: '1',
+        amount: '0.01',
         targetToken: logics.compoundv3.polygonTokens.WMATIC,
         slippage: 100,
       },
