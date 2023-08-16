@@ -87,12 +87,15 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
       }
 
       // 2. new and append swap token logic
-      if (sourceToken.is(targetToken)) {
+      let supplyToken: common.Token;
+      if (sourceToken.wrapped.is(targetToken.wrapped)) {
+        supplyToken = sourceToken;
         targetTokenAmount = amount;
       } else {
+        supplyToken = targetToken.wrapped;
         const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
           input: { token: sourceToken, amount },
-          tokenOut: targetToken.wrapped,
+          tokenOut: supplyToken,
           slippage,
         });
         targetTokenAmount = quotation.output.amount;
@@ -100,7 +103,7 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
       }
 
       // 3. new and append compound v3 supply logic
-      if (targetToken.unwrapped.is(baseToken)) {
+      if (supplyToken.unwrapped.is(baseToken)) {
         if (!new BigNumberJS(borrowUSD).isZero()) {
           throw newHttpError(400, { code: '400.6', message: 'borrow USD is not zero' });
         }
@@ -108,7 +111,7 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
         const supplyBaseQuotation = await apisdk.protocols.compoundv3.getSupplyBaseQuotation(chainId, {
           marketId,
           input: {
-            token: targetToken.wrapped,
+            token: supplyToken,
             amount: targetTokenAmount,
           },
           tokenOut: cToken,
@@ -123,7 +126,7 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
         logics.push(
           apisdk.protocols.compoundv3.newSupplyCollateralLogic({
             marketId,
-            input: { token: targetToken.wrapped, amount: targetTokenAmount },
+            input: { token: supplyToken, amount: targetTokenAmount },
             balanceBps: common.BPS_BASE,
           })
         );
@@ -135,7 +138,7 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
 
       // 4. calc target position
       let targetSupplyUSD, targetCollateralUSD, targetBorrowCapacityUSD, targetLiquidationLimit;
-      if (targetToken.unwrapped.is(baseToken)) {
+      if (supplyToken.unwrapped.is(baseToken)) {
         const targetUSD = new BigNumberJS(targetTokenAmount).times(baseTokenPrice);
         targetSupplyUSD = new BigNumberJS(supplyUSD).plus(targetUSD);
         targetCollateralUSD = new BigNumberJS(collateralUSD);
