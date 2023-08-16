@@ -9,7 +9,9 @@ import { v1GetLeverageQuotationRoute } from 'src/handlers/v1/markets/[chainId]/[
 import { v1GetMarketRoute } from 'src/handlers/v1/markets/[chainId]/[marketId]';
 import { v1GetMarketsRoute } from 'src/handlers/v1/markets';
 import { v1GetZapBorrowQuotationRoute } from 'src/handlers/v1/markets/[chainId]/[marketId]/zap-borrow';
+import { v1GetZapRepayQuotationRoute } from 'src/handlers/v1/markets/[chainId]/[marketId]/zap-repay';
 import { v1GetZapSupplyQuotationRoute } from 'src/handlers/v1/markets/[chainId]/[marketId]/zap-supply';
+import { v1GetZapWithdrawQuotationRoute } from 'src/handlers/v1/markets/[chainId]/[marketId]/zap-withdraw';
 
 export const routes: Route<api.Event>[] = [
   statusRoute,
@@ -21,5 +23,7 @@ export const routes: Route<api.Event>[] = [
   v1GetCollateralSwapQuotationRoute,
   v1GetZapSupplyQuotationRoute,
   v1GetZapBorrowQuotationRoute,
+  v1GetZapWithdrawQuotationRoute,
+  v1GetZapRepayQuotationRoute,
   v1BuildTransactionRoute,
 ];
