@@ -105,7 +105,7 @@ describe('Test get zap withdraw quotation api', function () {
         account: '0x8238892095d3bac5322894e84f349bcd52f843d5',
         targetToken: logics.compoundv3.polygonTokens.USDC,
       },
-      expected: { statusCode: 200, keys: ['quotation', 'approvals', 'logics'], logicsLength: 0 },
+      expected: { statusCode: 200, keys: ['quotation', 'fees', 'approvals', 'logics'], logicsLength: 0 },
     },
     {
       title: '200: without target token',
@@ -115,7 +115,7 @@ describe('Test get zap withdraw quotation api', function () {
         withdrawalToken: logics.compoundv3.polygonTokens.USDC,
         amount: '1',
       },
-      expected: { statusCode: 200, keys: ['quotation', 'approvals', 'logics'], logicsLength: 0 },
+      expected: { statusCode: 200, keys: ['quotation', 'fees', 'approvals', 'logics'], logicsLength: 0 },
     },
     {
       title: '200: zap withdraw base token',
@@ -133,7 +133,7 @@ describe('Test get zap withdraw quotation api', function () {
         },
         slippage: 100,
       },
-      expected: { statusCode: 200, keys: ['quotation', 'approvals', 'logics', 'permitData'], logicsLength: 2 },
+      expected: { statusCode: 200, keys: ['quotation', 'fees', 'approvals', 'logics', 'permitData'], logicsLength: 2 },
     },
     {
       title: '200: zap withdraw collateral',
@@ -151,7 +151,7 @@ describe('Test get zap withdraw quotation api', function () {
         },
         slippage: 100,
       },
-      expected: { statusCode: 200, keys: ['quotation', 'approvals', 'logics'], logicsLength: 2 },
+      expected: { statusCode: 200, keys: ['quotation', 'fees', 'approvals', 'logics'], logicsLength: 2 },
     },
     {
       title: '200: withdrawal token is target token',
@@ -163,7 +163,7 @@ describe('Test get zap withdraw quotation api', function () {
         targetToken: logics.compoundv3.polygonTokens.USDC,
         slippage: 100,
       },
-      expected: { statusCode: 200, keys: ['quotation', 'approvals', 'logics', 'permitData'], logicsLength: 1 },
+      expected: { statusCode: 200, keys: ['quotation', 'fees', 'approvals', 'logics', 'permitData'], logicsLength: 1 },
     },
   ];
 

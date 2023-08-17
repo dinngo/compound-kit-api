@@ -50,7 +50,7 @@ describe('Test get zap repay quotation api', function () {
       title: '200: without source token and amount',
       path: '/v1/markets/137/usdc/zap-repay',
       body: { account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83' },
-      expected: { statusCode: 200, keys: ['quotation', 'approvals', 'logics'], logicsLength: 0 },
+      expected: { statusCode: 200, keys: ['quotation', 'fees', 'approvals', 'logics'], logicsLength: 0 },
     },
     {
       title: '200: zap repay ERC20 token',
@@ -69,7 +69,7 @@ describe('Test get zap repay quotation api', function () {
       },
       expected: {
         statusCode: 200,
-        keys: ['quotation', 'approvals', 'logics', 'permitData'],
+        keys: ['quotation', 'fees', 'approvals', 'logics', 'permitData'],
         logicsLength: 2,
       },
     },
@@ -84,7 +84,7 @@ describe('Test get zap repay quotation api', function () {
       },
       expected: {
         statusCode: 200,
-        keys: ['quotation', 'approvals', 'logics', 'permitData'],
+        keys: ['quotation', 'fees', 'approvals', 'logics', 'permitData'],
         logicsLength: 1,
       },
     },

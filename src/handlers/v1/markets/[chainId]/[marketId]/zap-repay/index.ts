@@ -61,6 +61,7 @@ export const v1GetZapRepayQuotationRoute: Route<GetZapRepayQuotationRouteParams>
 
     let targetTokenAmount = '0';
     const logics: GetZapRepayQuotationResponseBody['logics'] = [];
+    let fees: GetZapRepayQuotationResponseBody['fees'] = [];
     let approvals: GetZapRepayQuotationResponseBody['approvals'] = [];
     let permitData: GetZapRepayQuotationResponseBody['permitData'];
     let targetPosition = currentPosition;
@@ -115,6 +116,7 @@ export const v1GetZapRepayQuotationRoute: Route<GetZapRepayQuotationRouteParams>
       logics.push(apisdk.protocols.compoundv3.newRepayLogic({ ...repayBaseQuotation, balanceBps: common.BPS_BASE }));
 
       const estimateResult = await apisdk.estimateRouterData({ chainId, account, logics });
+      fees = estimateResult.fees;
       approvals = estimateResult.approvals;
       permitData = estimateResult.permitData;
 
@@ -148,6 +150,7 @@ export const v1GetZapRepayQuotationRoute: Route<GetZapRepayQuotationRouteParams>
 
     const responseBody: GetZapRepayQuotationResponseBody = {
       quotation: { targetTokenAmount, currentPosition, targetPosition },
+      fees,
       approvals,
       permitData,
       logics,

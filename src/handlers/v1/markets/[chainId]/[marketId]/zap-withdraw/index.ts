@@ -62,6 +62,7 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
 
     let targetTokenAmount = '0';
     const logics: GetZapWithdrawQuotationResponseBody['logics'] = [];
+    let fees: GetZapWithdrawQuotationResponseBody['fees'] = [];
     let approvals: GetZapWithdrawQuotationResponseBody['approvals'] = [];
     let permitData: GetZapWithdrawQuotationResponseBody['permitData'];
     let targetPosition = currentPosition;
@@ -143,6 +144,7 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
       }
 
       const estimateResult = await apisdk.estimateRouterData({ chainId, account, logics });
+      fees = estimateResult.fees;
       approvals = estimateResult.approvals;
       permitData = estimateResult.permitData;
 
@@ -188,6 +190,7 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
 
     const responseBody: GetZapWithdrawQuotationResponseBody = {
       quotation: { targetTokenAmount, currentPosition, targetPosition },
+      fees,
       approvals,
       permitData,
       logics,
