@@ -1782,14 +1782,14 @@
     bignumber.js "^9.0.2"
     ts-essentials "^9.1.2"
 
-"@protocolink/api@^0.2.14":
-  version "0.2.14"
-  resolved "https://registry.yarnpkg.com/@protocolink/api/-/api-0.2.14.tgz#45aaa9736a06195c647aacc1e137455d09c5c154"
-  integrity sha512-lyDOQjdPZzFA8CrPOTFoRpgPWI0T6m2B8O/Kq6PagM7S9k2Rwj9KFVCzFsi5pDHBPRSqtgEsYCjd3rWU+k5jgg==
+"@protocolink/api@^0.2.16":
+  version "0.2.16"
+  resolved "https://registry.yarnpkg.com/@protocolink/api/-/api-0.2.16.tgz#88d39e1206be1753fd1f77154e08483bc6387760"
+  integrity sha512-FCVEu8AEVJ7Tw+rUY+eVU6xByxVnXwyzsw9mBXV9dun2V2rBBMWOhYdKULT4NK/9PMdgOdYHdGdkGcN4afXpug==
   dependencies:
     "@protocolink/common" "^0.2.18"
     "@protocolink/core" "^0.2.20"
-    "@protocolink/logics" "^0.2.14"
+    "@protocolink/logics" "^0.2.16"
     "@types/lodash" "^4.14.195"
     "@types/uuid" "^9.0.2"
     "@uniswap/permit2-sdk" "^1.2.0"
@@ -1820,10 +1820,10 @@
     tiny-invariant "^1.3.1"
     zksync-web3 "^0.14.3"
 
-"@protocolink/logics@^0.2.14":
-  version "0.2.14"
-  resolved "https://registry.yarnpkg.com/@protocolink/logics/-/logics-0.2.14.tgz#f5f66c28d575518073433935f98154dffb52ddbc"
-  integrity sha512-9L0Mef56rGt8jqmCLtUtwdp5J95ZMkF6ywXph4i/cINXKyUr9RohC/5yPDwyEC1PxB2qPWy9tuwrRB/a2eFhyg==
+"@protocolink/logics@^0.2.16":
+  version "0.2.16"
+  resolved "https://registry.yarnpkg.com/@protocolink/logics/-/logics-0.2.16.tgz#5668b896f54107c4b0953d03676cc48d3b367df5"
+  integrity sha512-R1DUVgWrAJEbGVq5ulxbdbN9kZPGLI6aRqUNyFHfLxK7/OohbhFftAKHE2pJ6p4FX1zzS6EedQVEiwNm/atiFg==
   dependencies:
     "@paraswap/sdk" "^6.2.1"
     "@protocolink/common" "^0.2.18"

@@ -61,6 +61,7 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
 
     let targetTokenAmount = '0';
     const logics: GetZapBorrowQuotationResponseBody['logics'] = [];
+    let fees: GetZapBorrowQuotationResponseBody['fees'] = [];
     let approvals: GetZapBorrowQuotationResponseBody['approvals'] = [];
     let targetPosition = currentPosition;
     if (event.body.amount && event.body.targetToken && Number(event.body.amount) > 0) {
@@ -112,6 +113,7 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
       }
 
       const estimateResult = await apisdk.estimateRouterData({ chainId, account, logics });
+      fees = estimateResult.fees;
       approvals = estimateResult.approvals;
 
       // 5. calc target position
@@ -144,6 +146,7 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
 
     const responseBody: GetZapBorrowQuotationResponseBody = {
       quotation: { targetTokenAmount, currentPosition, targetPosition },
+      fees,
       approvals,
       logics,
     };

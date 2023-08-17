@@ -55,6 +55,7 @@ export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRoutePar
     const currentPosition = { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR };
 
     const logics: GetDeleverageQuotationResponseBody['logics'] = [];
+    let fees: GetDeleverageQuotationResponseBody['fees'] = [];
     let approvals: GetDeleverageQuotationResponseBody['approvals'] = [];
     let targetPosition = currentPosition;
     if (event.body.token && event.body.amount && Number(event.body.amount) > 0) {
@@ -131,6 +132,7 @@ export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRoutePar
       logics.push(flashLoanRepayLogic);
 
       const estimateResult = await apisdk.estimateRouterData({ chainId, account, logics });
+      fees = estimateResult.fees;
       approvals = estimateResult.approvals;
 
       // 8. calc target position
@@ -166,6 +168,7 @@ export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRoutePar
 
     const responseBody: GetDeleverageQuotationResponseBody = {
       quotation: { currentPosition, targetPosition },
+      fees,
       approvals,
       logics,
     };

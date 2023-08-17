@@ -77,7 +77,7 @@ describe('Test get deleverage quotation api', function () {
         expect(resp.body).to.eq(expected.body);
       } else {
         const parsedBody = JSON.parse(resp.body);
-        expect(parsedBody).to.have.keys('quotation', 'approvals', 'logics');
+        expect(parsedBody).to.have.keys('quotation', 'fees', 'approvals', 'logics');
         expect(parsedBody.quotation).to.have.keys('currentPosition', 'targetPosition');
         expect(parsedBody.quotation.currentPosition).to.have.keys(
           'utilization',

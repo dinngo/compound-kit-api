@@ -56,6 +56,7 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
 
     let leverageTimes = '0';
     const logics: GetLeverageQuotationResponseBody['logics'] = [];
+    let fees: GetLeverageQuotationResponseBody['fees'] = [];
     let approvals: GetLeverageQuotationResponseBody['approvals'] = [];
     let targetPosition = currentPosition;
     if (event.body.token && event.body.amount && Number(event.body.amount) > 0) {
@@ -122,6 +123,7 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       logics.push(flashLoanRepayLogic);
 
       const estimateResult = await apisdk.estimateRouterData({ chainId, account, logics });
+      fees = estimateResult.fees;
       approvals = estimateResult.approvals;
 
       // 7. calc leverage times
@@ -158,6 +160,7 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
 
     const responseBody: GetLeverageQuotationResponseBody = {
       quotation: { leverageTimes, currentPosition, targetPosition },
+      fees,
       approvals,
       logics,
     };

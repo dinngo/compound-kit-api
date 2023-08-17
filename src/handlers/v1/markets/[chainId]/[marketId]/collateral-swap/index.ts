@@ -62,6 +62,7 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
 
     let targetTokenAmount = '0';
     const logics: GetCollateralSwapQuotationResponseBody['logics'] = [];
+    let fees: GetCollateralSwapQuotationResponseBody['fees'] = [];
     let approvals: GetCollateralSwapQuotationResponseBody['approvals'] = [];
     let targetPosition = currentPosition;
     if (event.body.withdrawalToken && event.body.targetToken && event.body.amount && Number(event.body.amount) > 0) {
@@ -124,6 +125,7 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
       logics.push(flashLoanRepayLogic);
 
       const estimateResult = await apisdk.estimateRouterData({ chainId, account, logics });
+      fees = estimateResult.fees;
       approvals = estimateResult.approvals;
 
       // 7. calc target position
@@ -160,6 +162,7 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
 
     const responseBody: GetCollateralSwapQuotationResponseBody = {
       quotation: { targetTokenAmount, currentPosition, targetPosition },
+      fees,
       approvals,
       logics,
     };

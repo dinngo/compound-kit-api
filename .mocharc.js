@@ -3,5 +3,5 @@
 module.exports = {
   extension: 'ts',
   require: ['ts-node/register', '@nomicfoundation/hardhat-chai-matchers/internal/add-chai-matchers'],
-  timeout: 30000,
+  timeout: 60000,
 };
