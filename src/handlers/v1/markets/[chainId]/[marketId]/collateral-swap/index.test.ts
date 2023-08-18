@@ -48,12 +48,27 @@ describe('Test get collateral swap quotation api', function () {
       },
     },
     {
-      title: '400.6: target token is not collateral',
+      title: '400.6: withdrawal amount is greater than available amount',
       path: '/v1/markets/137/usdc/collateral-swap',
       body: {
         account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
         withdrawalToken: logics.compoundv3.polygonTokens.WETH,
         amount: '1',
+        targetToken: logics.compoundv3.polygonTokens.WMATIC,
+        slippage: 100,
+      },
+      expected: {
+        statusCode: 400,
+        body: JSON.stringify({ code: '400.6', message: 'withdrawal amount is greater than available amount' }),
+      },
+    },
+    {
+      title: '400.7: target token is not collateral',
+      path: '/v1/markets/137/usdc/collateral-swap',
+      body: {
+        account: '0xb72c8bf1ca1714753ab376b53000db917964dc28',
+        withdrawalToken: logics.compoundv3.polygonTokens.WETH,
+        amount: '0.01',
         targetToken: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
@@ -65,22 +80,7 @@ describe('Test get collateral swap quotation api', function () {
       },
       expected: {
         statusCode: 400,
-        body: JSON.stringify({ code: '400.6', message: 'target token is not collateral' }),
-      },
-    },
-    {
-      title: '400.7: withdrawal amount is greater than available amount',
-      path: '/v1/markets/137/usdc/collateral-swap',
-      body: {
-        account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
-        withdrawalToken: logics.compoundv3.polygonTokens.WETH,
-        amount: '1',
-        targetToken: logics.compoundv3.polygonTokens.WMATIC,
-        slippage: 100,
-      },
-      expected: {
-        statusCode: 400,
-        body: JSON.stringify({ code: '400.7', message: 'withdrawal amount is greater than available amount' }),
+        body: JSON.stringify({ code: '400.7', message: 'target token is not collateral' }),
       },
     },
     {

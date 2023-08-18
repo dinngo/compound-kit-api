@@ -75,14 +75,15 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
       if (!withdrawalCollateral) {
         throw newHttpError(400, { code: '400.5', message: 'withdrawal token is not collateral' });
       }
+
+      if (new BigNumberJS(amount).gt(withdrawalCollateral.collateralBalance)) {
+        throw newHttpError(400, { code: '400.6', message: 'withdrawal amount is greater than available amount' });
+      }
+
       const targetToken = common.Token.from(event.body.targetToken);
       const targetCollateral = collaterals.find(({ asset }) => asset.is(targetToken.unwrapped));
       if (!targetCollateral) {
-        throw newHttpError(400, { code: '400.6', message: 'target token is not collateral' });
-      }
-
-      if (new BigNumberJS(amount).gt(withdrawalCollateral.collateralBalance)) {
-        throw newHttpError(400, { code: '400.7', message: 'withdrawal amount is greater than available amount' });
+        throw newHttpError(400, { code: '400.7', message: 'target token is not collateral' });
       }
 
       const withdrawal = { token: withdrawalToken.wrapped, amount };

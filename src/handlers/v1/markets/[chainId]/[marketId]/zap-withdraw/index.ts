@@ -1,4 +1,5 @@
 import BigNumberJS from 'bignumber.js';
+import { CollateralInfo, MarketInfo, Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
 import {
   EventBody,
   EventPathParameters,
@@ -7,7 +8,6 @@ import {
   newHttpError,
   newInternalServerError,
 } from 'src/libs/api';
-import { MarketInfo, Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
 import { QuoteAPIResponseBody, ZapQuotation } from 'src/types';
 import * as apisdk from '@protocolink/api';
 import * as common from '@protocolink/common';
@@ -84,17 +84,13 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
       const targetToken = common.Token.from(event.body.targetToken);
 
       // 1. check withdraw collateral or base token
-      const withdrawalCollateral = collaterals.find(({ asset }) => asset.is(withdrawalToken.unwrapped));
-      if (!withdrawalCollateral && !withdrawalToken.unwrapped.is(baseToken)) {
-        throw newHttpError(400, { code: '400.5', message: 'withdrawal token is not collateral nor base' });
-      }
-
-      // 2. new and append compound v3 withdraw logic
+      // 1-1. new and append compound v3 withdraw logic
+      let withdrawalCollateral: CollateralInfo | undefined;
       let realWithdrawalToken: common.Token;
       if (withdrawalToken.unwrapped.is(baseToken)) {
         if (new BigNumberJS(supplyBalance).lt(new BigNumberJS(amount))) {
           throw newHttpError(400, {
-            code: '400.6',
+            code: '400.5',
             message: 'withdrawal amount is greater than available base amount',
           });
         }
@@ -112,7 +108,11 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
           apisdk.protocols.compoundv3.newWithdrawBaseLogic({ ...withdrawBaseQuotation, balanceBps: common.BPS_BASE })
         );
       } else {
-        if (new BigNumberJS(withdrawalCollateral!.collateralBalance).lt(new BigNumberJS(amount))) {
+        withdrawalCollateral = collaterals.find(({ asset }) => asset.is(withdrawalToken.unwrapped));
+        if (!withdrawalCollateral) {
+          throw newHttpError(400, { code: '400.6', message: 'withdrawal token is not collateral nor base' });
+        }
+        if (new BigNumberJS(withdrawalCollateral.collateralBalance).lt(new BigNumberJS(amount))) {
           throw newHttpError(400, {
             code: '400.7',
             message: 'withdrawal amount is greater than available collateral amount',
@@ -130,7 +130,7 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
         );
       }
 
-      // 3. new and append swap token logic
+      // 2. new and append swap token logic
       if (withdrawalToken.wrapped.is(targetToken.wrapped)) {
         targetTokenAmount = amount;
       } else {
@@ -148,7 +148,7 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
       approvals = estimateResult.approvals;
       permitData = estimateResult.permitData;
 
-      // 4. calc target position
+      // 3. calc target position
       let targetSupplyUSD, targetCollateralUSD, targetBorrowCapacityUSD, targetLiquidationLimit;
       if (realWithdrawalToken.unwrapped.is(baseToken)) {
         const withdrawalUSD = new BigNumberJS(targetTokenAmount).times(baseTokenPrice);

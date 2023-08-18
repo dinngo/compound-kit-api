@@ -88,14 +88,9 @@ export const v1GetZapRepayQuotationRoute: Route<GetZapRepayQuotationRouteParams>
           slippage,
         });
 
-        if (!slippage || slippage === 0) {
-          targetTokenAmount = quotation.output.amount;
-        } else {
-          targetTokenAmount = new BigNumberJS(quotation.output.amount)
-            .multipliedBy(common.BPS_BASE - slippage)
-            .div(common.BPS_BASE)
-            .toString();
-        }
+        targetTokenAmount = slippage
+          ? quotation.output.setWei(common.calcSlippage(quotation.output.amountWei, slippage)).amount
+          : quotation.output.amount;
         repayToken = baseToken.wrapped;
         logics.push(apisdk.protocols.paraswapv5.newSwapTokenLogic(quotation));
       }

@@ -27,7 +27,28 @@ describe('Test get zap withdraw quotation api', function () {
       expected: { statusCode: 400, body: JSON.stringify({ code: '400.4', message: 'account is invalid' }) },
     },
     {
-      title: '400.5: withdrawal token is not collateral nor base',
+      title: '400.5: withdrawal amount is greater than available base amount',
+      path: '/v1/markets/137/usdc/zap-withdraw',
+      body: {
+        account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
+        withdrawalToken: logics.compoundv3.polygonTokens.USDC,
+        amount: '1',
+        targetToken: {
+          chainId: 137,
+          address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
+          decimals: 6,
+          symbol: 'USDT',
+          name: '(PoS) Tether USD',
+        },
+        slippage: 100,
+      },
+      expected: {
+        statusCode: 400,
+        body: JSON.stringify({ code: '400.5', message: 'withdrawal amount is greater than available base amount' }),
+      },
+    },
+    {
+      title: '400.6: withdrawal token is not collateral nor base',
       path: '/v1/markets/137/usdc/zap-withdraw',
       body: {
         account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
@@ -50,28 +71,7 @@ describe('Test get zap withdraw quotation api', function () {
       },
       expected: {
         statusCode: 400,
-        body: JSON.stringify({ code: '400.5', message: 'withdrawal token is not collateral nor base' }),
-      },
-    },
-    {
-      title: '400.6: withdrawal amount is greater than available base amount',
-      path: '/v1/markets/137/usdc/zap-withdraw',
-      body: {
-        account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
-        withdrawalToken: logics.compoundv3.polygonTokens.USDC,
-        amount: '1',
-        targetToken: {
-          chainId: 137,
-          address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
-          decimals: 6,
-          symbol: 'USDT',
-          name: '(PoS) Tether USD',
-        },
-        slippage: 100,
-      },
-      expected: {
-        statusCode: 400,
-        body: JSON.stringify({ code: '400.6', message: 'withdrawal amount is greater than available base amount' }),
+        body: JSON.stringify({ code: '400.6', message: 'withdrawal token is not collateral nor base' }),
       },
     },
     {

@@ -5,7 +5,7 @@ module.exports = {
   require: [
     'ts-node/register',
     '@nomicfoundation/hardhat-chai-matchers/internal/add-chai-matchers',
-    'unit-test-init.ts',
+    'test/unit-test-init.ts',
   ],
   timeout: 60000,
 };
