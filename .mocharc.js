@@ -2,6 +2,10 @@
 
 module.exports = {
   extension: 'ts',
-  require: ['ts-node/register', '@nomicfoundation/hardhat-chai-matchers/internal/add-chai-matchers'],
+  require: [
+    'ts-node/register',
+    '@nomicfoundation/hardhat-chai-matchers/internal/add-chai-matchers',
+    'test/unit-test-init.ts',
+  ],
   timeout: 60000,
 };
