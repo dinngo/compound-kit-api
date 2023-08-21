@@ -121,7 +121,7 @@ describe('Test get zap withdraw quotation api', function () {
       title: '200: zap withdraw base token',
       path: '/v1/markets/137/usdc/zap-withdraw',
       body: {
-        account: '0x8238892095d3bac5322894e84f349bcd52f843d5',
+        account: '0x43158f45b5EbD7b1179130130DF00393928C2691',
         withdrawalToken: logics.compoundv3.polygonTokens.USDC,
         amount: '1',
         targetToken: {
@@ -157,7 +157,7 @@ describe('Test get zap withdraw quotation api', function () {
       title: '200: withdrawal token is target token',
       path: '/v1/markets/137/usdc/zap-withdraw',
       body: {
-        account: '0x8238892095d3bac5322894e84f349bcd52f843d5',
+        account: '0x43158f45b5EbD7b1179130130DF00393928C2691',
         withdrawalToken: logics.compoundv3.polygonTokens.USDC,
         amount: '1',
         targetToken: logics.compoundv3.polygonTokens.USDC,

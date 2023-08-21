@@ -117,7 +117,7 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
       approvals = estimateResult.approvals;
 
       // 5. calc target position
-      const curBorrowUSD = new BigNumberJS(targetTokenAmount).times(baseTokenPrice);
+      const curBorrowUSD = new BigNumberJS(amount).times(baseTokenPrice);
       const targetSupplyUSD = new BigNumberJS(supplyUSD);
       const targetBorrowUSD = new BigNumberJS(borrowUSD).plus(curBorrowUSD);
       const targetCollateralUSD = new BigNumberJS(collateralUSD);

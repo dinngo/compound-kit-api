@@ -18,7 +18,7 @@ describe('Transaction: Zap Borrow', function () {
 
   before(async function () {
     chainId = await getChainId();
-    user = await hre.ethers.getImpersonatedSigner('0xf6da9e9d73d7893223578d32a95d6d7de5522767');
+    user = await hre.ethers.getImpersonatedSigner('0x0FBeABcaFCf817d47E10a7bCFC15ba194dbD4EEF');
     service = new logics.compoundv3.Service(chainId, hre.ethers.provider);
     initBorrowBalance = await service.getBorrowBalance(marketId, user.address, baseToken);
   });

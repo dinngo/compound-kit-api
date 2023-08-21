@@ -151,13 +151,13 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
       // 3. calc target position
       let targetSupplyUSD, targetCollateralUSD, targetBorrowCapacityUSD, targetLiquidationLimit;
       if (realWithdrawalToken.unwrapped.is(baseToken)) {
-        const withdrawalUSD = new BigNumberJS(targetTokenAmount).times(baseTokenPrice);
+        const withdrawalUSD = new BigNumberJS(amount).times(baseTokenPrice);
         targetSupplyUSD = new BigNumberJS(supplyUSD).minus(withdrawalUSD);
         targetCollateralUSD = new BigNumberJS(collateralUSD);
         targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD);
         targetLiquidationLimit = new BigNumberJS(liquidationLimit);
       } else {
-        const withdrawalUSD = new BigNumberJS(targetTokenAmount).times(withdrawalCollateral!.assetPrice);
+        const withdrawalUSD = new BigNumberJS(amount).times(withdrawalCollateral!.assetPrice);
         targetSupplyUSD = new BigNumberJS(supplyUSD);
         targetCollateralUSD = new BigNumberJS(collateralUSD).minus(withdrawalUSD);
         targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD).minus(
