@@ -13,7 +13,7 @@ export const v1GetZapTokensRoute: Route<GetZapTokensRouteParams> = {
       throw newHttpError(400, { code: '400.1', message: 'chain does not exist' });
     }
 
-    // get Paraswap token list
+    // Zaps use Paraswap for swapping thus support the same tokens
     const tokens = await apisdk.protocols.paraswapv5.getSwapTokenTokenList(chainId);
     return formatJSONResponse({ tokens });
   },

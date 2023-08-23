@@ -13,11 +13,5 @@ export function validateMarket(chainId: number, marketId: string) {
 }
 
 export function validateChain(chainId: number) {
-  for (const config of logics.compoundv3.configs) {
-    if (chainId === config.chainId) {
-      return true;
-    }
-  }
-
-  return false;
+  return logics.compoundv3.configs.some((config) => chainId === config.chainId);
 }
