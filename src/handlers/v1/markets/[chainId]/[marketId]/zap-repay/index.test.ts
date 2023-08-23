@@ -31,14 +31,14 @@ describe('Test get zap repay quotation api', function () {
       path: '/v1/markets/137/usdc/zap-repay',
       body: {
         account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
-        sourceToken: {
+        srcToken: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
           decimals: 6,
           symbol: 'USDT',
           name: '(PoS) Tether USD',
         },
-        amount: '1',
+        srcAmount: '1',
         slippage: 100,
       },
       expected: {
@@ -47,7 +47,7 @@ describe('Test get zap repay quotation api', function () {
       },
     },
     {
-      title: '200: without source token and amount',
+      title: '200: without source token and source amount',
       path: '/v1/markets/137/usdc/zap-repay',
       body: { account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83' },
       expected: { statusCode: 200, keys: ['quotation', 'fees', 'approvals', 'logics'], logicsLength: 0 },
@@ -57,14 +57,14 @@ describe('Test get zap repay quotation api', function () {
       path: '/v1/markets/137/usdc/zap-repay',
       body: {
         account: '0x0fbeabcafcf817d47e10a7bcfc15ba194dbd4eef',
-        sourceToken: {
+        srcToken: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
           decimals: 6,
           symbol: 'USDT',
           name: '(PoS) Tether USD',
         },
-        amount: '1',
+        srcAmount: '1',
         slippage: 100,
       },
       expected: {
@@ -78,8 +78,8 @@ describe('Test get zap repay quotation api', function () {
       path: '/v1/markets/137/usdc/zap-repay',
       body: {
         account: '0x0fbeabcafcf817d47e10a7bcfc15ba194dbd4eef',
-        sourceToken: logics.compoundv3.polygonTokens.USDC,
-        amount: '1',
+        srcToken: logics.compoundv3.polygonTokens.USDC,
+        srcAmount: '1',
         slippage: 100,
       },
       expected: {
@@ -100,7 +100,7 @@ describe('Test get zap repay quotation api', function () {
       } else {
         const parsedBody = JSON.parse(resp.body);
         expect(parsedBody).to.have.keys(<string[]>expected.keys);
-        expect(parsedBody.quotation).to.have.keys('targetTokenAmount', 'currentPosition', 'targetPosition');
+        expect(parsedBody.quotation).to.have.keys('destAmount', 'currentPosition', 'targetPosition');
         expect(parsedBody.quotation.currentPosition).to.have.keys(
           'utilization',
           'healthRate',

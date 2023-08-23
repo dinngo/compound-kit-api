@@ -27,14 +27,14 @@ describe('Transaction: Zap Borrow', function () {
 
   it('user zap borrow USDC in USDC market', async function () {
     // 1. user obtains a quotation for zap borrow 100 USDC through the zap borrow API
-    const targetToken = baseToken;
-    const initTargetBalance = await getBalance(user.address, targetToken);
-    const amount = '100';
+    const destToken = baseToken;
+    const initDestBalance = await getBalance(user.address, destToken);
+    const baseAmount = '100';
     const slippage = 100;
     const quotation = await api.quote(chainId, marketId, 'zap-borrow', {
       account: user.address,
-      amount,
-      targetToken,
+      baseAmount,
+      destToken,
       slippage,
     });
 
@@ -56,29 +56,29 @@ describe('Transaction: Zap Borrow', function () {
     // 4. user's USDC borrow balance should increase.
     const borrowBalance = await service.getBorrowBalance(marketId, user.address, baseToken);
     const borrowDifference = borrowBalance.clone().sub(initBorrowBalance);
-    const quoteTargetAmount = new common.TokenAmount(baseToken, quotation.quotation.targetTokenAmount);
+    const quoteDestAmount = new common.TokenAmount(baseToken, quotation.quotation.destAmount);
 
     // 4-1. debt grows when the block of getting api data is different from the block of executing tx
-    const [, max] = utils.bpsBound(quoteTargetAmount.amount, 10);
-    const maxTargetAmount = quoteTargetAmount.clone().set(max);
-    expect(borrowDifference.lte(maxTargetAmount)).to.be.true;
-    expect(borrowDifference.gte(quoteTargetAmount)).to.be.true;
+    const [, max] = utils.bpsBound(quoteDestAmount.amount, 10);
+    const maxDestAmount = quoteDestAmount.clone().set(max);
+    expect(borrowDifference.lte(maxDestAmount)).to.be.true;
+    expect(borrowDifference.gte(quoteDestAmount)).to.be.true;
 
     // 5. user's USDC balance should increase
-    const targetBalance = await getBalance(user.address, targetToken);
-    expect(targetBalance.clone().sub(initTargetBalance).eq(quoteTargetAmount)).to.be.true;
+    const destBalance = await getBalance(user.address, destToken);
+    expect(destBalance.clone().sub(initDestBalance).eq(quoteDestAmount)).to.be.true;
   });
 
   it('user zap borrow USDT in USDC market', async function () {
     // 1. user obtains a quotation for zap borrow USDT from 100 USDC through the zap borrow API
-    const targetToken = polygonTokens.USDT;
-    const initTargetBalance = await getBalance(user.address, targetToken);
-    const amount = '100';
+    const destToken = polygonTokens.USDT;
+    const initDestBalance = await getBalance(user.address, destToken);
+    const baseAmount = '100';
     const slippage = 100;
     const quotation = await api.quote(chainId, marketId, 'zap-borrow', {
       account: user.address,
-      amount,
-      targetToken,
+      baseAmount,
+      destToken,
       slippage,
     });
 
@@ -100,7 +100,7 @@ describe('Transaction: Zap Borrow', function () {
     // 4. user's USDC borrow balance should increase.
     const borrowBalance = await service.getBorrowBalance(marketId, user.address, baseToken);
     const borrowDifference = borrowBalance.clone().sub(initBorrowBalance);
-    const borrowAmount = new common.TokenAmount(baseToken, amount);
+    const borrowAmount = new common.TokenAmount(baseToken, baseAmount);
 
     // 4-1. debt grows when the block of getting api data is different from the block of executing tx
     const [, maxBorrow] = utils.bpsBound(borrowAmount.amount, 10);
@@ -110,14 +110,14 @@ describe('Transaction: Zap Borrow', function () {
 
     // 5. user's USDT balance should increase
     // 5-1. rate may change when the block of getting api data is different from the block of executing tx
-    const targetBalance = await getBalance(user.address, targetToken);
-    const targetDifference = targetBalance.clone().sub(initTargetBalance);
-    const quoteTargetAmount = new common.TokenAmount(targetToken, quotation.quotation.targetTokenAmount);
-    const [minTarget, maxTarget] = utils.bpsBound(quoteTargetAmount.amount);
-    const minTargetAmount = quoteTargetAmount.clone().set(minTarget);
-    const maxTargetAmount = quoteTargetAmount.clone().set(maxTarget);
+    const destBalance = await getBalance(user.address, destToken);
+    const destDifference = destBalance.clone().sub(initDestBalance);
+    const quoteDestAmount = new common.TokenAmount(destToken, quotation.quotation.destAmount);
+    const [minDest, maxDest] = utils.bpsBound(quoteDestAmount.amount);
+    const minDestAmount = quoteDestAmount.clone().set(minDest);
+    const maxDestAmount = quoteDestAmount.clone().set(maxDest);
 
-    expect(targetDifference.lte(maxTargetAmount)).to.be.true;
-    expect(targetDifference.gte(minTargetAmount)).to.be.true;
+    expect(destDifference.lte(maxDestAmount)).to.be.true;
+    expect(destDifference.gte(minDestAmount)).to.be.true;
   });
 });

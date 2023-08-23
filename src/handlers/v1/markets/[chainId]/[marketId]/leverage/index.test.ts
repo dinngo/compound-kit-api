@@ -31,14 +31,14 @@ describe('Test get leverage quotation api', function () {
       path: '/v1/markets/137/usdc/leverage',
       body: {
         account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
-        token: {
+        collateralToken: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
           decimals: 6,
           symbol: 'USDT',
           name: '(PoS) Tether USD',
         },
-        amount: '1',
+        collateralAmount: '1',
         slippage: 100,
       },
       expected: {
@@ -47,18 +47,18 @@ describe('Test get leverage quotation api', function () {
       },
     },
     {
-      title: '200: without token and amount',
+      title: '200: without collateral token and collateral amount',
       path: '/v1/markets/137/usdc/leverage',
       body: { account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83' },
       expected: { statusCode: 200 },
     },
     {
-      title: '200: with token and amount',
+      title: '200: with collateral token and collateral amount',
       path: '/v1/markets/137/usdc/leverage',
       body: {
         account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
-        token: logics.compoundv3.polygonTokens.WETH,
-        amount: '1',
+        collateralToken: logics.compoundv3.polygonTokens.WETH,
+        collateralAmount: '1',
         slippage: 100,
       },
       expected: { statusCode: 200 },

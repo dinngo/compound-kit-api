@@ -27,19 +27,19 @@ describe('Test get zap supply quotation api', function () {
       expected: { statusCode: 400, body: JSON.stringify({ code: '400.4', message: 'account is invalid' }) },
     },
     {
-      title: '400.5: target token is not collateral nor base',
+      title: '400.5: destination token is not collateral nor base',
       path: '/v1/markets/137/usdc/zap-supply',
       body: {
         account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
-        sourceToken: {
+        srcToken: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
           decimals: 6,
           symbol: 'USDT',
           name: '(PoS) Tether USD',
         },
-        amount: '1',
-        targetToken: {
+        srcAmount: '1',
+        destToken: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
           decimals: 6,
@@ -50,7 +50,7 @@ describe('Test get zap supply quotation api', function () {
       },
       expected: {
         statusCode: 400,
-        body: JSON.stringify({ code: '400.5', message: 'target token is not collateral nor base' }),
+        body: JSON.stringify({ code: '400.5', message: 'destination token is not collateral nor base' }),
       },
     },
     {
@@ -58,15 +58,15 @@ describe('Test get zap supply quotation api', function () {
       path: '/v1/markets/137/usdc/zap-supply',
       body: {
         account: '0x0fbeabcafcf817d47e10a7bcfc15ba194dbd4eef',
-        sourceToken: {
+        srcToken: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
           decimals: 6,
           symbol: 'USDT',
           name: '(PoS) Tether USD',
         },
-        amount: '1',
-        targetToken: logics.compoundv3.polygonTokens.USDC,
+        srcAmount: '1',
+        destToken: logics.compoundv3.polygonTokens.USDC,
         slippage: 100,
       },
       expected: {
@@ -75,21 +75,21 @@ describe('Test get zap supply quotation api', function () {
       },
     },
     {
-      title: '200: without source token and amount',
+      title: '200: without source token and source amount',
       path: '/v1/markets/137/usdc/zap-supply',
       body: {
         account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
-        targetToken: logics.compoundv3.polygonTokens.USDC,
+        destToken: logics.compoundv3.polygonTokens.USDC,
       },
       expected: { statusCode: 200, keys: ['quotation', 'fees', 'approvals', 'logics'], logicsLength: 0 },
     },
     {
-      title: '200: without target token',
+      title: '200: without destination token',
       path: '/v1/markets/137/usdc/zap-supply',
       body: {
         account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
-        sourceToken: logics.compoundv3.polygonTokens.WETH,
-        amount: '1',
+        srcToken: logics.compoundv3.polygonTokens.WETH,
+        srcAmount: '1',
         slippage: 100,
       },
       expected: { statusCode: 200, keys: ['quotation', 'fees', 'approvals', 'logics'], logicsLength: 0 },
@@ -99,15 +99,15 @@ describe('Test get zap supply quotation api', function () {
       path: '/v1/markets/137/usdc/zap-supply',
       body: {
         account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
-        sourceToken: {
+        srcToken: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
           decimals: 6,
           symbol: 'USDT',
           name: '(PoS) Tether USD',
         },
-        amount: '1',
-        targetToken: logics.compoundv3.polygonTokens.WMATIC,
+        srcAmount: '1',
+        destToken: logics.compoundv3.polygonTokens.WMATIC,
         slippage: 100,
       },
       expected: {
@@ -121,15 +121,15 @@ describe('Test get zap supply quotation api', function () {
       path: '/v1/markets/137/usdc/zap-supply',
       body: {
         account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
-        sourceToken: {
+        srcToken: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
           decimals: 6,
           symbol: 'USDT',
           name: '(PoS) Tether USD',
         },
-        amount: '1',
-        targetToken: logics.compoundv3.polygonTokens.USDC,
+        srcAmount: '1',
+        destToken: logics.compoundv3.polygonTokens.USDC,
         slippage: 100,
       },
       expected: {
@@ -139,13 +139,13 @@ describe('Test get zap supply quotation api', function () {
       },
     },
     {
-      title: '200: source token is target token',
+      title: '200: source token is destination token',
       path: '/v1/markets/137/usdc/zap-supply',
       body: {
         account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
-        sourceToken: logics.compoundv3.polygonTokens.USDC,
-        amount: '1',
-        targetToken: logics.compoundv3.polygonTokens.USDC,
+        srcToken: logics.compoundv3.polygonTokens.USDC,
+        srcAmount: '1',
+        destToken: logics.compoundv3.polygonTokens.USDC,
         slippage: 100,
       },
       expected: {
@@ -166,7 +166,7 @@ describe('Test get zap supply quotation api', function () {
       } else {
         const parsedBody = JSON.parse(resp.body);
         expect(parsedBody).to.have.keys(<string[]>expected.keys);
-        expect(parsedBody.quotation).to.have.keys('targetTokenAmount', 'currentPosition', 'targetPosition');
+        expect(parsedBody.quotation).to.have.keys('destAmount', 'currentPosition', 'targetPosition');
         expect(parsedBody.quotation.currentPosition).to.have.keys(
           'utilization',
           'healthRate',

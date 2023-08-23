@@ -17,9 +17,9 @@ import { validateMarket } from 'src/validations';
 type GetZapSupplyQuotationRouteParams = EventPathParameters<{ chainId: string; marketId: string }> &
   EventBody<{
     account?: string;
-    sourceToken?: common.TokenObject;
-    amount?: string;
-    targetToken?: common.TokenObject;
+    srcToken?: common.TokenObject;
+    srcAmount?: string;
+    destToken?: common.TokenObject;
     slippage?: number;
   }>;
 
@@ -60,14 +60,14 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
     const { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR } = marketInfo;
     const currentPosition = { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR };
 
-    let targetTokenAmount = '0';
+    let destAmount = '0';
     const logics: GetZapSupplyQuotationResponseBody['logics'] = [];
     let fees: GetZapSupplyQuotationResponseBody['fees'] = [];
     let approvals: GetZapSupplyQuotationResponseBody['approvals'] = [];
     let permitData: GetZapSupplyQuotationResponseBody['permitData'];
     let targetPosition = currentPosition;
-    if (event.body.sourceToken && event.body.targetToken && event.body.amount && Number(event.body.amount) > 0) {
-      const { amount, slippage } = event.body;
+    if (event.body.srcToken && event.body.destToken && event.body.srcAmount && Number(event.body.srcAmount) > 0) {
+      const { srcAmount, slippage } = event.body;
       const {
         baseToken,
         baseTokenPrice,
@@ -78,28 +78,28 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
         liquidationLimit,
         collaterals,
       } = marketInfo;
-      const sourceToken = common.Token.from(event.body.sourceToken);
-      const targetToken = common.Token.from(event.body.targetToken);
+      const srcToken = common.Token.from(event.body.srcToken);
+      const destToken = common.Token.from(event.body.destToken);
 
       // 1. check supply collateral or base token
-      const targetCollateral = collaterals.find(({ asset }) => asset.is(targetToken.unwrapped));
-      if (!targetCollateral && !targetToken.unwrapped.is(baseToken)) {
-        throw newHttpError(400, { code: '400.5', message: 'target token is not collateral nor base' });
+      const destCollateral = collaterals.find(({ asset }) => asset.is(destToken.unwrapped));
+      if (!destCollateral && !destToken.unwrapped.is(baseToken)) {
+        throw newHttpError(400, { code: '400.5', message: 'destination token is not collateral nor base' });
       }
 
       // 2. new and append swap token logic
       let supplyToken: common.Token;
-      if (sourceToken.wrapped.is(targetToken.wrapped)) {
-        supplyToken = sourceToken;
-        targetTokenAmount = amount;
+      if (srcToken.wrapped.is(destToken.wrapped)) {
+        supplyToken = srcToken;
+        destAmount = srcAmount;
       } else {
-        supplyToken = targetToken.wrapped;
+        supplyToken = destToken.wrapped;
         const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
-          input: { token: sourceToken, amount },
+          input: { token: srcToken, amount: srcAmount },
           tokenOut: supplyToken,
           slippage,
         });
-        targetTokenAmount = quotation.output.amount;
+        destAmount = quotation.output.amount;
         logics.push(apisdk.protocols.paraswapv5.newSwapTokenLogic(quotation));
       }
 
@@ -113,7 +113,7 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
           marketId,
           input: {
             token: supplyToken,
-            amount: targetTokenAmount,
+            amount: destAmount,
           },
           tokenOut: cToken,
         });
@@ -127,7 +127,7 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
         logics.push(
           apisdk.protocols.compoundv3.newSupplyCollateralLogic({
             marketId,
-            input: { token: supplyToken, amount: targetTokenAmount },
+            input: { token: supplyToken, amount: destAmount },
             balanceBps: common.BPS_BASE,
           })
         );
@@ -141,20 +141,20 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
       // 4. calc target position
       let targetSupplyUSD, targetCollateralUSD, targetBorrowCapacityUSD, targetLiquidationLimit;
       if (supplyToken.unwrapped.is(baseToken)) {
-        const targetUSD = new BigNumberJS(targetTokenAmount).times(baseTokenPrice);
+        const targetUSD = new BigNumberJS(destAmount).times(baseTokenPrice);
         targetSupplyUSD = new BigNumberJS(supplyUSD).plus(targetUSD);
         targetCollateralUSD = new BigNumberJS(collateralUSD);
         targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD);
         targetLiquidationLimit = new BigNumberJS(liquidationLimit);
       } else {
-        const targetUSD = new BigNumberJS(targetTokenAmount).times(targetCollateral!.assetPrice);
+        const targetUSD = new BigNumberJS(destAmount).times(destCollateral!.assetPrice);
         targetSupplyUSD = new BigNumberJS(supplyUSD);
         targetCollateralUSD = new BigNumberJS(collateralUSD).plus(targetUSD);
         targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD).plus(
-          targetUSD.times(targetCollateral!.borrowCollateralFactor)
+          targetUSD.times(destCollateral!.borrowCollateralFactor)
         );
         targetLiquidationLimit = new BigNumberJS(liquidationLimit).plus(
-          targetUSD.times(targetCollateral!.liquidateCollateralFactor)
+          targetUSD.times(destCollateral!.liquidateCollateralFactor)
         );
       }
       const targetBorrowUSD = new BigNumberJS(borrowUSD);
@@ -179,7 +179,7 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
     }
 
     const responseBody: GetZapSupplyQuotationResponseBody = {
-      quotation: { targetTokenAmount, currentPosition, targetPosition },
+      quotation: { destAmount, currentPosition, targetPosition },
       fees,
       approvals,
       permitData,

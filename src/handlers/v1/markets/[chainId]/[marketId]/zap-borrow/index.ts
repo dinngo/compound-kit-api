@@ -17,8 +17,8 @@ import { validateMarket } from 'src/validations';
 type GetZapBorrowQuotationRouteParams = EventPathParameters<{ chainId: string; marketId: string }> &
   EventBody<{
     account?: string;
-    amount?: string;
-    targetToken?: common.TokenObject;
+    baseAmount?: string;
+    destToken?: common.TokenObject;
     slippage?: number;
   }>;
 
@@ -59,13 +59,13 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
     const { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR } = marketInfo;
     const currentPosition = { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR };
 
-    let targetTokenAmount = '0';
+    let destAmount = '0';
     const logics: GetZapBorrowQuotationResponseBody['logics'] = [];
     let fees: GetZapBorrowQuotationResponseBody['fees'] = [];
     let approvals: GetZapBorrowQuotationResponseBody['approvals'] = [];
     let targetPosition = currentPosition;
-    if (event.body.amount && event.body.targetToken && Number(event.body.amount) > 0) {
-      const { amount, slippage } = event.body;
+    if (event.body.baseAmount && event.body.destToken && Number(event.body.baseAmount) > 0) {
+      const { baseAmount, slippage } = event.body;
       const {
         baseToken,
         supplyAPR,
@@ -76,16 +76,16 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
         liquidationLimit,
         baseTokenPrice,
       } = marketInfo;
-      const targetToken = common.Token.from(event.body.targetToken);
+      const destToken = common.Token.from(event.body.destToken);
 
       // 1. check supply USD
       if (!new BigNumberJS(supplyUSD).isZero()) {
         throw newHttpError(400, { code: '400.5', message: 'supply USD is not zero' });
       }
 
-      // 2. check borrow amount
-      if (new BigNumberJS(amount).gt(new BigNumberJS(availableToBorrow))) {
-        throw newHttpError(400, { code: '400.6', message: 'borrow amount is greater than available amount' });
+      // 2. check base amount
+      if (new BigNumberJS(baseAmount).gt(new BigNumberJS(availableToBorrow))) {
+        throw newHttpError(400, { code: '400.6', message: 'base amount is greater than available amount' });
       }
 
       // 3. new and append compound v3 borrow logic
@@ -93,22 +93,22 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
         apisdk.protocols.compoundv3.newBorrowLogic({
           marketId,
           output: {
-            token: targetToken.unwrapped.is(baseToken) ? targetToken : baseToken.wrapped,
-            amount,
+            token: destToken.unwrapped.is(baseToken) ? destToken : baseToken.wrapped,
+            amount: baseAmount,
           },
         })
       );
 
       // 4. new and append swap token logic
-      if (targetToken.unwrapped.is(baseToken)) {
-        targetTokenAmount = amount;
+      if (destToken.unwrapped.is(baseToken)) {
+        destAmount = baseAmount;
       } else {
         const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
-          input: { token: baseToken.wrapped, amount },
-          tokenOut: targetToken,
+          input: { token: baseToken.wrapped, amount: baseAmount },
+          tokenOut: destToken,
           slippage,
         });
-        targetTokenAmount = quotation.output.amount;
+        destAmount = quotation.output.amount;
         logics.push(apisdk.protocols.paraswapv5.newSwapTokenLogic(quotation));
       }
 
@@ -117,7 +117,7 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
       approvals = estimateResult.approvals;
 
       // 5. calc target position
-      const curBorrowUSD = new BigNumberJS(amount).times(baseTokenPrice);
+      const curBorrowUSD = new BigNumberJS(baseAmount).times(baseTokenPrice);
       const targetSupplyUSD = new BigNumberJS(supplyUSD);
       const targetBorrowUSD = new BigNumberJS(borrowUSD).plus(curBorrowUSD);
       const targetCollateralUSD = new BigNumberJS(collateralUSD);
@@ -145,7 +145,7 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
     }
 
     const responseBody: GetZapBorrowQuotationResponseBody = {
-      quotation: { targetTokenAmount, currentPosition, targetPosition },
+      quotation: { destAmount, currentPosition, targetPosition },
       fees,
       approvals,
       logics,

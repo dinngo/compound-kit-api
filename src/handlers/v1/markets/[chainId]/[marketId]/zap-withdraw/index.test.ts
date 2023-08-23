@@ -27,13 +27,13 @@ describe('Test get zap withdraw quotation api', function () {
       expected: { statusCode: 400, body: JSON.stringify({ code: '400.4', message: 'account is invalid' }) },
     },
     {
-      title: '400.5: withdrawal amount is greater than available base amount',
+      title: '400.5: source amount is greater than available base amount',
       path: '/v1/markets/137/usdc/zap-withdraw',
       body: {
         account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
-        withdrawalToken: logics.compoundv3.polygonTokens.USDC,
-        amount: '1',
-        targetToken: {
+        srcToken: logics.compoundv3.polygonTokens.USDC,
+        srcAmount: '1',
+        destToken: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
           decimals: 6,
@@ -44,23 +44,23 @@ describe('Test get zap withdraw quotation api', function () {
       },
       expected: {
         statusCode: 400,
-        body: JSON.stringify({ code: '400.5', message: 'withdrawal amount is greater than available base amount' }),
+        body: JSON.stringify({ code: '400.5', message: 'source amount is greater than available base amount' }),
       },
     },
     {
-      title: '400.6: withdrawal token is not collateral nor base',
+      title: '400.6: source token is not collateral nor base',
       path: '/v1/markets/137/usdc/zap-withdraw',
       body: {
         account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
-        withdrawalToken: {
+        srcToken: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
           decimals: 6,
           symbol: 'USDT',
           name: '(PoS) Tether USD',
         },
-        amount: '1',
-        targetToken: {
+        srcAmount: '1',
+        destToken: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
           decimals: 6,
@@ -71,17 +71,17 @@ describe('Test get zap withdraw quotation api', function () {
       },
       expected: {
         statusCode: 400,
-        body: JSON.stringify({ code: '400.6', message: 'withdrawal token is not collateral nor base' }),
+        body: JSON.stringify({ code: '400.6', message: 'source token is not collateral nor base' }),
       },
     },
     {
-      title: '400.7: withdrawal amount is greater than available collateral amount',
+      title: '400.7: source amount is greater than available collateral amount',
       path: '/v1/markets/137/usdc/zap-withdraw',
       body: {
         account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83',
-        withdrawalToken: logics.compoundv3.polygonTokens.WMATIC,
-        amount: '1',
-        targetToken: {
+        srcToken: logics.compoundv3.polygonTokens.WMATIC,
+        srcAmount: '1',
+        destToken: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
           decimals: 6,
@@ -94,26 +94,26 @@ describe('Test get zap withdraw quotation api', function () {
         statusCode: 400,
         body: JSON.stringify({
           code: '400.7',
-          message: 'withdrawal amount is greater than available collateral amount',
+          message: 'source amount is greater than available collateral amount',
         }),
       },
     },
     {
-      title: '200: without withdrawal token and amount',
+      title: '200: without source token and source amount',
       path: '/v1/markets/137/usdc/zap-withdraw',
       body: {
         account: '0x8238892095d3bac5322894e84f349bcd52f843d5',
-        targetToken: logics.compoundv3.polygonTokens.USDC,
+        destToken: logics.compoundv3.polygonTokens.USDC,
       },
       expected: { statusCode: 200, keys: ['quotation', 'fees', 'approvals', 'logics'], logicsLength: 0 },
     },
     {
-      title: '200: without target token',
+      title: '200: without destination token',
       path: '/v1/markets/137/usdc/zap-withdraw',
       body: {
         account: '0x8238892095d3bac5322894e84f349bcd52f843d5',
-        withdrawalToken: logics.compoundv3.polygonTokens.USDC,
-        amount: '1',
+        srcToken: logics.compoundv3.polygonTokens.USDC,
+        srcAmount: '1',
       },
       expected: { statusCode: 200, keys: ['quotation', 'fees', 'approvals', 'logics'], logicsLength: 0 },
     },
@@ -122,9 +122,9 @@ describe('Test get zap withdraw quotation api', function () {
       path: '/v1/markets/137/usdc/zap-withdraw',
       body: {
         account: '0x43158f45b5EbD7b1179130130DF00393928C2691',
-        withdrawalToken: logics.compoundv3.polygonTokens.USDC,
-        amount: '1',
-        targetToken: {
+        srcToken: logics.compoundv3.polygonTokens.USDC,
+        srcAmount: '1',
+        destToken: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
           decimals: 6,
@@ -140,9 +140,9 @@ describe('Test get zap withdraw quotation api', function () {
       path: '/v1/markets/137/usdc/zap-withdraw',
       body: {
         account: '0xb72c8bf1ca1714753ab376b53000db917964dc28',
-        withdrawalToken: logics.compoundv3.polygonTokens.WETH,
-        amount: '0.01',
-        targetToken: {
+        srcToken: logics.compoundv3.polygonTokens.WETH,
+        srcAmount: '0.01',
+        destToken: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
           decimals: 6,
@@ -154,13 +154,13 @@ describe('Test get zap withdraw quotation api', function () {
       expected: { statusCode: 200, keys: ['quotation', 'fees', 'approvals', 'logics'], logicsLength: 2 },
     },
     {
-      title: '200: withdrawal token is target token',
+      title: '200: source token is destination token',
       path: '/v1/markets/137/usdc/zap-withdraw',
       body: {
         account: '0x43158f45b5EbD7b1179130130DF00393928C2691',
-        withdrawalToken: logics.compoundv3.polygonTokens.USDC,
-        amount: '1',
-        targetToken: logics.compoundv3.polygonTokens.USDC,
+        srcToken: logics.compoundv3.polygonTokens.USDC,
+        srcAmount: '1',
+        destToken: logics.compoundv3.polygonTokens.USDC,
         slippage: 100,
       },
       expected: { statusCode: 200, keys: ['quotation', 'fees', 'approvals', 'logics', 'permitData'], logicsLength: 1 },
@@ -177,7 +177,7 @@ describe('Test get zap withdraw quotation api', function () {
       } else {
         const parsedBody = JSON.parse(resp.body);
         expect(parsedBody).to.have.keys(<string[]>expected.keys);
-        expect(parsedBody.quotation).to.have.keys('targetTokenAmount', 'currentPosition', 'targetPosition');
+        expect(parsedBody.quotation).to.have.keys('destAmount', 'currentPosition', 'targetPosition');
         expect(parsedBody.quotation.currentPosition).to.have.keys(
           'utilization',
           'healthRate',

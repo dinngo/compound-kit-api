@@ -21,13 +21,13 @@ export interface DeleverageQuotation {
 }
 
 export interface CollateralSwapQuotation {
-  targetTokenAmount: string;
+  destAmount: string;
   currentPosition: Position;
   targetPosition: Position;
 }
 
 export interface ZapQuotation {
-  targetTokenAmount: string;
+  destAmount: string;
   currentPosition: Position;
   targetPosition: Position;
 }
