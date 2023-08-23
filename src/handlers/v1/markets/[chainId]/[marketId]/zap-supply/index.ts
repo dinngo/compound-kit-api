@@ -2,6 +2,7 @@ import BigNumberJS from 'bignumber.js';
 import {
   EventBody,
   EventPathParameters,
+  EventQueryStringParameters,
   Route,
   formatJSONResponse,
   newHttpError,
@@ -21,7 +22,8 @@ type GetZapSupplyQuotationRouteParams = EventPathParameters<{ chainId: string; m
     amount?: string;
     targetToken?: common.TokenObject;
     slippage?: number;
-  }>;
+  }> &
+  EventQueryStringParameters<{ permit2Type?: apisdk.Permit2Type }>;
 
 type GetZapSupplyQuotationResponseBody = QuoteAPIResponseBody<ZapQuotation>;
 
@@ -133,7 +135,10 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
         );
       }
 
-      const estimateResult = await apisdk.estimateRouterData({ chainId, account, logics });
+      const estimateResult = await apisdk.estimateRouterData(
+        { chainId, account, logics },
+        event.queryStringParameters?.permit2Type
+      );
       fees = estimateResult.fees;
       approvals = estimateResult.approvals;
       permitData = estimateResult.permitData;

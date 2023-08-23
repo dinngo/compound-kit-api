@@ -3,6 +3,7 @@ import { CollateralInfo, MarketInfo, Service, calcHealthRate, calcNetAPR, calcUt
 import {
   EventBody,
   EventPathParameters,
+  EventQueryStringParameters,
   Route,
   formatJSONResponse,
   newHttpError,
@@ -21,7 +22,8 @@ type GetZapWithdrawQuotationRouteParams = EventPathParameters<{ chainId: string;
     amount?: string;
     targetToken?: common.TokenObject;
     slippage?: number;
-  }>;
+  }> &
+  EventQueryStringParameters<{ permit2Type?: apisdk.Permit2Type }>;
 
 type GetZapWithdrawQuotationResponseBody = QuoteAPIResponseBody<ZapQuotation>;
 
@@ -143,7 +145,10 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
         logics.push(apisdk.protocols.paraswapv5.newSwapTokenLogic(quotation));
       }
 
-      const estimateResult = await apisdk.estimateRouterData({ chainId, account, logics });
+      const estimateResult = await apisdk.estimateRouterData(
+        { chainId, account, logics },
+        event.queryStringParameters?.permit2Type
+      );
       fees = estimateResult.fees;
       approvals = estimateResult.approvals;
       permitData = estimateResult.permitData;

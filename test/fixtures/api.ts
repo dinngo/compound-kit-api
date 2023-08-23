@@ -95,9 +95,13 @@ export async function quote<Params = any, ResponseBody = any>(
   chainId: number,
   marketId: string,
   operation: string,
-  params: Params
+  params: Params,
+  permit2Type: apisdk.Permit2Type = 'permit'
 ): Promise<ResponseBody> {
-  const event = newTestEvent('POST', `/v1/markets/${chainId}/${marketId}/${operation}`, { body: params });
+  const event = newTestEvent('POST', `/v1/markets/${chainId}/${marketId}/${operation}`, {
+    body: params,
+    queryStringParameters: { permit2Type },
+  });
   const resp = await testHandler(event, testContext);
   expect(resp.statusCode).to.eq(200);
 

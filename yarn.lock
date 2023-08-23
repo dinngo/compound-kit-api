@@ -1782,10 +1782,10 @@
     bignumber.js "^9.0.2"
     ts-essentials "^9.1.2"
 
-"@protocolink/api@^0.2.16":
-  version "0.2.16"
-  resolved "https://registry.yarnpkg.com/@protocolink/api/-/api-0.2.16.tgz#88d39e1206be1753fd1f77154e08483bc6387760"
-  integrity sha512-FCVEu8AEVJ7Tw+rUY+eVU6xByxVnXwyzsw9mBXV9dun2V2rBBMWOhYdKULT4NK/9PMdgOdYHdGdkGcN4afXpug==
+"@protocolink/api@^0.2.17":
+  version "0.2.17"
+  resolved "https://registry.yarnpkg.com/@protocolink/api/-/api-0.2.17.tgz#4ef70c9e87be4ac3fffc105917b5652611ae03de"
+  integrity sha512-FDtdoDt81TXLfmlFWFvGtWOjOLE6ytW6PM+J47vYrmxa1HKPTh0l1Fbls5EZ7nqmKZJwNJ6ktlJphqBShoT2kg==
   dependencies:
     "@protocolink/common" "^0.2.18"
     "@protocolink/core" "^0.2.20"
