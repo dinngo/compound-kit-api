@@ -64,7 +64,7 @@ describe('Test get zap borrow quotation api', function () {
       title: '200: zap borrow base token',
       path: '/v1/markets/137/usdc/zap-borrow',
       body: {
-        account: '0x34693b4b0e8237854cee68251441a0bf301c4d65',
+        account: '0x0FBeABcaFCf817d47E10a7bCFC15ba194dbD4EEF',
         amount: '1',
         targetToken: logics.compoundv3.polygonTokens.USDC,
         slippage: 100,
@@ -75,7 +75,7 @@ describe('Test get zap borrow quotation api', function () {
       title: '200: zap borrow USDT',
       path: '/v1/markets/137/usdc/zap-borrow',
       body: {
-        account: '0x34693b4b0e8237854cee68251441a0bf301c4d65',
+        account: '0x0FBeABcaFCf817d47E10a7bCFC15ba194dbD4EEF',
         amount: '1',
         targetToken: {
           chainId: 137,

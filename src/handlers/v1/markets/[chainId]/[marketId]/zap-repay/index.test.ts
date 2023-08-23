@@ -56,7 +56,7 @@ describe('Test get zap repay quotation api', function () {
       title: '200: zap repay ERC20 token',
       path: '/v1/markets/137/usdc/zap-repay',
       body: {
-        account: '0xf6da9e9d73d7893223578d32a95d6d7de5522767',
+        account: '0x0fbeabcafcf817d47e10a7bcfc15ba194dbd4eef',
         sourceToken: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
@@ -77,7 +77,7 @@ describe('Test get zap repay quotation api', function () {
       title: '200: zap repay base token',
       path: '/v1/markets/137/usdc/zap-repay',
       body: {
-        account: '0xf6da9e9d73d7893223578d32a95d6d7de5522767',
+        account: '0x0fbeabcafcf817d47e10a7bcfc15ba194dbd4eef',
         sourceToken: logics.compoundv3.polygonTokens.USDC,
         amount: '1',
         slippage: 100,
