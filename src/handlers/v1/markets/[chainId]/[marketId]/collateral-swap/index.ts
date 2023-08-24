@@ -69,7 +69,6 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
       const { srcAmount, slippage } = event.body;
       const { supplyAPR, supplyUSD, borrowAPR, borrowCapacityUSD, liquidationLimit, collaterals } = marketInfo;
 
-      // Verify token input
       const srcToken = common.Token.from(event.body.srcToken);
       const srcCollateral = collaterals.find(({ asset }) => asset.is(srcToken.unwrapped));
       if (!srcCollateral) {

@@ -29,11 +29,11 @@ describe('Transaction: Zap Borrow', function () {
     // 1. user obtains a quotation for zap borrow 100 USDC through the zap borrow API
     const destToken = baseToken;
     const initDestBalance = await getBalance(user.address, destToken);
-    const baseAmount = '100';
+    const srcAmount = '100';
     const slippage = 100;
     const quotation = await api.quote(chainId, marketId, 'zap-borrow', {
       account: user.address,
-      baseAmount,
+      srcAmount,
       destToken,
       slippage,
     });
@@ -73,11 +73,11 @@ describe('Transaction: Zap Borrow', function () {
     // 1. user obtains a quotation for zap borrow USDT from 100 USDC through the zap borrow API
     const destToken = polygonTokens.USDT;
     const initDestBalance = await getBalance(user.address, destToken);
-    const baseAmount = '100';
+    const srcAmount = '100';
     const slippage = 100;
     const quotation = await api.quote(chainId, marketId, 'zap-borrow', {
       account: user.address,
-      baseAmount,
+      srcAmount,
       destToken,
       slippage,
     });
@@ -100,7 +100,7 @@ describe('Transaction: Zap Borrow', function () {
     // 4. user's USDC borrow balance should increase.
     const borrowBalance = await service.getBorrowBalance(marketId, user.address, baseToken);
     const borrowDifference = borrowBalance.clone().sub(initBorrowBalance);
-    const borrowAmount = new common.TokenAmount(baseToken, baseAmount);
+    const borrowAmount = new common.TokenAmount(baseToken, srcAmount);
 
     // 4-1. debt grows when the block of getting api data is different from the block of executing tx
     const [, maxBorrow] = utils.bpsBound(borrowAmount.amount, 10);

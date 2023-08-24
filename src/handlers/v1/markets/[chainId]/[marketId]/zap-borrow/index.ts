@@ -17,7 +17,7 @@ import { validateMarket } from 'src/validations';
 type GetZapBorrowQuotationRouteParams = EventPathParameters<{ chainId: string; marketId: string }> &
   EventBody<{
     account?: string;
-    baseAmount?: string;
+    srcAmount?: string;
     destToken?: common.TokenObject;
     slippage?: number;
   }>;
@@ -64,8 +64,8 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
     let fees: GetZapBorrowQuotationResponseBody['fees'] = [];
     let approvals: GetZapBorrowQuotationResponseBody['approvals'] = [];
     let targetPosition = currentPosition;
-    if (event.body.baseAmount && event.body.destToken && Number(event.body.baseAmount) > 0) {
-      const { baseAmount, slippage } = event.body;
+    if (event.body.srcAmount && event.body.destToken && Number(event.body.srcAmount) > 0) {
+      const { srcAmount, slippage } = event.body;
       const {
         baseToken,
         supplyAPR,
@@ -83,9 +83,9 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
         throw newHttpError(400, { code: '400.5', message: 'supply USD is not zero' });
       }
 
-      // 2. check base amount
-      if (new BigNumberJS(baseAmount).gt(new BigNumberJS(availableToBorrow))) {
-        throw newHttpError(400, { code: '400.6', message: 'base amount is greater than available amount' });
+      // 2. check source amount
+      if (new BigNumberJS(srcAmount).gt(new BigNumberJS(availableToBorrow))) {
+        throw newHttpError(400, { code: '400.6', message: 'source amount is greater than available amount' });
       }
 
       // 3. new and append compound v3 borrow logic
@@ -94,17 +94,17 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
           marketId,
           output: {
             token: destToken.unwrapped.is(baseToken) ? destToken : baseToken.wrapped,
-            amount: baseAmount,
+            amount: srcAmount,
           },
         })
       );
 
       // 4. new and append swap token logic
       if (destToken.unwrapped.is(baseToken)) {
-        destAmount = baseAmount;
+        destAmount = srcAmount;
       } else {
         const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
-          input: { token: baseToken.wrapped, amount: baseAmount },
+          input: { token: baseToken.wrapped, amount: srcAmount },
           tokenOut: destToken,
           slippage,
         });
@@ -117,7 +117,7 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
       approvals = estimateResult.approvals;
 
       // 5. calc target position
-      const curBorrowUSD = new BigNumberJS(baseAmount).times(baseTokenPrice);
+      const curBorrowUSD = new BigNumberJS(srcAmount).times(baseTokenPrice);
       const targetSupplyUSD = new BigNumberJS(supplyUSD);
       const targetBorrowUSD = new BigNumberJS(borrowUSD).plus(curBorrowUSD);
       const targetCollateralUSD = new BigNumberJS(collateralUSD);
