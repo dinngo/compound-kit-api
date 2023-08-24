@@ -15,7 +15,7 @@ import { utils } from 'ethers';
 import { validateMarket } from 'src/validations';
 
 type GetDeleverageQuotationRouteParams = EventPathParameters<{ chainId: string; marketId: string }> &
-  EventBody<{ account?: string; token?: common.TokenObject; amount?: string; slippage?: number }>;
+  EventBody<{ account?: string; collateralToken?: common.TokenObject; baseAmount?: string; slippage?: number }>;
 
 type GetDeleverageQuotationResponseBody = QuoteAPIResponseBody<DeleverageQuotation>;
 
@@ -58,8 +58,8 @@ export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRoutePar
     let fees: GetDeleverageQuotationResponseBody['fees'] = [];
     let approvals: GetDeleverageQuotationResponseBody['approvals'] = [];
     let targetPosition = currentPosition;
-    if (event.body.token && event.body.amount && Number(event.body.amount) > 0) {
-      const { token, amount, slippage } = event.body;
+    if (event.body.collateralToken && event.body.baseAmount && Number(event.body.baseAmount) > 0) {
+      const { collateralToken, baseAmount, slippage } = event.body;
       const {
         baseToken,
         baseTokenPrice,
@@ -71,17 +71,17 @@ export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRoutePar
         collaterals,
       } = marketInfo;
 
-      const deleverageCollateralToken = common.Token.from(token);
+      const deleverageCollateralToken = common.Token.from(collateralToken);
       const deleverageCollateral = collaterals.find(({ asset }) => asset.is(deleverageCollateralToken.unwrapped));
       if (!deleverageCollateral) {
         throw newHttpError(400, { code: '400.5', message: 'deleverage token is not collateral' });
       }
-      const deleverageDebtUSD = new BigNumberJS(amount).times(baseTokenPrice);
+      const deleverageDebtUSD = new BigNumberJS(baseAmount).times(baseTokenPrice);
 
       // 1. get the quotation for swapping the deleverage token into amount of the base token.
       const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
         tokenIn: deleverageCollateralToken.wrapped,
-        output: { token: baseToken.wrapped, amount },
+        output: { token: baseToken.wrapped, amount: baseAmount },
         slippage,
       });
 
@@ -115,7 +115,7 @@ export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRoutePar
         apisdk.protocols.compoundv3.newRepayLogic({
           marketId,
           borrower: account,
-          input: { token: baseToken.wrapped, amount },
+          input: { token: baseToken.wrapped, amount: baseAmount },
           balanceBps: common.BPS_BASE,
         })
       );

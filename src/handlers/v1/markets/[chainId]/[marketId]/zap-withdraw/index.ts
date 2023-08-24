@@ -18,9 +18,9 @@ import { validateMarket } from 'src/validations';
 type GetZapWithdrawQuotationRouteParams = EventPathParameters<{ chainId: string; marketId: string }> &
   EventBody<{
     account?: string;
-    withdrawalToken?: common.TokenObject;
-    amount?: string;
-    targetToken?: common.TokenObject;
+    srcToken?: common.TokenObject;
+    srcAmount?: string;
+    destToken?: common.TokenObject;
     slippage?: number;
   }> &
   EventQueryStringParameters<{ permit2Type?: apisdk.Permit2Type }>;
@@ -62,14 +62,14 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
     const { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR } = marketInfo;
     const currentPosition = { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR };
 
-    let targetTokenAmount = '0';
+    let destAmount = '0';
     const logics: GetZapWithdrawQuotationResponseBody['logics'] = [];
     let fees: GetZapWithdrawQuotationResponseBody['fees'] = [];
     let approvals: GetZapWithdrawQuotationResponseBody['approvals'] = [];
     let permitData: GetZapWithdrawQuotationResponseBody['permitData'];
     let targetPosition = currentPosition;
-    if (event.body.withdrawalToken && event.body.amount && event.body.targetToken && Number(event.body.amount) > 0) {
-      const { amount, slippage } = event.body;
+    if (event.body.srcToken && event.body.srcAmount && event.body.destToken && Number(event.body.srcAmount) > 0) {
+      const { srcAmount, slippage } = event.body;
       const {
         baseToken,
         supplyAPR,
@@ -82,66 +82,66 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
         collaterals,
       } = marketInfo;
 
-      const withdrawalToken = common.Token.from(event.body.withdrawalToken);
-      const targetToken = common.Token.from(event.body.targetToken);
+      const srcToken = common.Token.from(event.body.srcToken);
+      const destToken = common.Token.from(event.body.destToken);
 
       // 1. check withdraw collateral or base token
       // 1-1. new and append compound v3 withdraw logic
-      let withdrawalCollateral: CollateralInfo | undefined;
-      let realWithdrawalToken: common.Token;
-      if (withdrawalToken.unwrapped.is(baseToken)) {
-        if (new BigNumberJS(supplyBalance).lt(new BigNumberJS(amount))) {
+      let srcCollateral: CollateralInfo | undefined;
+      let withdrawalToken: common.Token;
+      if (srcToken.unwrapped.is(baseToken)) {
+        if (new BigNumberJS(supplyBalance).lt(new BigNumberJS(srcAmount))) {
           throw newHttpError(400, {
             code: '400.5',
-            message: 'withdrawal amount is greater than available base amount',
+            message: 'source amount is greater than available base amount',
           });
         }
         const cToken = await service.getCToken(marketId);
-        realWithdrawalToken = targetToken.wrapped.is(baseToken.wrapped) ? targetToken : withdrawalToken.wrapped;
+        withdrawalToken = destToken.wrapped.is(baseToken.wrapped) ? destToken : srcToken.wrapped;
         const withdrawBaseQuotation = await apisdk.protocols.compoundv3.getWithdrawBaseQuotation(chainId, {
           marketId,
           input: {
             token: cToken,
-            amount,
+            amount: srcAmount,
           },
-          tokenOut: realWithdrawalToken,
+          tokenOut: withdrawalToken,
         });
         logics.push(
           apisdk.protocols.compoundv3.newWithdrawBaseLogic({ ...withdrawBaseQuotation, balanceBps: common.BPS_BASE })
         );
       } else {
-        withdrawalCollateral = collaterals.find(({ asset }) => asset.is(withdrawalToken.unwrapped));
-        if (!withdrawalCollateral) {
-          throw newHttpError(400, { code: '400.6', message: 'withdrawal token is not collateral nor base' });
+        srcCollateral = collaterals.find(({ asset }) => asset.is(srcToken.unwrapped));
+        if (!srcCollateral) {
+          throw newHttpError(400, { code: '400.6', message: 'source token is not collateral nor base' });
         }
-        if (new BigNumberJS(withdrawalCollateral.collateralBalance).lt(new BigNumberJS(amount))) {
+        if (new BigNumberJS(srcCollateral.collateralBalance).lt(new BigNumberJS(srcAmount))) {
           throw newHttpError(400, {
             code: '400.7',
-            message: 'withdrawal amount is greater than available collateral amount',
+            message: 'source amount is greater than available collateral amount',
           });
         }
-        realWithdrawalToken = targetToken.wrapped.is(withdrawalToken.wrapped) ? targetToken : withdrawalToken.wrapped;
+        withdrawalToken = destToken.wrapped.is(srcToken.wrapped) ? destToken : srcToken.wrapped;
         logics.push(
           apisdk.protocols.compoundv3.newWithdrawCollateralLogic({
             marketId,
             output: {
-              token: realWithdrawalToken,
-              amount,
+              token: withdrawalToken,
+              amount: srcAmount,
             },
           })
         );
       }
 
       // 2. new and append swap token logic
-      if (withdrawalToken.wrapped.is(targetToken.wrapped)) {
-        targetTokenAmount = amount;
+      if (srcToken.wrapped.is(destToken.wrapped)) {
+        destAmount = srcAmount;
       } else {
         const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
-          input: { token: realWithdrawalToken, amount },
-          tokenOut: targetToken,
+          input: { token: withdrawalToken, amount: srcAmount },
+          tokenOut: destToken,
           slippage,
         });
-        targetTokenAmount = quotation.output.amount;
+        destAmount = quotation.output.amount;
         logics.push(apisdk.protocols.paraswapv5.newSwapTokenLogic(quotation));
       }
 
@@ -155,21 +155,21 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
 
       // 3. calc target position
       let targetSupplyUSD, targetCollateralUSD, targetBorrowCapacityUSD, targetLiquidationLimit;
-      if (realWithdrawalToken.unwrapped.is(baseToken)) {
-        const withdrawalUSD = new BigNumberJS(amount).times(baseTokenPrice);
+      if (withdrawalToken.unwrapped.is(baseToken)) {
+        const withdrawalUSD = new BigNumberJS(srcAmount).times(baseTokenPrice);
         targetSupplyUSD = new BigNumberJS(supplyUSD).minus(withdrawalUSD);
         targetCollateralUSD = new BigNumberJS(collateralUSD);
         targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD);
         targetLiquidationLimit = new BigNumberJS(liquidationLimit);
       } else {
-        const withdrawalUSD = new BigNumberJS(amount).times(withdrawalCollateral!.assetPrice);
+        const withdrawalUSD = new BigNumberJS(srcAmount).times(srcCollateral!.assetPrice);
         targetSupplyUSD = new BigNumberJS(supplyUSD);
         targetCollateralUSD = new BigNumberJS(collateralUSD).minus(withdrawalUSD);
         targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD).minus(
-          withdrawalUSD.times(withdrawalCollateral!.borrowCapacity)
+          withdrawalUSD.times(srcCollateral!.borrowCapacity)
         );
         targetLiquidationLimit = new BigNumberJS(liquidationLimit).minus(
-          withdrawalUSD.times(withdrawalCollateral!.liquidateCollateralFactor)
+          withdrawalUSD.times(srcCollateral!.liquidateCollateralFactor)
         );
       }
 
@@ -194,7 +194,7 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
     }
 
     const responseBody: GetZapWithdrawQuotationResponseBody = {
-      quotation: { targetTokenAmount, currentPosition, targetPosition },
+      quotation: { destAmount, currentPosition, targetPosition },
       fees,
       approvals,
       permitData,

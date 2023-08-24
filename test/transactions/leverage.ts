@@ -35,8 +35,8 @@ describe('Transaction: Leverage', function () {
     const slippage = 100;
     const quotation = await api.quote(chainId, marketId, 'leverage', {
       account: user.address,
-      token: leverageAmount.token,
-      amount: leverageAmount.amount,
+      collateralToken: leverageAmount.token,
+      collateralAmount: leverageAmount.amount,
       slippage,
     });
 

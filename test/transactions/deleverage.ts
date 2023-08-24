@@ -38,8 +38,8 @@ describe('Transaction: Deleverage', function () {
     );
     const quotation = await api.quote(chainId, marketId, 'deleverage', {
       account: user.address,
-      token: deleverageCollateralToken,
-      amount: deleverageAmount.amount,
+      collateralToken: deleverageCollateralToken,
+      baseAmount: deleverageAmount.amount,
       slippage,
     });
 

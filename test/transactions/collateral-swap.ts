@@ -8,8 +8,8 @@ import * as logics from '@protocolink/logics';
 import * as utils from 'test/utils';
 
 describe('Transaction: Collateral Swap', function () {
-  const collateralToken = polygonTokens.WETH;
-  const collateralTokenInitBalance = '5';
+  const srcToken = polygonTokens.WETH;
+  const srcTokenInitBalance = '5';
 
   let chainId: number;
   let user: SignerWithAddress;
@@ -17,7 +17,7 @@ describe('Transaction: Collateral Swap', function () {
   before(async function () {
     chainId = await getChainId();
     [, user] = await hre.ethers.getSigners();
-    await claimToken(chainId, user.address, collateralToken, collateralTokenInitBalance);
+    await claimToken(chainId, user.address, srcToken, srcTokenInitBalance);
   });
 
   snapshotAndRevertEach();
@@ -26,7 +26,7 @@ describe('Transaction: Collateral Swap', function () {
     const marketId = logics.compoundv3.MarketId.USDC;
 
     // 1. user has supplied 5 WETH
-    const supplyAmount = new common.TokenAmount(collateralToken, collateralTokenInitBalance);
+    const supplyAmount = new common.TokenAmount(srcToken, srcTokenInitBalance);
     await utils.supply(chainId, user, marketId, supplyAmount);
 
     // 2. user has borrowed 2000 USDC
@@ -36,14 +36,14 @@ describe('Transaction: Collateral Swap', function () {
     await utils.borrow(chainId, user, marketId, borrowAmount);
 
     // 3. user obtains a quotation for collateral swap 3 WETH through the collateral swap API
-    const amount = '3';
+    const srcAmount = '3';
     const slippage = 100;
-    const targetToken = polygonTokens.WMATIC;
+    const destToken = polygonTokens.WMATIC;
     const quotation = await api.quote(chainId, marketId, 'collateral-swap', {
       account: user.address,
-      withdrawalToken: collateralToken,
-      amount,
-      targetToken,
+      srcToken,
+      srcAmount,
+      destToken,
       slippage,
     });
 
@@ -64,19 +64,19 @@ describe('Transaction: Collateral Swap', function () {
 
     // 6. user's WETH collateral balance will decrease.
     const service = new logics.compoundv3.Service(chainId, hre.ethers.provider);
-    const collateralBalance = await service.getCollateralBalance(marketId, user.address, collateralToken);
-    expect(collateralBalance.eq(supplyAmount.clone().sub(amount))).to.be.true;
+    const collateralBalance = await service.getCollateralBalance(marketId, user.address, srcToken);
+    expect(collateralBalance.eq(supplyAmount.clone().sub(srcAmount))).to.be.true;
 
     // 7. user's WMATIC collateral balance will increase.
-    const targetBalance = await service.getCollateralBalance(marketId, user.address, targetToken);
-    const quoteTargetAmount = new common.TokenAmount(targetToken, quotation.quotation.targetTokenAmount);
+    const destBalance = await service.getCollateralBalance(marketId, user.address, destToken);
+    const quoteDestAmount = new common.TokenAmount(destToken, quotation.quotation.destAmount);
 
     // 7-1. rate may change when the block of getting api data is different from the block of executing tx
-    const [min, max] = utils.bpsBound(quoteTargetAmount.amount);
-    const maxTargetAmount = quoteTargetAmount.clone().set(max);
-    const minTargetAmount = quoteTargetAmount.clone().set(min);
+    const [min, max] = utils.bpsBound(quoteDestAmount.amount);
+    const maxDestAmount = quoteDestAmount.clone().set(max);
+    const minDestAmount = quoteDestAmount.clone().set(min);
 
-    expect(targetBalance.lte(maxTargetAmount)).to.be.true;
-    expect(targetBalance.gte(minTargetAmount)).to.be.true;
+    expect(destBalance.lte(maxDestAmount)).to.be.true;
+    expect(destBalance.gte(minDestAmount)).to.be.true;
   });
 });

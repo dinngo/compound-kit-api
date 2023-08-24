@@ -17,9 +17,9 @@ import { validateMarket } from 'src/validations';
 type GetCollateralSwapQuotationRouteParams = EventPathParameters<{ chainId: string; marketId: string }> &
   EventBody<{
     account?: string;
-    withdrawalToken?: common.TokenObject;
-    amount?: string;
-    targetToken?: common.TokenObject;
+    srcToken?: common.TokenObject;
+    srcAmount?: string;
+    destToken?: common.TokenObject;
     slippage?: number;
   }>;
 
@@ -60,33 +60,32 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
     const { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR } = marketInfo;
     const currentPosition = { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR };
 
-    let targetTokenAmount = '0';
+    let destAmount = '0';
     const logics: GetCollateralSwapQuotationResponseBody['logics'] = [];
     let fees: GetCollateralSwapQuotationResponseBody['fees'] = [];
     let approvals: GetCollateralSwapQuotationResponseBody['approvals'] = [];
     let targetPosition = currentPosition;
-    if (event.body.withdrawalToken && event.body.targetToken && event.body.amount && Number(event.body.amount) > 0) {
-      const { amount, slippage } = event.body;
+    if (event.body.srcToken && event.body.destToken && event.body.srcAmount && Number(event.body.srcAmount) > 0) {
+      const { srcAmount, slippage } = event.body;
       const { supplyAPR, supplyUSD, borrowAPR, borrowCapacityUSD, liquidationLimit, collaterals } = marketInfo;
 
-      // Verify token input
-      const withdrawalToken = common.Token.from(event.body.withdrawalToken);
-      const withdrawalCollateral = collaterals.find(({ asset }) => asset.is(withdrawalToken.unwrapped));
-      if (!withdrawalCollateral) {
-        throw newHttpError(400, { code: '400.5', message: 'withdrawal token is not collateral' });
+      const srcToken = common.Token.from(event.body.srcToken);
+      const srcCollateral = collaterals.find(({ asset }) => asset.is(srcToken.unwrapped));
+      if (!srcCollateral) {
+        throw newHttpError(400, { code: '400.5', message: 'source token is not collateral' });
       }
 
-      if (new BigNumberJS(amount).gt(withdrawalCollateral.collateralBalance)) {
-        throw newHttpError(400, { code: '400.6', message: 'withdrawal amount is greater than available amount' });
+      if (new BigNumberJS(srcAmount).gt(srcCollateral.collateralBalance)) {
+        throw newHttpError(400, { code: '400.6', message: 'source amount is greater than available amount' });
       }
 
-      const targetToken = common.Token.from(event.body.targetToken);
-      const targetCollateral = collaterals.find(({ asset }) => asset.is(targetToken.unwrapped));
-      if (!targetCollateral) {
-        throw newHttpError(400, { code: '400.7', message: 'target token is not collateral' });
+      const destToken = common.Token.from(event.body.destToken);
+      const destCollateral = collaterals.find(({ asset }) => asset.is(destToken.unwrapped));
+      if (!destCollateral) {
+        throw newHttpError(400, { code: '400.7', message: 'destination token is not collateral' });
       }
 
-      const withdrawal = { token: withdrawalToken.wrapped, amount };
+      const withdrawal = { token: srcToken.wrapped, amount: srcAmount };
 
       // 1. get flash loan aggregator quotation with repays
       const { protocolId, loans } = await apisdk.protocols.utility.getFlashLoanAggregatorQuotation(chainId, {
@@ -103,17 +102,17 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
       // 3. new and append paraswap swap token logic
       const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
         input: loans.at(0),
-        tokenOut: targetToken.wrapped,
+        tokenOut: destToken.wrapped,
         slippage,
       });
       logics.push(apisdk.protocols.paraswapv5.newSwapTokenLogic(quotation));
 
       // 4. new and append compound v3 supply collateral logic
-      targetTokenAmount = quotation.output.amount;
+      destAmount = quotation.output.amount;
       logics.push(
         apisdk.protocols.compoundv3.newSupplyCollateralLogic({
           marketId,
-          input: { token: targetToken.wrapped, amount: targetTokenAmount },
+          input: { token: destToken.wrapped, amount: destAmount },
           balanceBps: common.BPS_BASE,
         })
       );
@@ -134,8 +133,8 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
       approvals = estimateResult.approvals;
 
       // 7. calc target position
-      const withdrawalUSD = new BigNumberJS(amount).times(withdrawalCollateral.assetPrice);
-      const targetUSD = new BigNumberJS(targetTokenAmount).times(targetCollateral.assetPrice);
+      const withdrawalUSD = new BigNumberJS(srcAmount).times(srcCollateral.assetPrice);
+      const targetUSD = new BigNumberJS(destAmount).times(destCollateral.assetPrice);
       const targetSupplyUSD = new BigNumberJS(supplyUSD);
       const targetBorrowUSD = new BigNumberJS(borrowUSD);
       const targetCollateralUSD = new BigNumberJS(collateralUSD).minus(withdrawalUSD).plus(targetUSD);
@@ -143,8 +142,8 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
 
       const targetLiquidationLimit = new BigNumberJS(liquidationLimit).minus(
         withdrawalUSD
-          .times(withdrawalCollateral.liquidateCollateralFactor)
-          .plus(targetUSD.times(targetCollateral.liquidateCollateralFactor))
+          .times(srcCollateral.liquidateCollateralFactor)
+          .plus(targetUSD.times(destCollateral.liquidateCollateralFactor))
       );
       const targetLiquidationThreshold = common.formatBigUnit(targetLiquidationLimit.div(targetCollateralUSD), 4);
       const targetPositiveProportion = targetSupplyUSD.times(supplyAPR);
@@ -166,7 +165,7 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
     }
 
     const responseBody: GetCollateralSwapQuotationResponseBody = {
-      quotation: { targetTokenAmount, currentPosition, targetPosition },
+      quotation: { destAmount, currentPosition, targetPosition },
       fees,
       approvals,
       logics,

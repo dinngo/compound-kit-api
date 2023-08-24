@@ -15,7 +15,7 @@ import { utils } from 'ethers';
 import { validateMarket } from 'src/validations';
 
 type GetLeverageQuotationRouteParams = EventPathParameters<{ chainId: string; marketId: string }> &
-  EventBody<{ account?: string; token?: common.TokenObject; amount?: string; slippage?: number }>;
+  EventBody<{ account?: string; collateralToken?: common.TokenObject; collateralAmount?: string; slippage?: number }>;
 
 type GetLeverageQuotationResponseBody = QuoteAPIResponseBody<LeverageQuotation>;
 
@@ -59,8 +59,8 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
     let fees: GetLeverageQuotationResponseBody['fees'] = [];
     let approvals: GetLeverageQuotationResponseBody['approvals'] = [];
     let targetPosition = currentPosition;
-    if (event.body.token && event.body.amount && Number(event.body.amount) > 0) {
-      const { token, amount, slippage } = event.body;
+    if (event.body.collateralToken && event.body.collateralAmount && Number(event.body.collateralAmount) > 0) {
+      const { collateralToken, collateralAmount, slippage } = event.body;
       const {
         baseToken,
         baseTokenPrice,
@@ -72,17 +72,17 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
         collaterals,
       } = marketInfo;
 
-      const leverageToken = common.Token.from(token);
+      const leverageToken = common.Token.from(collateralToken);
       const leverageCollateral = collaterals.find(({ asset }) => asset.is(leverageToken.unwrapped));
       if (!leverageCollateral) {
         throw newHttpError(400, { code: '400.5', message: 'leverage token is not collateral' });
       }
-      const leverageUSD = new BigNumberJS(amount).times(leverageCollateral.assetPrice);
+      const leverageUSD = new BigNumberJS(collateralAmount).times(leverageCollateral.assetPrice);
 
       // 1. get the quotation for swapping the base token into amount of leverage token.
       const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
         tokenIn: baseToken.wrapped,
-        output: { token: leverageToken.wrapped, amount },
+        output: { token: leverageToken.wrapped, amount: collateralAmount },
         slippage,
       });
 
@@ -106,7 +106,7 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       logics.push(
         apisdk.protocols.compoundv3.newSupplyCollateralLogic({
           marketId,
-          input: { token: leverageToken.wrapped, amount },
+          input: { token: leverageToken.wrapped, amount: collateralAmount },
           balanceBps: common.BPS_BASE,
         })
       );

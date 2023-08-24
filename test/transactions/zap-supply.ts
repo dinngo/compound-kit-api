@@ -24,15 +24,15 @@ describe('Transaction: Zap Supply', function () {
 
   it('user zap supply USDT to WETH Token in USDC market', async function () {
     // 1. user obtains a quotation for zap supply 100 USDT to WETH through the zap supply API
-    const sourceToken = polygonTokens.USDT;
-    const targetToken = polygonTokens.WETH;
-    const amount = '100';
+    const srcToken = polygonTokens.USDT;
+    const destToken = polygonTokens.WETH;
+    const srcAmount = '100';
     const slippage = 100;
     const quotation = await api.quote(chainId, marketId, 'zap-supply', {
       account: user.address,
-      sourceToken,
-      amount,
-      targetToken,
+      srcToken,
+      srcAmount,
+      destToken,
       slippage,
     });
 
@@ -59,29 +59,29 @@ describe('Transaction: Zap Supply', function () {
 
     // 4. user's WETH collateral balance will increase.
     const service = new logics.compoundv3.Service(chainId, hre.ethers.provider);
-    const collateralBalance = await service.getCollateralBalance(marketId, user.address, targetToken);
-    const quoteTargetAmount = new common.TokenAmount(targetToken, quotation.quotation.targetTokenAmount);
+    const collateralBalance = await service.getCollateralBalance(marketId, user.address, destToken);
+    const quoteDestAmount = new common.TokenAmount(destToken, quotation.quotation.destAmount);
 
     // 4-1. rate may change when the block of getting api data is different from the block of executing tx
-    const [min, max] = utils.bpsBound(quoteTargetAmount.amount);
-    const maxTargetAmount = quoteTargetAmount.clone().set(max);
-    const minTargetAmount = quoteTargetAmount.clone().set(min);
+    const [min, max] = utils.bpsBound(quoteDestAmount.amount);
+    const maxDestAmount = quoteDestAmount.clone().set(max);
+    const minDestAmount = quoteDestAmount.clone().set(min);
 
-    expect(collateralBalance.lte(maxTargetAmount)).to.be.true;
-    expect(collateralBalance.gte(minTargetAmount)).to.be.true;
+    expect(collateralBalance.lte(maxDestAmount)).to.be.true;
+    expect(collateralBalance.gte(minDestAmount)).to.be.true;
   });
 
   it('user zap supply USDT to USDC Token in USDC market', async function () {
     // 1. user obtains a quotation for zap supply 100 USDT to USDC through the zap supply API
-    const sourceToken = polygonTokens.USDT;
-    const targetToken = polygonTokens.USDC;
-    const amount = '100';
+    const srcToken = polygonTokens.USDT;
+    const destToken = polygonTokens.USDC;
+    const srcAmount = '100';
     const slippage = 100;
     const quotation = await api.quote(chainId, marketId, 'zap-supply', {
       account: user.address,
-      sourceToken,
-      amount,
-      targetToken,
+      srcToken,
+      srcAmount,
+      destToken,
       slippage,
     });
 
@@ -108,15 +108,15 @@ describe('Transaction: Zap Supply', function () {
 
     // 4. user's USDC balance will increase.
     // 4-1. rate may change when the block of getting api data is different from the block of executing tx
-    const quoteTargetAmount = new common.TokenAmount(targetToken, quotation.quotation.targetTokenAmount);
-    const [min, max] = utils.bpsBound(quoteTargetAmount.amount);
-    const maxTargetAmount = quoteTargetAmount.clone().set(max);
-    const minTargetAmount = quoteTargetAmount.clone().set(min);
+    const quoteDestAmount = new common.TokenAmount(destToken, quotation.quotation.destAmount);
+    const [min, max] = utils.bpsBound(quoteDestAmount.amount);
+    const maxDestAmount = quoteDestAmount.clone().set(max);
+    const minDestAmount = quoteDestAmount.clone().set(min);
 
     const service = new logics.compoundv3.Service(chainId, hre.ethers.provider);
     const cToken = await service.getCToken(marketId);
     const baseTokenBalance = await getBalance(user.address, cToken);
-    expect(baseTokenBalance.lte(maxTargetAmount)).to.be.true;
-    expect(baseTokenBalance.gte(minTargetAmount)).to.be.true;
+    expect(baseTokenBalance.lte(maxDestAmount)).to.be.true;
+    expect(baseTokenBalance.gte(minDestAmount)).to.be.true;
   });
 });
