@@ -89,8 +89,9 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
       // 1-1. new and append compound v3 withdraw logic
       let srcCollateral: CollateralInfo | undefined;
       let withdrawalToken: common.Token;
+      const realSrcAmount = new common.TokenAmount(srcToken, srcAmount);
       if (srcToken.unwrapped.is(baseToken)) {
-        if (new BigNumberJS(supplyBalance).lt(new BigNumberJS(srcAmount))) {
+        if (new BigNumberJS(supplyBalance).lt(new BigNumberJS(realSrcAmount.amount))) {
           throw newHttpError(400, {
             code: '400.5',
             message: 'source amount is greater than available base amount',
@@ -98,23 +99,25 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
         }
         const cToken = await service.getCToken(marketId);
         withdrawalToken = destToken.wrapped.is(baseToken.wrapped) ? destToken : srcToken.wrapped;
+        realSrcAmount.subWei(2); // cToken amount would be 2 wei less after permit2-pull
         const withdrawBaseQuotation = await apisdk.protocols.compoundv3.getWithdrawBaseQuotation(chainId, {
           marketId,
           input: {
             token: cToken,
-            amount: srcAmount,
+            amount: realSrcAmount.amount,
           },
           tokenOut: withdrawalToken,
         });
         logics.push(
           apisdk.protocols.compoundv3.newWithdrawBaseLogic({ ...withdrawBaseQuotation, balanceBps: common.BPS_BASE })
         );
+        realSrcAmount.subWei(1); // would receive 1 wei less base token
       } else {
         srcCollateral = collaterals.find(({ asset }) => asset.is(srcToken.unwrapped));
         if (!srcCollateral) {
           throw newHttpError(400, { code: '400.6', message: 'source token is not collateral nor base' });
         }
-        if (new BigNumberJS(srcCollateral.collateralBalance).lt(new BigNumberJS(srcAmount))) {
+        if (new BigNumberJS(srcCollateral.collateralBalance).lt(new BigNumberJS(realSrcAmount.amount))) {
           throw newHttpError(400, {
             code: '400.7',
             message: 'source amount is greater than available collateral amount',
@@ -126,7 +129,7 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
             marketId,
             output: {
               token: withdrawalToken,
-              amount: srcAmount,
+              amount: realSrcAmount.amount,
             },
           })
         );
@@ -134,10 +137,10 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
 
       // 2. new and append swap token logic
       if (srcToken.wrapped.is(destToken.wrapped)) {
-        destAmount = srcAmount;
+        destAmount = realSrcAmount.amount;
       } else {
         const quotation = await apisdk.protocols.paraswapv5.getSwapTokenQuotation(chainId, {
-          input: { token: withdrawalToken, amount: srcAmount },
+          input: { token: withdrawalToken, amount: realSrcAmount.amount },
           tokenOut: destToken,
           slippage,
         });
@@ -156,13 +159,13 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
       // 3. calc target position
       let targetSupplyUSD, targetCollateralUSD, targetBorrowCapacityUSD, targetLiquidationLimit;
       if (withdrawalToken.unwrapped.is(baseToken)) {
-        const withdrawalUSD = new BigNumberJS(srcAmount).times(baseTokenPrice);
+        const withdrawalUSD = new BigNumberJS(realSrcAmount.amount).times(baseTokenPrice);
         targetSupplyUSD = new BigNumberJS(supplyUSD).minus(withdrawalUSD);
         targetCollateralUSD = new BigNumberJS(collateralUSD);
         targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD);
         targetLiquidationLimit = new BigNumberJS(liquidationLimit);
       } else {
-        const withdrawalUSD = new BigNumberJS(srcAmount).times(srcCollateral!.assetPrice);
+        const withdrawalUSD = new BigNumberJS(realSrcAmount.amount).times(srcCollateral!.assetPrice);
         targetSupplyUSD = new BigNumberJS(supplyUSD);
         targetCollateralUSD = new BigNumberJS(collateralUSD).minus(withdrawalUSD);
         targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD).minus(
