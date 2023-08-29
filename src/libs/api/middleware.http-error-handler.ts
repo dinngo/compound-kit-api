@@ -4,13 +4,13 @@ import middy from '@middy/core';
 
 // enhance the middy HTTP error handler by incorporating a condition to forward protocolink errors.
 // https://github.com/middyjs/middy/tree/main/packages/http-error-handler
-export default function cacheMiddleware(): middy.MiddlewareObj<Event, any, any> {
+export default function httpErrorHandler(): middy.MiddlewareObj<Event, any, any> {
   return {
     onError: async (request) => {
       if (request.response !== undefined) return;
       console.error(request.error);
 
-      // forwarding the protocolink API Axios error
+      // forwarding the Protocolink API Axios error
       if (request.error.response && request.error.expose === undefined) {
         const { status, data } = request.error.response;
         request.error = { statusCode: status, message: JSON.stringify(data), expose: true };
