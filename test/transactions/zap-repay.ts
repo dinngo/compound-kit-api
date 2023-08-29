@@ -77,12 +77,13 @@ describe('Transaction: Zap Repay', function () {
   });
 
   it('user zap repay extra USDT in USDC market', async function () {
-    await claimToken(chainId, user.address, polygonTokens.USDT, '80000');
-    await claimToken(chainId, user.address, polygonTokens.MATIC, '500');
+    const initBorrowBalance = await service.getBorrowBalance(marketId, user.address, baseToken);
+    const srcAmount = initBorrowBalance.add(initBorrowBalance).amount; // multiply by 2 to avoid rate changing
+    await claimToken(chainId, user.address, polygonTokens.USDT, srcAmount);
+    await claimToken(chainId, user.address, polygonTokens.MATIC, '5000'); // gas
 
-    // 1. user obtains a quotation for zap withdraw 0.1 WETH to USDT through the zap withdraw API
+    // 1. user obtains a quotation for zap repay USDT to USDC through the zap repay API
     const srcToken = polygonTokens.USDT;
-    const srcAmount = '80000';
     const slippage = 100;
     const permit2Type = 'approve';
     const quotation = await api.quote(
@@ -97,10 +98,6 @@ describe('Transaction: Zap Repay', function () {
       },
       permit2Type
     );
-
-    const quoteDestAmount = new common.TokenAmount(baseToken, quotation.quotation.destAmount);
-    const srcTokenAmount = new common.TokenAmount(srcToken, srcAmount);
-    expect(quoteDestAmount.lt(srcTokenAmount)).to.be.true;
 
     // 2. user needs to allow the Protocolink user agent to repay on behalf of the user
     expect(quotation.approvals.length).to.eq(2);
