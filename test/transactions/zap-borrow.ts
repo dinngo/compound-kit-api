@@ -2,7 +2,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import * as api from 'test/fixtures/api';
 import * as common from '@protocolink/common';
 import { expect } from 'chai';
-import { getBalance, getChainId, polygonTokens, snapshotAndRevertEach } from '@protocolink/test-helpers';
+import { getChainId, polygonTokens, snapshotAndRevertEach } from '@protocolink/test-helpers';
 import hre from 'hardhat';
 import * as logics from '@protocolink/logics';
 import * as utils from 'test/utils';
@@ -28,7 +28,6 @@ describe('Transaction: Zap Borrow', function () {
   it('user zap borrow USDC in USDC market', async function () {
     // 1. user obtains a quotation for zap borrow 100 USDC through the zap borrow API
     const destToken = baseToken;
-    const initDestBalance = await getBalance(user.address, destToken);
     const srcAmount = '100';
     const slippage = 100;
     const quotation = await api.quote(chainId, marketId, 'zap-borrow', {
@@ -65,14 +64,12 @@ describe('Transaction: Zap Borrow', function () {
     expect(borrowDifference.gte(quoteDestAmount)).to.be.true;
 
     // 5. user's USDC balance should increase
-    const destBalance = await getBalance(user.address, destToken);
-    expect(destBalance.clone().sub(initDestBalance).eq(quoteDestAmount)).to.be.true;
+    await expect(user.address).to.changeBalance(destToken, quotation.quotation.destAmount);
   });
 
   it('user zap borrow USDT in USDC market', async function () {
     // 1. user obtains a quotation for zap borrow USDT from 100 USDC through the zap borrow API
     const destToken = polygonTokens.USDT;
-    const initDestBalance = await getBalance(user.address, destToken);
     const srcAmount = '100';
     const slippage = 100;
     const quotation = await api.quote(chainId, marketId, 'zap-borrow', {
@@ -110,14 +107,6 @@ describe('Transaction: Zap Borrow', function () {
 
     // 5. user's USDT balance should increase
     // 5-1. rate may change when the block of getting api data is different from the block of executing tx
-    const destBalance = await getBalance(user.address, destToken);
-    const destDifference = destBalance.clone().sub(initDestBalance);
-    const quoteDestAmount = new common.TokenAmount(destToken, quotation.quotation.destAmount);
-    const [minDest, maxDest] = utils.bpsBound(quoteDestAmount.amount);
-    const minDestAmount = quoteDestAmount.clone().set(minDest);
-    const maxDestAmount = quoteDestAmount.clone().set(maxDest);
-
-    expect(destDifference.lte(maxDestAmount)).to.be.true;
-    expect(destDifference.gte(minDestAmount)).to.be.true;
+    await expect(user.address).to.changeBalance(destToken, quotation.quotation.destAmount, slippage);
   });
 });

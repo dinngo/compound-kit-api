@@ -108,15 +108,8 @@ describe('Transaction: Zap Supply', function () {
 
     // 4. user's USDC balance will increase.
     // 4-1. rate may change when the block of getting api data is different from the block of executing tx
-    const quoteDestAmount = new common.TokenAmount(destToken, quotation.quotation.destAmount);
-    const [min, max] = utils.bpsBound(quoteDestAmount.amount);
-    const maxDestAmount = quoteDestAmount.clone().set(max);
-    const minDestAmount = quoteDestAmount.clone().set(min);
-
     const service = new logics.compoundv3.Service(chainId, hre.ethers.provider);
     const cToken = await service.getCToken(marketId);
-    const baseTokenBalance = await getBalance(user.address, cToken);
-    expect(baseTokenBalance.lte(maxDestAmount)).to.be.true;
-    expect(baseTokenBalance.gte(minDestAmount)).to.be.true;
+    await expect(user.address).to.changeBalance(cToken, quotation.quotation.destAmount, slippage);
   });
 });
