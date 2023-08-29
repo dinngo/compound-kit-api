@@ -1,5 +1,5 @@
 import errorLogger from '@middy/error-logger';
-import httpErrorHandler from '@middy/http-error-handler';
+import httpErrorHandler from 'src/libs/api/middleware.http-error-handler';
 import httpHeaderNormalizer from '@middy/http-header-normalizer';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
 import httpRouterHandler from '@middy/http-router';
