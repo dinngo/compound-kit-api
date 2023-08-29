@@ -57,7 +57,7 @@ describe('Test get zap supply quotation api', function () {
       title: '400.6: borrow USD is not zero',
       path: '/v1/markets/137/usdc/zap-supply',
       body: {
-        account: '0x0fbeabcafcf817d47e10a7bcfc15ba194dbd4eef',
+        account: '0x0FBeABcaFCf817d47E10a7bCFC15ba194dbD4EEF',
         srcToken: {
           chainId: 137,
           address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',

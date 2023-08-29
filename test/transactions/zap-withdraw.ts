@@ -18,8 +18,8 @@ describe('Transaction: Zap Withdraw', function () {
 
   before(async function () {
     chainId = await getChainId();
-    user1 = await hre.ethers.getImpersonatedSigner('0x0fbeabcafcf817d47e10a7bcfc15ba194dbd4eef');
-    user2 = await hre.ethers.getImpersonatedSigner('0x43fc188f003e444e9e538189fc675acdfb8f5d12');
+    user1 = await hre.ethers.getImpersonatedSigner('0x0FBeABcaFCf817d47E10a7bCFC15ba194dbD4EEF');
+    user2 = await hre.ethers.getImpersonatedSigner('0x43fC188f003e444e9e538189Fc675acDfB8f5d12');
     service = new logics.compoundv3.Service(chainId, hre.ethers.provider);
     cToken = await service.getCToken(marketId);
   });
