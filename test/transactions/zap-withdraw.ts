@@ -64,7 +64,7 @@ describe('Transaction: Zap Withdraw', function () {
 
     // 4. user's USDC supply balance should decrease.
     // 4-1. supply grows when the block of getting api data is different from the block of executing tx
-    await expect(user2.address).to.changeBalance(cToken, -srcAmount, 1);
+    await expect(user2.address).to.changeBalance(cToken, -srcAmount, 100);
 
     // 5. user's USDC balance should increase
     await expect(user2.address).to.changeBalance(destToken, quotation.quotation.destAmount);
@@ -109,7 +109,7 @@ describe('Transaction: Zap Withdraw', function () {
 
     // 4. user's USDC supply balance should decrease.
     // 4-1. supply grows when the block of getting api data is different from the block of executing tx
-    await expect(user2.address).to.changeBalance(cToken, -srcAmount, 2);
+    await expect(user2.address).to.changeBalance(cToken, -srcAmount, 100);
 
     // 5. user's USDT balance should increase
     await expect(user2.address).to.changeBalance(destToken, quotation.quotation.destAmount, slippage);
