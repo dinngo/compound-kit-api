@@ -177,7 +177,9 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
       }
 
       const targetBorrowUSD = new BigNumberJS(borrowUSD);
-      const targetLiquidationThreshold = common.formatBigUnit(targetLiquidationLimit.div(targetCollateralUSD), 4);
+      const targetLiquidationThreshold = !targetCollateralUSD.isZero()
+        ? common.formatBigUnit(targetLiquidationLimit.div(targetCollateralUSD), 4)
+        : '0';
       const targetPositiveProportion = targetSupplyUSD.times(supplyAPR);
       const targetNegativeProportion = targetBorrowCapacityUSD.times(borrowAPR);
       targetPosition = {
