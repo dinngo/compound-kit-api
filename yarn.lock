@@ -1448,6 +1448,13 @@
   resolved "https://registry.yarnpkg.com/@middy/error-logger/-/error-logger-4.5.5.tgz#30d25970ec03afd869a161cc6f915ea323a30278"
   integrity sha512-yMcazafhBM2GUlJGUJylsXG7SQKIY/p1L2pVTEGiF4ACBp1aCd6299tG9gEJFWT2UIkE+viRY+bAnGiaM1BUcg==
 
+"@middy/http-cors@^4.5.5":
+  version "4.5.5"
+  resolved "https://registry.yarnpkg.com/@middy/http-cors/-/http-cors-4.5.5.tgz#a20d5d1e62840a01ce9c7d4f4985e4a1c52b6fe2"
+  integrity sha512-gbbduePUTismeQwDtXJC4Gxg+3fbyhNRjr8zjxcuqPiSm57NLyTPk67m0O3CpZy13kpM2GIvsW5/8oYR8UTihw==
+  dependencies:
+    "@middy/util" "4.5.5"
+
 "@middy/http-error-handler@^4.5.5":
   version "4.5.5"
   resolved "https://registry.yarnpkg.com/@middy/http-error-handler/-/http-error-handler-4.5.5.tgz#34a505db7dc77fccd7b153b8e855bd418cf641a5"

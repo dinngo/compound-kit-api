@@ -20,6 +20,7 @@
   "dependencies": {
     "@middy/core": "^4.5.5",
     "@middy/error-logger": "^4.5.5",
+    "@middy/http-cors": "^4.5.5",
     "@middy/http-error-handler": "^4.5.5",
     "@middy/http-header-normalizer": "^4.5.5",
     "@middy/http-json-body-parser": "^4.5.5",

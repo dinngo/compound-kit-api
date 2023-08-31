@@ -1,4 +1,5 @@
 import errorLogger from '@middy/error-logger';
+import httpCors from '@middy/http-cors';
 import httpErrorHandler from 'src/libs/api/middleware.http-error-handler';
 import httpHeaderNormalizer from '@middy/http-header-normalizer';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
@@ -14,6 +15,7 @@ export const handler = middy(httpRouterHandler(routes))
   // misc
   .use(inputOutputLogger())
   .use(errorLogger())
+  .use(httpCors())
   .use(warmup())
   // request transformation
   .use(httpHeaderNormalizer())

@@ -45,7 +45,7 @@ const serverlessConfiguration: AWS = {
       handler: 'src/index.handler',
       timeout: 30,
       memorySize: 256,
-      events: [{ http: { path: '/{proxy+}', method: 'any' } }],
+      events: [{ http: { path: '/{proxy+}', method: 'any', cors: true } }],
       environment: {
         STAGE: '${self:provider.stage}',
       },
