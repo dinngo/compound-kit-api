@@ -1,8 +1,8 @@
 import { BigNumber, providers } from 'ethers';
 import BigNumberJS from 'bignumber.js';
-import { CollateralInfo, MarketInfo } from './types';
 import { calcAPR, calcHealthRate, calcNetAPR, calcUtilization } from './utils';
 import * as common from '@protocolink/common';
+import * as compoundKit from '@protocolink/compound-kit';
 import { getCustomBaseTokenPriceFeed } from './configs';
 import * as logics from '@protocolink/logics';
 
@@ -254,7 +254,7 @@ export class Service extends logics.compoundv3.Service {
     let totalCollateralUSD = new BigNumberJS(0);
     let totalBorrowCapacityUSD = new BigNumberJS(0);
     let liquidationLimit = new BigNumberJS(0);
-    const collaterals: CollateralInfo[] = [];
+    const collaterals: compoundKit.CollateralInfo[] = [];
     for (let i = 0; i < numAssets; i++) {
       const { asset, borrowCollateralFactor, liquidateCollateralFactor } = assets[i];
       const assetPrice = assetPrices[i];
@@ -274,7 +274,7 @@ export class Service extends logics.compoundv3.Service {
         liquidationLimit = liquidationLimit.plus(collateralUSD.times(liquidateCollateralFactor));
       }
 
-      const collateralInfo: CollateralInfo = {
+      const collateralInfo: compoundKit.CollateralInfo = {
         asset: asset.unwrapped,
         assetPrice,
         borrowCollateralFactor,
@@ -314,7 +314,7 @@ export class Service extends logics.compoundv3.Service {
     const healthRate = calcHealthRate(totalCollateralUSD, borrowUSD, liquidationThreshold);
     const netAPR = calcNetAPR(supplyUSD, positiveProportion, borrowUSD, negativeProportion, totalCollateralUSD);
 
-    const marketInfo: MarketInfo = {
+    const marketInfo: compoundKit.MarketInfo = {
       baseToken: baseToken.unwrapped,
       baseTokenPrice,
       supplyAPR,

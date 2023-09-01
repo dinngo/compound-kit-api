@@ -8,10 +8,10 @@ import {
   newHttpError,
   newInternalServerError,
 } from 'src/libs/api';
-import { MarketInfo, Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
-import { QuoteAPIResponseBody, ZapQuotation } from 'src/types';
+import { Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
 import * as apisdk from '@protocolink/api';
 import * as common from '@protocolink/common';
+import * as compoundKit from '@protocolink/compound-kit';
 import { utils } from 'ethers';
 import { validateMarket } from 'src/validations';
 
@@ -24,7 +24,7 @@ type GetZapRepayQuotationRouteParams = EventPathParameters<{ chainId: string; ma
   }> &
   EventQueryStringParameters<{ permit2Type?: apisdk.Permit2Type }>;
 
-type GetZapRepayQuotationResponseBody = QuoteAPIResponseBody<ZapQuotation>;
+type GetZapRepayQuotationResponseBody = compoundKit.QuoteAPIResponseBody<compoundKit.ZapRepayQuotation>;
 
 export const v1GetZapRepayQuotationRoute: Route<GetZapRepayQuotationRouteParams> = {
   method: 'POST',
@@ -52,7 +52,7 @@ export const v1GetZapRepayQuotationRoute: Route<GetZapRepayQuotationRouteParams>
 
     const service = new Service(chainId);
 
-    let marketInfo: MarketInfo;
+    let marketInfo: compoundKit.MarketInfo;
     try {
       marketInfo = await service.getMarketInfo(marketId, account);
     } catch (err) {

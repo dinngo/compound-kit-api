@@ -1,5 +1,4 @@
 import BigNumberJS from 'bignumber.js';
-import { CollateralSwapQuotation, QuoteAPIResponseBody } from 'src/types';
 import {
   EventBody,
   EventPathParameters,
@@ -8,9 +7,10 @@ import {
   newHttpError,
   newInternalServerError,
 } from 'src/libs/api';
-import { MarketInfo, Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
+import { Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
 import * as apisdk from '@protocolink/api';
 import * as common from '@protocolink/common';
+import * as compoundKit from '@protocolink/compound-kit';
 import { utils } from 'ethers';
 import { validateMarket } from 'src/validations';
 
@@ -23,7 +23,7 @@ type GetCollateralSwapQuotationRouteParams = EventPathParameters<{ chainId: stri
     slippage?: number;
   }>;
 
-type GetCollateralSwapQuotationResponseBody = QuoteAPIResponseBody<CollateralSwapQuotation>;
+type GetCollateralSwapQuotationResponseBody = compoundKit.QuoteAPIResponseBody<compoundKit.CollateralSwapQuotation>;
 
 export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotationRouteParams> = {
   method: 'POST',
@@ -51,7 +51,7 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
 
     const service = new Service(chainId);
 
-    let marketInfo: MarketInfo;
+    let marketInfo: compoundKit.MarketInfo;
     try {
       marketInfo = await service.getMarketInfo(marketId, account);
     } catch (err) {

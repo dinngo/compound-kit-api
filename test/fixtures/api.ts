@@ -3,7 +3,7 @@ import { Event } from 'src/libs/api';
 import * as apisdk from '@protocolink/api';
 import * as common from '@protocolink/common';
 import { expect } from 'chai';
-import httpErrorHandler from '@middy/http-error-handler';
+import httpErrorHandler from 'src/libs/api/middleware.http-error-handler';
 import httpHeaderNormalizer from '@middy/http-header-normalizer';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
 import httpRouterHandler, { Method } from '@middy/http-router';
@@ -89,7 +89,7 @@ export const testHandler = middy(httpRouterHandler(routes))
   .use(httpUrlEncodeBodyParser())
   .use(httpJsonBodyParser())
   // response transformation
-  .use(httpErrorHandler({ logger: false }));
+  .use(httpErrorHandler(false));
 
 export async function quote<Params = any, ResponseBody = any>(
   chainId: number,

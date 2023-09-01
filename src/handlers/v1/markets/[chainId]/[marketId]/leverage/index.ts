@@ -7,17 +7,17 @@ import {
   newHttpError,
   newInternalServerError,
 } from 'src/libs/api';
-import { LeverageQuotation, QuoteAPIResponseBody } from 'src/types';
-import { MarketInfo, Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
+import { Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
 import * as apisdk from '@protocolink/api';
 import * as common from '@protocolink/common';
+import * as compoundKit from '@protocolink/compound-kit';
 import { utils } from 'ethers';
 import { validateMarket } from 'src/validations';
 
 type GetLeverageQuotationRouteParams = EventPathParameters<{ chainId: string; marketId: string }> &
   EventBody<{ account?: string; collateralToken?: common.TokenObject; collateralAmount?: string; slippage?: number }>;
 
-type GetLeverageQuotationResponseBody = QuoteAPIResponseBody<LeverageQuotation>;
+type GetLeverageQuotationResponseBody = compoundKit.QuoteAPIResponseBody<compoundKit.LeverageQuotation>;
 
 export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams> = {
   method: 'POST',
@@ -45,7 +45,7 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
 
     const service = new Service(chainId);
 
-    let marketInfo: MarketInfo;
+    let marketInfo: compoundKit.MarketInfo;
     try {
       marketInfo = await service.getMarketInfo(marketId, account);
     } catch (err) {
