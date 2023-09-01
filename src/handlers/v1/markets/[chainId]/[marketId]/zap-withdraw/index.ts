@@ -169,7 +169,7 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
         targetSupplyUSD = new BigNumberJS(supplyUSD);
         targetCollateralUSD = new BigNumberJS(collateralUSD).minus(withdrawalUSD);
         targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD).minus(
-          withdrawalUSD.times(srcCollateral!.borrowCapacity)
+          withdrawalUSD.times(srcCollateral!.borrowCollateralFactor)
         );
         targetLiquidationLimit = new BigNumberJS(liquidationLimit).minus(
           withdrawalUSD.times(srcCollateral!.liquidateCollateralFactor)
@@ -177,9 +177,12 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
       }
 
       const targetBorrowUSD = new BigNumberJS(borrowUSD);
-      const targetLiquidationThreshold = common.formatBigUnit(targetLiquidationLimit.div(targetCollateralUSD), 4);
+      const targetLiquidationThreshold = !targetCollateralUSD.isZero()
+        ? common.formatBigUnit(targetLiquidationLimit.div(targetCollateralUSD), 4)
+        : '0';
       const targetPositiveProportion = targetSupplyUSD.times(supplyAPR);
       const targetNegativeProportion = targetBorrowCapacityUSD.times(borrowAPR);
+
       targetPosition = {
         utilization: calcUtilization(targetBorrowCapacityUSD, targetBorrowUSD),
         healthRate: calcHealthRate(targetCollateralUSD, targetBorrowUSD, targetLiquidationThreshold),

@@ -123,7 +123,9 @@ export const v1GetZapRepayQuotationRoute: Route<GetZapRepayQuotationRouteParams>
       // 4. calc target position
       const repayUSD = new BigNumberJS(destAmount).times(baseTokenPrice);
       const targetSupplyUSD = new BigNumberJS(supplyUSD);
-      const targetBorrowUSD = new BigNumberJS(borrowUSD).minus(repayUSD);
+      const targetBorrowUSD = new BigNumberJS(borrowUSD).gt(repayUSD)
+        ? new BigNumberJS(borrowUSD).minus(repayUSD)
+        : new BigNumberJS(0);
       const targetCollateralUSD = new BigNumberJS(collateralUSD);
       const targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD);
       const targetLiquidationLimit = new BigNumberJS(liquidationLimit);
