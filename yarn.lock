@@ -1810,10 +1810,10 @@
     type-fest "^3.12.0"
     zksync-web3 "^0.14.3"
 
-"@protocolink/compound-kit@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@protocolink/compound-kit/-/compound-kit-0.1.1.tgz#7ed17e4dcab08d8916456c7f203d2b5e837943cd"
-  integrity sha512-41rm0xQm1qXhhz+L8rMHXSGaSLejGK4sUz5YNJi2G2mwnM94r+ZWopxwR0MFSfMPuYR4bq7CVrBSt+i2QvRMWA==
+"@protocolink/compound-kit@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@protocolink/compound-kit/-/compound-kit-0.1.2.tgz#18d4bb0cbb42ea1fbc92af0f08501400f183a09f"
+  integrity sha512-jpv/GHvi0Q44B9RAbCzk94yM/7bY5VMjgGOsMOg1xIa1cgKF/zxmmlI8fSzR7CPgGNcRx3Ba//4uW/liCiksCA==
   dependencies:
     "@protocolink/api" "^0.2.17"
     "@protocolink/common" "^0.2.18"

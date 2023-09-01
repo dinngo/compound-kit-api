@@ -171,6 +171,7 @@ describe('Test get zap supply quotation api', function () {
           'utilization',
           'healthRate',
           'liquidationThreshold',
+          'supplyUSD',
           'borrowUSD',
           'collateralUSD',
           'netAPR'
@@ -179,6 +180,7 @@ describe('Test get zap supply quotation api', function () {
           'utilization',
           'healthRate',
           'liquidationThreshold',
+          'supplyUSD',
           'borrowUSD',
           'collateralUSD',
           'netAPR'

@@ -51,8 +51,16 @@ export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRoutePar
     } catch (err) {
       throw newInternalServerError(err);
     }
-    const { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR } = marketInfo;
-    const currentPosition = { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR };
+    const { utilization, healthRate, liquidationThreshold, supplyUSD, borrowUSD, collateralUSD, netAPR } = marketInfo;
+    const currentPosition: compoundKit.Position = {
+      utilization,
+      healthRate,
+      liquidationThreshold,
+      supplyUSD,
+      borrowUSD,
+      collateralUSD,
+      netAPR,
+    };
 
     const logics: GetDeleverageQuotationResponseBody['logics'] = [];
     let fees: GetDeleverageQuotationResponseBody['fees'] = [];
@@ -154,6 +162,7 @@ export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRoutePar
         utilization: calcUtilization(targetBorrowCapacityUSD, targetBorrowUSD),
         healthRate: calcHealthRate(targetCollateralUSD, targetBorrowUSD, targetLiquidationThreshold),
         liquidationThreshold: targetLiquidationThreshold,
+        supplyUSD: common.formatBigUnit(targetSupplyUSD, 2),
         borrowUSD: common.formatBigUnit(targetBorrowUSD, 2),
         collateralUSD: common.formatBigUnit(targetCollateralUSD, 2),
         netAPR: calcNetAPR(
