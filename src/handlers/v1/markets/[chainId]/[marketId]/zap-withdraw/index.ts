@@ -1,5 +1,4 @@
 import BigNumberJS from 'bignumber.js';
-import { CollateralInfo, MarketInfo, Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
 import {
   EventBody,
   EventPathParameters,
@@ -9,9 +8,10 @@ import {
   newHttpError,
   newInternalServerError,
 } from 'src/libs/api';
-import { QuoteAPIResponseBody, ZapQuotation } from 'src/types';
+import { Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
 import * as apisdk from '@protocolink/api';
 import * as common from '@protocolink/common';
+import * as compoundKit from '@protocolink/compound-kit';
 import { utils } from 'ethers';
 import { validateMarket } from 'src/validations';
 
@@ -25,7 +25,7 @@ type GetZapWithdrawQuotationRouteParams = EventPathParameters<{ chainId: string;
   }> &
   EventQueryStringParameters<{ permit2Type?: apisdk.Permit2Type }>;
 
-type GetZapWithdrawQuotationResponseBody = QuoteAPIResponseBody<ZapQuotation>;
+type GetZapWithdrawQuotationResponseBody = compoundKit.QuoteAPIResponseBody<compoundKit.ZapWithdrawQuotation>;
 
 export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteParams> = {
   method: 'POST',
@@ -53,14 +53,22 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
 
     const service = new Service(chainId);
 
-    let marketInfo: MarketInfo;
+    let marketInfo: compoundKit.MarketInfo;
     try {
       marketInfo = await service.getMarketInfo(marketId, account);
     } catch (err) {
       throw newInternalServerError(err);
     }
-    const { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR } = marketInfo;
-    const currentPosition = { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR };
+    const { utilization, healthRate, liquidationThreshold, supplyUSD, borrowUSD, collateralUSD, netAPR } = marketInfo;
+    const currentPosition: compoundKit.Position = {
+      utilization,
+      healthRate,
+      liquidationThreshold,
+      supplyUSD,
+      borrowUSD,
+      collateralUSD,
+      netAPR,
+    };
 
     let destAmount = '0';
     const logics: GetZapWithdrawQuotationResponseBody['logics'] = [];
@@ -87,7 +95,7 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
 
       // 1. check withdraw collateral or base token
       // 1-1. new and append compound v3 withdraw logic
-      let srcCollateral: CollateralInfo | undefined;
+      let srcCollateral: compoundKit.CollateralInfo | undefined;
       let withdrawalToken: common.Token;
       const realSrcAmount = new common.TokenAmount(srcToken, srcAmount);
       if (srcToken.unwrapped.is(baseToken)) {
@@ -187,6 +195,7 @@ export const v1GetZapWithdrawQuotationRoute: Route<GetZapWithdrawQuotationRouteP
         utilization: calcUtilization(targetBorrowCapacityUSD, targetBorrowUSD),
         healthRate: calcHealthRate(targetCollateralUSD, targetBorrowUSD, targetLiquidationThreshold),
         liquidationThreshold: targetLiquidationThreshold,
+        supplyUSD: common.formatBigUnit(targetSupplyUSD, 2),
         borrowUSD: common.formatBigUnit(targetBorrowUSD, 2),
         collateralUSD: common.formatBigUnit(targetCollateralUSD, 2),
         netAPR: calcNetAPR(

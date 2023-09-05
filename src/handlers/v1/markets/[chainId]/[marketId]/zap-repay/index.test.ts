@@ -105,6 +105,7 @@ describe('Test get zap repay quotation api', function () {
           'utilization',
           'healthRate',
           'liquidationThreshold',
+          'supplyUSD',
           'borrowUSD',
           'collateralUSD',
           'netAPR'
@@ -113,6 +114,7 @@ describe('Test get zap repay quotation api', function () {
           'utilization',
           'healthRate',
           'liquidationThreshold',
+          'supplyUSD',
           'borrowUSD',
           'collateralUSD',
           'netAPR'

@@ -129,6 +129,7 @@ describe('Test get collateral swap quotation api', function () {
           'utilization',
           'healthRate',
           'liquidationThreshold',
+          'supplyUSD',
           'borrowUSD',
           'collateralUSD',
           'netAPR'
@@ -137,6 +138,7 @@ describe('Test get collateral swap quotation api', function () {
           'utilization',
           'healthRate',
           'liquidationThreshold',
+          'supplyUSD',
           'borrowUSD',
           'collateralUSD',
           'netAPR'

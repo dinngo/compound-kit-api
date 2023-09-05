@@ -8,10 +8,10 @@ import {
   newHttpError,
   newInternalServerError,
 } from 'src/libs/api';
-import { MarketInfo, Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
-import { QuoteAPIResponseBody, ZapQuotation } from 'src/types';
+import { Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
 import * as apisdk from '@protocolink/api';
 import * as common from '@protocolink/common';
+import * as compoundKit from '@protocolink/compound-kit';
 import { utils } from 'ethers';
 import { validateMarket } from 'src/validations';
 
@@ -25,7 +25,7 @@ type GetZapSupplyQuotationRouteParams = EventPathParameters<{ chainId: string; m
   }> &
   EventQueryStringParameters<{ permit2Type?: apisdk.Permit2Type }>;
 
-type GetZapSupplyQuotationResponseBody = QuoteAPIResponseBody<ZapQuotation>;
+type GetZapSupplyQuotationResponseBody = compoundKit.QuoteAPIResponseBody<compoundKit.ZapSupplyQuotation>;
 
 export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParams> = {
   method: 'POST',
@@ -53,14 +53,22 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
 
     const service = new Service(chainId);
 
-    let marketInfo: MarketInfo;
+    let marketInfo: compoundKit.MarketInfo;
     try {
       marketInfo = await service.getMarketInfo(marketId, account);
     } catch (err) {
       throw newInternalServerError(err);
     }
-    const { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR } = marketInfo;
-    const currentPosition = { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR };
+    const { utilization, healthRate, liquidationThreshold, supplyUSD, borrowUSD, collateralUSD, netAPR } = marketInfo;
+    const currentPosition: compoundKit.Position = {
+      utilization,
+      healthRate,
+      liquidationThreshold,
+      supplyUSD,
+      borrowUSD,
+      collateralUSD,
+      netAPR,
+    };
 
     let destAmount = '0';
     const logics: GetZapSupplyQuotationResponseBody['logics'] = [];
@@ -173,6 +181,7 @@ export const v1GetZapSupplyQuotationRoute: Route<GetZapSupplyQuotationRouteParam
         utilization: calcUtilization(targetBorrowCapacityUSD, targetBorrowUSD),
         healthRate: calcHealthRate(targetCollateralUSD, targetBorrowUSD, targetLiquidationThreshold),
         liquidationThreshold: targetLiquidationThreshold,
+        supplyUSD: common.formatBigUnit(targetSupplyUSD, 2),
         borrowUSD: common.formatBigUnit(targetBorrowUSD, 2),
         collateralUSD: common.formatBigUnit(targetCollateralUSD, 2),
         netAPR: calcNetAPR(

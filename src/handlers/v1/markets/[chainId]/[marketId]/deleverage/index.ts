@@ -1,5 +1,4 @@
 import BigNumberJS from 'bignumber.js';
-import { DeleverageQuotation, QuoteAPIResponseBody } from 'src/types';
 import {
   EventBody,
   EventPathParameters,
@@ -8,16 +7,17 @@ import {
   newHttpError,
   newInternalServerError,
 } from 'src/libs/api';
-import { MarketInfo, Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
+import { Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
 import * as apisdk from '@protocolink/api';
 import * as common from '@protocolink/common';
+import * as compoundKit from '@protocolink/compound-kit';
 import { utils } from 'ethers';
 import { validateMarket } from 'src/validations';
 
 type GetDeleverageQuotationRouteParams = EventPathParameters<{ chainId: string; marketId: string }> &
   EventBody<{ account?: string; collateralToken?: common.TokenObject; baseAmount?: string; slippage?: number }>;
 
-type GetDeleverageQuotationResponseBody = QuoteAPIResponseBody<DeleverageQuotation>;
+type GetDeleverageQuotationResponseBody = compoundKit.QuoteAPIResponseBody<compoundKit.DeleverageQuotation>;
 
 export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRouteParams> = {
   method: 'POST',
@@ -45,14 +45,22 @@ export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRoutePar
 
     const service = new Service(chainId);
 
-    let marketInfo: MarketInfo;
+    let marketInfo: compoundKit.MarketInfo;
     try {
       marketInfo = await service.getMarketInfo(marketId, account);
     } catch (err) {
       throw newInternalServerError(err);
     }
-    const { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR } = marketInfo;
-    const currentPosition = { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR };
+    const { utilization, healthRate, liquidationThreshold, supplyUSD, borrowUSD, collateralUSD, netAPR } = marketInfo;
+    const currentPosition: compoundKit.Position = {
+      utilization,
+      healthRate,
+      liquidationThreshold,
+      supplyUSD,
+      borrowUSD,
+      collateralUSD,
+      netAPR,
+    };
 
     const logics: GetDeleverageQuotationResponseBody['logics'] = [];
     let fees: GetDeleverageQuotationResponseBody['fees'] = [];
@@ -154,6 +162,7 @@ export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRoutePar
         utilization: calcUtilization(targetBorrowCapacityUSD, targetBorrowUSD),
         healthRate: calcHealthRate(targetCollateralUSD, targetBorrowUSD, targetLiquidationThreshold),
         liquidationThreshold: targetLiquidationThreshold,
+        supplyUSD: common.formatBigUnit(targetSupplyUSD, 2),
         borrowUSD: common.formatBigUnit(targetBorrowUSD, 2),
         collateralUSD: common.formatBigUnit(targetCollateralUSD, 2),
         netAPR: calcNetAPR(

@@ -7,17 +7,17 @@ import {
   newHttpError,
   newInternalServerError,
 } from 'src/libs/api';
-import { LeverageQuotation, QuoteAPIResponseBody } from 'src/types';
-import { MarketInfo, Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
+import { Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
 import * as apisdk from '@protocolink/api';
 import * as common from '@protocolink/common';
+import * as compoundKit from '@protocolink/compound-kit';
 import { utils } from 'ethers';
 import { validateMarket } from 'src/validations';
 
 type GetLeverageQuotationRouteParams = EventPathParameters<{ chainId: string; marketId: string }> &
   EventBody<{ account?: string; collateralToken?: common.TokenObject; collateralAmount?: string; slippage?: number }>;
 
-type GetLeverageQuotationResponseBody = QuoteAPIResponseBody<LeverageQuotation>;
+type GetLeverageQuotationResponseBody = compoundKit.QuoteAPIResponseBody<compoundKit.LeverageQuotation>;
 
 export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams> = {
   method: 'POST',
@@ -45,14 +45,22 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
 
     const service = new Service(chainId);
 
-    let marketInfo: MarketInfo;
+    let marketInfo: compoundKit.MarketInfo;
     try {
       marketInfo = await service.getMarketInfo(marketId, account);
     } catch (err) {
       throw newInternalServerError(err);
     }
-    const { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR } = marketInfo;
-    const currentPosition = { utilization, healthRate, liquidationThreshold, borrowUSD, collateralUSD, netAPR };
+    const { utilization, healthRate, liquidationThreshold, supplyUSD, borrowUSD, collateralUSD, netAPR } = marketInfo;
+    const currentPosition: compoundKit.Position = {
+      utilization,
+      healthRate,
+      liquidationThreshold,
+      supplyUSD,
+      borrowUSD,
+      collateralUSD,
+      netAPR,
+    };
 
     let leverageTimes = '0';
     const logics: GetLeverageQuotationResponseBody['logics'] = [];
@@ -146,6 +154,7 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
         utilization: calcUtilization(targetBorrowCapacityUSD, targetBorrowUSD),
         healthRate: calcHealthRate(targetCollateralUSD, targetBorrowUSD, targetLiquidationThreshold),
         liquidationThreshold: targetLiquidationThreshold,
+        supplyUSD: common.formatBigUnit(targetSupplyUSD, 2),
         borrowUSD: common.formatBigUnit(targetBorrowUSD, 2),
         collateralUSD: common.formatBigUnit(targetCollateralUSD, 2),
         netAPR: calcNetAPR(

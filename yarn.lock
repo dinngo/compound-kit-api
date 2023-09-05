@@ -1455,13 +1455,6 @@
   dependencies:
     "@middy/util" "4.5.5"
 
-"@middy/http-error-handler@^4.5.5":
-  version "4.5.5"
-  resolved "https://registry.yarnpkg.com/@middy/http-error-handler/-/http-error-handler-4.5.5.tgz#34a505db7dc77fccd7b153b8e855bd418cf641a5"
-  integrity sha512-l3H2HhKau6T6v5fRcXEg18CdYzxBIBfNAkhhT3EOSeeAHqRxzjljv+R/5fPVRIDKFSOOxajbIGwJI/x+w8t6uQ==
-  dependencies:
-    "@middy/util" "4.5.5"
-
 "@middy/http-header-normalizer@^4.5.5":
   version "4.5.5"
   resolved "https://registry.yarnpkg.com/@middy/http-header-normalizer/-/http-header-normalizer-4.5.5.tgz#58ffe45f361e81405b60f6fd29699d2de8379334"
@@ -1816,6 +1809,18 @@
     tiny-invariant "^1.3.1"
     type-fest "^3.12.0"
     zksync-web3 "^0.14.3"
+
+"@protocolink/compound-kit@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@protocolink/compound-kit/-/compound-kit-0.1.2.tgz#18d4bb0cbb42ea1fbc92af0f08501400f183a09f"
+  integrity sha512-jpv/GHvi0Q44B9RAbCzk94yM/7bY5VMjgGOsMOg1xIa1cgKF/zxmmlI8fSzR7CPgGNcRx3Ba//4uW/liCiksCA==
+  dependencies:
+    "@protocolink/api" "^0.2.17"
+    "@protocolink/common" "^0.2.18"
+    "@protocolink/core" "^0.2.20"
+    "@protocolink/logics" "^0.2.16"
+    axios "^1.3.6"
+    axios-retry "^3.5.1"
 
 "@protocolink/core@^0.2.20":
   version "0.2.20"
