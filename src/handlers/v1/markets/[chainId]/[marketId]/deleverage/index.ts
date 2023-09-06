@@ -91,6 +91,7 @@ export const v1GetDeleverageQuotationRoute: Route<GetDeleverageQuotationRoutePar
         tokenIn: deleverageCollateralToken.wrapped,
         output: { token: baseToken.wrapped, amount: baseAmount },
         slippage,
+        excludeDEXS: ['BalancerV2'],
       });
 
       if (

@@ -112,6 +112,7 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
         input: loans.at(0),
         tokenOut: destToken.wrapped,
         slippage,
+        excludeDEXS: ['BalancerV2'],
       });
       logics.push(apisdk.protocols.paraswapv5.newSwapTokenLogic(quotation));
 

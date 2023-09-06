@@ -92,6 +92,7 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
         tokenIn: baseToken.wrapped,
         output: { token: leverageToken.wrapped, amount: collateralAmount },
         slippage,
+        excludeDEXS: ['BalancerV2'],
       });
 
       // 2. get flash loan aggregator quotation
