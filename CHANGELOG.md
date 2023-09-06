@@ -1,5 +1,12 @@
 # CompoundKit API
 
+## 0.1.2
+
+### Patch Changes
+
+- c35b559: fix targetLiquidationLimit of collateral swap
+- 4a84f10: prevent balancer swap in paraswap when using balancer flash loan
+
 ## 0.1.1
 
 ### Patch Changes
