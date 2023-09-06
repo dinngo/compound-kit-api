@@ -42,7 +42,7 @@ export class Service extends logics.compoundv3.Service {
       let numAssets: number;
       let utilization: BigNumber;
       {
-        const calls: common.Multicall2.CallStruct[] = [
+        const calls: common.Multicall3.CallStruct[] = [
           {
             target: cometAddress,
             callData: iface.encodeFunctionData('baseToken'),
@@ -60,7 +60,7 @@ export class Service extends logics.compoundv3.Service {
             callData: iface.encodeFunctionData('getUtilization'),
           },
         ];
-        const { returnData } = await this.multicall2.callStatic.aggregate(calls, { blockTag: this.blockTag });
+        const { returnData } = await this.multicall3.callStatic.aggregate(calls, { blockTag: this.blockTag });
 
         [baseTokenAddress] = iface.decodeFunctionResult('baseToken', returnData[0]);
         [baseTokenPriceFeed] = iface.decodeFunctionResult('baseTokenPriceFeed', returnData[1]);
@@ -73,11 +73,11 @@ export class Service extends logics.compoundv3.Service {
       const borrowCollateralFactors: string[] = [];
       const liquidateCollateralFactors: string[] = [];
       {
-        const calls: common.Multicall2.CallStruct[] = [];
+        const calls: common.Multicall3.CallStruct[] = [];
         for (let i = 0; i < numAssets; i++) {
           calls.push({ target: cometAddress, callData: iface.encodeFunctionData('getAssetInfo', [i]) });
         }
-        const { returnData } = await this.multicall2.callStatic.aggregate(calls, { blockTag: this.blockTag });
+        const { returnData } = await this.multicall3.callStatic.aggregate(calls, { blockTag: this.blockTag });
 
         for (let i = 0; i < numAssets; i++) {
           const [{ asset, priceFeed, borrowCollateralFactor, liquidateCollateralFactor }] = iface.decodeFunctionResult(
@@ -115,7 +115,7 @@ export class Service extends logics.compoundv3.Service {
     const { cometAddress, utilization } = await this.getMarket(marketId);
 
     const iface = logics.compoundv3.Comet__factory.createInterface();
-    const calls: common.Multicall2.CallStruct[] = [
+    const calls: common.Multicall3.CallStruct[] = [
       {
         target: cometAddress,
         callData: iface.encodeFunctionData('getSupplyRate', [utilization]),
@@ -125,7 +125,7 @@ export class Service extends logics.compoundv3.Service {
         callData: iface.encodeFunctionData('getBorrowRate', [utilization]),
       },
     ];
-    const { returnData } = await this.multicall2.callStatic.aggregate(calls, { blockTag: this.blockTag });
+    const { returnData } = await this.multicall3.callStatic.aggregate(calls, { blockTag: this.blockTag });
 
     const [supplyRate] = iface.decodeFunctionResult('getSupplyRate', returnData[0]);
     const supplyAPR = calcAPR(supplyRate);
@@ -141,7 +141,7 @@ export class Service extends logics.compoundv3.Service {
     const customBaseTokenPriceFeed = getCustomBaseTokenPriceFeed(this.chainId, marketId);
 
     const iface = logics.compoundv3.Comet__factory.createInterface();
-    const calls: common.Multicall2.CallStruct[] = [];
+    const calls: common.Multicall3.CallStruct[] = [];
     if (customBaseTokenPriceFeed) {
       calls.push({
         target: cometAddress,
@@ -158,7 +158,7 @@ export class Service extends logics.compoundv3.Service {
         callData: iface.encodeFunctionData('getPrice', [priceFeed]),
       });
     }
-    const { returnData } = await this.multicall2.callStatic.aggregate(calls, { blockTag: this.blockTag });
+    const { returnData } = await this.multicall3.callStatic.aggregate(calls, { blockTag: this.blockTag });
 
     let j = 0;
 
@@ -198,7 +198,7 @@ export class Service extends logics.compoundv3.Service {
     const collateralBalances: string[] = Array(numAssets).fill('0');
     if (account) {
       const iface = logics.compoundv3.Comet__factory.createInterface();
-      const calls: common.Multicall2.CallStruct[] = [
+      const calls: common.Multicall3.CallStruct[] = [
         {
           target: cometAddress,
           callData: iface.encodeFunctionData('balanceOf', [account]),
@@ -214,7 +214,7 @@ export class Service extends logics.compoundv3.Service {
           callData: iface.encodeFunctionData('collateralBalanceOf', [account, asset.address]),
         });
       }
-      const { returnData } = await this.multicall2.callStatic.aggregate(calls, { blockTag: this.blockTag });
+      const { returnData } = await this.multicall3.callStatic.aggregate(calls, { blockTag: this.blockTag });
 
       const [supplyBalanceWei] = iface.decodeFunctionResult('balanceOf', returnData[0]);
       supplyBalance = common.toBigUnit(supplyBalanceWei, baseToken.decimals);
