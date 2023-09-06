@@ -1,5 +1,43 @@
 # CompoundKit API
 
+## 0.1.1
+
+### Patch Changes
+
+- fd8630c: forward protocolink error
+- 3a19169: refine request and response parameter naming convention
+- 60de717: add v1 get zap borrow quotation route
+- c784980: fix liquidationThreshold of zap supply and withdraw
+- e561415: update collateral swap flash loan quote with repays
+- 29d213e: Updated dependencies
+  - @protocolink/api@0.3.0
+  - @protocolink/common@0.3.0
+  - @protocolink/compound-kit@0.1.3
+  - @protocolink/logics@0.3.0
+- 540b722: fix zap withdraw e2e balance check
+- a421e60: add v1 get collateral swap quotation route
+- b1f1886: add v1 get zap repay quotation route
+- 4e67bfc: resolve cors issue
+- b1f1886: add v1 get zap withdraw quotation route
+- 82292c1: implement deleverage function
+- 1c83168: fix borrowUSD of zap repay
+- d03ba16: fix zap borrow/withdraw target position
+- 6de4b28: update quote apis to respond fees
+- d06f0bc: fix zap withdraw 1 wei issue
+- a8fb589: integrate flash loan aggregator
+- c2a4bd4: fix netAPR calculation
+- 07f5e6d: add v1 get zap tokens route
+- 87615f1: refine Position and collateral swap e2e test
+- 7b39028: fix targetBorrowCapacityUSD of zap withdraw
+- 6f46caa: fix identical object key and value
+- a31f2be: implement protocolink estimate api permit2 type param
+- db8e611: update with @protocolink/compound-kit sdk
+- 6058ff1: add v1 get zap supply quotation route
+- d426ad2: add unit test init
+- d06f0bc: add zap repay & withdraw e2e test
+- f373422: Position type add supplyUSD
+- d5ae3a0: fix collateral swap amount check
+
 ## 0.1.0
 
 ### Patch Changes
