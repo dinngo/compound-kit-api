@@ -1,5 +1,5 @@
 ---
-'protocolink-api': patch
+'compound-kit-api': patch
 ---
 
 integrate flash loan aggregator
