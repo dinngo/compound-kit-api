@@ -148,11 +148,9 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
       const targetCollateralUSD = new BigNumberJS(collateralUSD).minus(withdrawalUSD).plus(targetUSD);
       const targetBorrowCapacityUSD = new BigNumberJS(borrowCapacityUSD);
 
-      const targetLiquidationLimit = new BigNumberJS(liquidationLimit).minus(
-        withdrawalUSD
-          .times(srcCollateral.liquidateCollateralFactor)
-          .plus(targetUSD.times(destCollateral.liquidateCollateralFactor))
-      );
+      const targetLiquidationLimit = new BigNumberJS(liquidationLimit)
+        .minus(withdrawalUSD.times(srcCollateral.liquidateCollateralFactor))
+        .plus(targetUSD.times(destCollateral.liquidateCollateralFactor));
       const targetLiquidationThreshold = common.formatBigUnit(targetLiquidationLimit.div(targetCollateralUSD), 4);
       const targetPositiveProportion = targetSupplyUSD.times(supplyAPR);
       const targetNegativeProportion = targetBorrowUSD.times(borrowAPR);
