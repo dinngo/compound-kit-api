@@ -105,7 +105,7 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       if (new BigNumberJS(borrowBalance).plus(borrowAmount).lt(baseBorrowMin)) {
         throw newHttpError(400, {
           code: '400.6',
-          message: `total borrow balance is less than baseBorrowMin: ${baseBorrowMin}`,
+          message: `target borrow balance is less than baseBorrowMin: ${baseBorrowMin}`,
         });
       }
 

@@ -110,7 +110,7 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
       if (new BigNumberJS(borrowBalance).plus(srcAmount).lt(baseBorrowMin)) {
         throw newHttpError(400, {
           code: '400.7',
-          message: `total borrow balance is less than baseBorrowMin: ${baseBorrowMin}`,
+          message: `target borrow balance is less than baseBorrowMin: ${baseBorrowMin}`,
         });
       }
 

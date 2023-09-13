@@ -55,7 +55,7 @@ describe('Test get zap borrow quotation api', function () {
       },
     },
     {
-      title: '400.7: total borrow balance is less than baseBorrowMin',
+      title: '400.7: target borrow balance is less than baseBorrowMin',
       path: '/v1/markets/1/usdc/zap-borrow',
       body: {
         account: '0xe037cddE28EC42dA5be8a5e90617E287A6eBb149',
@@ -65,7 +65,7 @@ describe('Test get zap borrow quotation api', function () {
       },
       expected: {
         statusCode: 400,
-        body: JSON.stringify({ code: '400.7', message: 'total borrow balance is less than baseBorrowMin: 100' }),
+        body: JSON.stringify({ code: '400.7', message: 'target borrow balance is less than baseBorrowMin: 100' }),
       },
     },
     {
