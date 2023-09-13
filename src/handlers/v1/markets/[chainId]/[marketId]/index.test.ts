@@ -49,6 +49,7 @@ describe('Test get market api', function () {
         expect(body).to.have.all.keys([
           'baseToken',
           'baseTokenPrice',
+          'baseBorrowMin',
           'supplyAPR',
           'supplyBalance',
           'supplyUSD',

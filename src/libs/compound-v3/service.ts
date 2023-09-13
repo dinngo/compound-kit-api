@@ -10,6 +10,7 @@ interface Market {
   cometAddress: string;
   baseToken: common.Token;
   baseTokenPriceFeed: string;
+  baseBorrowMin: string;
   numAssets: number;
   utilization: string;
   assets: {
@@ -41,6 +42,7 @@ export class Service extends logics.compoundv3.Service {
       let baseTokenPriceFeed: string;
       let numAssets: number;
       let utilization: BigNumber;
+      let baseBorrowMinWei: BigNumber;
       {
         const calls: common.Multicall3.CallStruct[] = [
           {
@@ -57,6 +59,10 @@ export class Service extends logics.compoundv3.Service {
           },
           {
             target: cometAddress,
+            callData: iface.encodeFunctionData('baseBorrowMin'),
+          },
+          {
+            target: cometAddress,
             callData: iface.encodeFunctionData('getUtilization'),
           },
         ];
@@ -65,7 +71,8 @@ export class Service extends logics.compoundv3.Service {
         [baseTokenAddress] = iface.decodeFunctionResult('baseToken', returnData[0]);
         [baseTokenPriceFeed] = iface.decodeFunctionResult('baseTokenPriceFeed', returnData[1]);
         [numAssets] = iface.decodeFunctionResult('numAssets', returnData[2]);
-        [utilization] = iface.decodeFunctionResult('getUtilization', returnData[3]);
+        [baseBorrowMinWei] = iface.decodeFunctionResult('baseBorrowMin', returnData[3]);
+        [utilization] = iface.decodeFunctionResult('getUtilization', returnData[4]);
       }
 
       const assetAddresses: string[] = [];
@@ -97,6 +104,7 @@ export class Service extends logics.compoundv3.Service {
         cometAddress,
         baseToken,
         baseTokenPriceFeed,
+        baseBorrowMin: common.toBigUnit(baseBorrowMinWei, baseToken.decimals),
         numAssets,
         utilization: utilization.toString(),
         assets: assets.map((asset, i) => ({
@@ -232,7 +240,7 @@ export class Service extends logics.compoundv3.Service {
   }
 
   async getMarketInfo(marketId: string, account?: string) {
-    const { baseToken, numAssets, assets } = await this.getMarket(marketId);
+    const { baseToken, numAssets, assets, baseBorrowMin } = await this.getMarket(marketId);
     const { baseTokenPrice, assetPrices } = await this.getPrices(marketId);
     const { supplyAPR, borrowAPR } = await this.getAPRs(marketId);
     const { supplyBalance, borrowBalance, collateralBalances } = await this.getUserBalances(marketId, account);
@@ -317,6 +325,7 @@ export class Service extends logics.compoundv3.Service {
     const marketInfo: compoundKit.MarketInfo = {
       baseToken: baseToken.unwrapped,
       baseTokenPrice,
+      baseBorrowMin,
       supplyAPR,
       supplyBalance,
       supplyUSD: common.formatBigUnit(supplyUSD, 2),

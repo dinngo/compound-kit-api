@@ -1834,10 +1834,10 @@
     type-fest "^3.12.0"
     zksync-web3 "^0.14.3"
 
-"@protocolink/compound-kit@^0.1.3":
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/@protocolink/compound-kit/-/compound-kit-0.1.3.tgz#de9be7423b4d2d58b6b56d96cbade14c912fb800"
-  integrity sha512-ZQBUV4zkxo7BgUYIAcl5LKrZgNNNPcYKR+fnuRUxZGNpLwP7GKH+0Zu8wPAnzf4xBGBKwdNtqd6ljnY/Akhh+Q==
+"@protocolink/compound-kit@^0.1.4":
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/@protocolink/compound-kit/-/compound-kit-0.1.4.tgz#8cea1745b4b6d8fd208d43cec2415cd5b62ade3f"
+  integrity sha512-CtRFbp+niFaV59Egr9qXklIRdLpxHU7DK8Q5FRp/kLkV+VMpgowgEk6Ay8XTarEUC6V8VGJecNzdm0UfXH4E+g==
   dependencies:
     "@protocolink/api" "^0.3.0"
     "@protocolink/common" "^0.3.0"

@@ -47,6 +47,20 @@ describe('Test get leverage quotation api', function () {
       },
     },
     {
+      title: '400.6: total borrow balance is less than baseBorrowMin',
+      path: '/v1/markets/1/usdc/leverage',
+      body: {
+        account: '0xe037cddE28EC42dA5be8a5e90617E287A6eBb149',
+        collateralToken: logics.compoundv3.mainnetTokens.WETH,
+        collateralAmount: '0.01',
+        slippage: 100,
+      },
+      expected: {
+        statusCode: 400,
+        body: JSON.stringify({ code: '400.6', message: 'total borrow balance is less than baseBorrowMin: 100' }),
+      },
+    },
+    {
       title: '200: without collateral token and collateral amount',
       path: '/v1/markets/137/usdc/leverage',
       body: { account: '0x9fC7D6E7a3d4aB7b8b28d813f68674C8A6e91e83' },

@@ -72,9 +72,11 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
       const {
         baseToken,
         baseTokenPrice,
+        baseBorrowMin,
         supplyAPR,
         supplyUSD,
         borrowAPR,
+        borrowBalance,
         borrowCapacityUSD,
         liquidationLimit,
         collaterals,
@@ -100,6 +102,12 @@ export const v1GetLeverageQuotationRoute: Route<GetLeverageQuotationRouteParams>
         loans: [{ token: baseToken.wrapped, amount: quotation.input.amount }],
       });
       const borrowAmount = repays.at(0).amount;
+      if (new BigNumberJS(borrowBalance).plus(borrowAmount).lt(baseBorrowMin)) {
+        throw newHttpError(400, {
+          code: '400.6',
+          message: `total borrow balance is less than baseBorrowMin: ${baseBorrowMin}`,
+        });
+      }
 
       // 3. new flash loan aggregator logics and append loan logic
       const [flashLoanLoanLogic, flashLoanRepayLogic] = apisdk.protocols.utility.newFlashLoanAggregatorLogicPair(

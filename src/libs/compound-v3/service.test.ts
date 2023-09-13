@@ -22,6 +22,7 @@ describe('Service', function () {
               name: 'USD Coin',
             },
             baseTokenPriceFeed: '0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6',
+            baseBorrowMin: '100',
             numAssets: 5,
             utilization: '976557181997462749',
             assets: [
@@ -115,6 +116,7 @@ describe('Service', function () {
               name: 'Wrapped Ether',
             },
             baseTokenPriceFeed: '0xD72ac1bCE9177CFe7aEb5d0516a38c88a64cE0AB',
+            baseBorrowMin: '0.1',
             numAssets: 2,
             utilization: '444485252335261480',
             assets: [
@@ -165,6 +167,7 @@ describe('Service', function () {
               name: 'USD Coin (PoS)',
             },
             baseTokenPriceFeed: '0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7',
+            baseBorrowMin: '100',
             numAssets: 3,
             utilization: '796389769840623049',
             assets: [
@@ -215,6 +218,88 @@ describe('Service', function () {
           },
         },
       },
+      {
+        chainId: common.ChainId.arbitrum,
+        marketId: logics.compoundv3.MarketId.USDC,
+        account: '0xA62315902fAADC69F898cc8B85F86FfD1F6aAeD8',
+        blockTag: 130619502,
+        expected: {
+          market: {
+            cometAddress: '0xA5EDBDD9646f8dFF606d7448e414884C7d905dCA',
+            baseToken: {
+              chainId: 42161,
+              address: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8',
+              decimals: 6,
+              symbol: 'USDC',
+              name: 'USD Coin (Arb1)',
+            },
+            baseTokenPriceFeed: '0x50834F3163758fcC1Df9973b6e91f0F0F0434aD3',
+            baseBorrowMin: '100',
+            numAssets: 4,
+            utilization: '796229640588301884',
+            assets: [
+              {
+                asset: {
+                  chainId: 42161,
+                  address: '0x912CE59144191C1204E64559FE8253a0e49E6548',
+                  decimals: 18,
+                  symbol: 'ARB',
+                  name: 'Arbitrum',
+                },
+                priceFeed: '0xb2A824043730FE05F3DA2efaFa1CBbe83fa548D6',
+                borrowCollateralFactor: '0.55',
+                liquidateCollateralFactor: '0.6',
+              },
+              {
+                asset: {
+                  chainId: 42161,
+                  address: '0xfc5A1A6EB076a2C7aD06eD22C90d7E710E35ad0a',
+                  decimals: 18,
+                  symbol: 'GMX',
+                  name: 'GMX',
+                },
+                priceFeed: '0xDB98056FecFff59D032aB628337A4887110df3dB',
+                borrowCollateralFactor: '0.4',
+                liquidateCollateralFactor: '0.45',
+              },
+              {
+                asset: {
+                  chainId: 42161,
+                  address: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
+                  decimals: 18,
+                  symbol: 'WETH',
+                  name: 'Wrapped Ether',
+                },
+                priceFeed: '0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612',
+                borrowCollateralFactor: '0.78',
+                liquidateCollateralFactor: '0.85',
+              },
+              {
+                asset: {
+                  chainId: 42161,
+                  address: '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f',
+                  decimals: 8,
+                  symbol: 'WBTC',
+                  name: 'Wrapped BTC',
+                },
+                priceFeed: '0xd0C7101eACbB49F3deCcCc166d238410D6D46d57',
+                borrowCollateralFactor: '0.7',
+                liquidateCollateralFactor: '0.77',
+              },
+            ],
+          },
+          aprs: { supplyAPR: '0.0258', borrowAPR: '0.0428' },
+          prices: {
+            baseTokenPrice: '0.99996426',
+            assetPrices: ['0.77777613', '31.486851', '1588.58', '25902.87584738'],
+          },
+          userBalances: {
+            supplyBalance: '0',
+            borrowBalance: '0',
+            collateralBalances: ['0.000000461031091903', '0', '0', '0'],
+          },
+        },
+      },
     ];
 
     testCases.forEach(({ chainId, marketId, account, blockTag, expected }) => {
@@ -245,6 +330,7 @@ describe('Service', function () {
             name: 'USD Coin (PoS)',
           },
           baseTokenPrice: '0.99994868',
+          baseBorrowMin: '100',
           supplyAPR: '0.0179',
           supplyBalance: '0',
           supplyUSD: '0',
@@ -331,6 +417,7 @@ describe('Service', function () {
             name: 'USD Coin (PoS)',
           },
           baseTokenPrice: '0.99995719',
+          baseBorrowMin: '100',
           supplyAPR: '0.0258',
           supplyBalance: '0',
           supplyUSD: '0',
@@ -417,6 +504,7 @@ describe('Service', function () {
             name: 'USD Coin (PoS)',
           },
           baseTokenPrice: '0.99994868',
+          baseBorrowMin: '100',
           supplyAPR: '0.0179',
           supplyBalance: '0',
           supplyUSD: '0',
