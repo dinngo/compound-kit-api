@@ -56,7 +56,17 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
     } catch (err) {
       throw newInternalServerError(err);
     }
-    const { utilization, healthRate, liquidationThreshold, supplyUSD, borrowUSD, collateralUSD, netAPR } = marketInfo;
+    const {
+      baseBorrowMin,
+      utilization,
+      healthRate,
+      liquidationThreshold,
+      supplyUSD,
+      borrowBalance,
+      borrowUSD,
+      collateralUSD,
+      netAPR,
+    } = marketInfo;
     const currentPosition: compoundKit.Position = {
       utilization,
       healthRate,
@@ -96,7 +106,15 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
         throw newHttpError(400, { code: '400.6', message: 'source amount is greater than available amount' });
       }
 
-      // 3. new and append compound v3 borrow logic
+      // 3. check borrow amount with baseBorrowMin
+      if (new BigNumberJS(borrowBalance).plus(srcAmount).lt(baseBorrowMin)) {
+        throw newHttpError(400, {
+          code: '400.7',
+          message: `target borrow balance is less than baseBorrowMin: ${baseBorrowMin}`,
+        });
+      }
+
+      // 4. new and append compound v3 borrow logic
       logics.push(
         apisdk.protocols.compoundv3.newBorrowLogic({
           marketId,
@@ -107,7 +125,7 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
         })
       );
 
-      // 4. new and append swap token logic
+      // 5. new and append swap token logic
       if (destToken.unwrapped.is(baseToken)) {
         destAmount = srcAmount;
       } else {
@@ -124,7 +142,7 @@ export const v1GetZapBorrowQuotationRoute: Route<GetZapBorrowQuotationRouteParam
       fees = estimateResult.fees;
       approvals = estimateResult.approvals;
 
-      // 5. calc target position
+      // 6. calc target position
       const curBorrowUSD = new BigNumberJS(srcAmount).times(baseTokenPrice);
       const targetSupplyUSD = new BigNumberJS(supplyUSD);
       const targetBorrowUSD = new BigNumberJS(borrowUSD).plus(curBorrowUSD);
