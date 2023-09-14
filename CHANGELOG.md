@@ -1,5 +1,11 @@
 # CompoundKit API
 
+## 0.1.3
+
+### Patch Changes
+
+- 9d20663: leverage, zap-borrow apis add baseBorrowMin validation
+
 ## 0.1.2
 
 ### Patch Changes
