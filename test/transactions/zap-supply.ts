@@ -1,6 +1,6 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import * as api from 'test/fixtures/api';
-import { claimToken, getBalance, getChainId, polygonTokens, snapshotAndRevertEach } from '@protocolink/test-helpers';
+import { claimToken, getChainId, polygonTokens, snapshotAndRevertEach } from '@protocolink/test-helpers';
 import * as common from '@protocolink/common';
 import { expect } from 'chai';
 import hre from 'hardhat';

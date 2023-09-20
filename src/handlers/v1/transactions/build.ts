@@ -35,7 +35,7 @@ export const v1BuildTransactionRoute: Route<BuildTransactionRouteParams> = {
       throw newHttpError(400, { code: '400.6', message: 'account is invalid' });
     }
 
-    const { logics = [], permitData, permitSig, referralCode } = event.body;
+    const { logics = [], permitData, permitSig, referral, referrals } = event.body;
     if (logics.length === 0) {
       throw newHttpError(400, { code: '400.7', message: `logics can't be blank` });
     }
@@ -46,7 +46,8 @@ export const v1BuildTransactionRoute: Route<BuildTransactionRouteParams> = {
       logics,
       permitData,
       permitSig,
-      referralCode,
+      referral,
+      referrals,
     });
 
     return formatJSONResponse(transactionRequest);
