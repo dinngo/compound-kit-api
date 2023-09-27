@@ -6,9 +6,8 @@ import {
   newHttpError,
   newInternalServerError,
 } from 'src/libs/api';
-import { Service } from 'src/libs/compound-v3';
+import { Service, transformMarketId } from 'src/libs/compound-v3';
 import { utils } from 'ethers';
-import { validateMarket } from 'src/validations';
 
 type GetMarketRouteParams = EventPathParameters<{ chainId: string; marketId: string }> &
   EventQueryStringParameters<{ account?: string }>;
@@ -18,8 +17,8 @@ export const v1GetMarketRoute: Route<GetMarketRouteParams> = {
   path: '/v1/markets/{chainId}/{marketId}',
   handler: async (event) => {
     const chainId = Number(event.pathParameters.chainId);
-    const marketId = event.pathParameters.marketId.toUpperCase();
-    if (!validateMarket(chainId, marketId)) {
+    const marketId = transformMarketId(chainId, event.pathParameters.marketId);
+    if (!marketId) {
       throw newHttpError(400, { code: '400.1', message: 'market does not exist' });
     }
 
