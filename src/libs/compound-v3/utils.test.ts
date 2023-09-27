@@ -1,37 +1,46 @@
 import { BigNumber } from 'ethers';
 import BigNumberJS from 'bignumber.js';
-import { calcAPR, calcHealthRate, calcNetAPR, calcUtilization, getMarketLabel } from './utils';
+import { calcAPR, calcHealthRate, calcNetAPR, calcUtilization, transformMarketId } from './utils';
 import * as common from '@protocolink/common';
 import { expect } from 'chai';
-import * as logics from '@protocolink/logics';
 
-describe('Test getMarketLabel', function () {
+describe('Test transformMarketId', function () {
   const testCases = [
     {
       chainId: common.ChainId.mainnet,
-      marketId: logics.compoundv3.MarketId.USDC,
+      marketId: 'usdc',
       expected: 'USDC',
     },
     {
       chainId: common.ChainId.mainnet,
-      marketId: logics.compoundv3.MarketId.ETH,
+      marketId: 'eth',
       expected: 'ETH',
     },
     {
       chainId: common.ChainId.polygon,
-      marketId: logics.compoundv3.MarketId.USDC,
+      marketId: 'usdc',
       expected: 'USDC',
     },
     {
       chainId: common.ChainId.arbitrum,
-      marketId: logics.compoundv3.MarketId.USDC,
+      marketId: 'usdc.e',
       expected: 'USDC.e',
+    },
+    {
+      chainId: common.ChainId.arbitrum,
+      marketId: 'usdc',
+      expected: 'USDC',
+    },
+    {
+      chainId: common.ChainId.mainnet,
+      marketId: 'usdc.e',
+      expected: undefined,
     },
   ];
 
   testCases.forEach(({ chainId, marketId, expected }) => {
     it(`${common.toNetworkId(chainId)}: ${expected}`, async function () {
-      expect(getMarketLabel(chainId, marketId)).to.eq(expected);
+      expect(transformMarketId(chainId, marketId)).to.eq(expected);
     });
   });
 });

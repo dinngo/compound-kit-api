@@ -4,11 +4,18 @@ import { SECONDS_PER_YEAR } from './constants';
 import * as common from '@protocolink/common';
 import * as logics from '@protocolink/logics';
 
-export function getMarketLabel(chainId: number, marketId: string) {
-  if (chainId === common.ChainId.arbitrum && marketId === logics.compoundv3.MarketId.USDC) {
-    return 'USDC.e';
+export function transformMarketId(chainId: number, marketId: string) {
+  for (const config of logics.compoundv3.configs) {
+    if (chainId === config.chainId) {
+      for (const market of config.markets) {
+        if (marketId.toLowerCase() === market.id.toLowerCase()) {
+          return market.id;
+        }
+      }
+    }
   }
-  return marketId;
+
+  return undefined;
 }
 
 export function calcAPR(rate: BigNumber) {

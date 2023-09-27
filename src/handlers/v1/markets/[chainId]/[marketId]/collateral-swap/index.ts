@@ -7,12 +7,11 @@ import {
   newHttpError,
   newInternalServerError,
 } from 'src/libs/api';
-import { Service, calcHealthRate, calcNetAPR, calcUtilization } from 'src/libs/compound-v3';
+import { Service, calcHealthRate, calcNetAPR, calcUtilization, transformMarketId } from 'src/libs/compound-v3';
 import * as apisdk from '@protocolink/api';
 import * as common from '@protocolink/common';
 import * as compoundKit from '@protocolink/compound-kit';
 import { utils } from 'ethers';
-import { validateMarket } from 'src/validations';
 
 type GetCollateralSwapQuotationRouteParams = EventPathParameters<{ chainId: string; marketId: string }> &
   EventBody<{
@@ -30,8 +29,8 @@ export const v1GetCollateralSwapQuotationRoute: Route<GetCollateralSwapQuotation
   path: '/v1/markets/{chainId}/{marketId}/collateral-swap',
   handler: async (event) => {
     const chainId = Number(event.pathParameters.chainId);
-    const marketId = event.pathParameters.marketId.toUpperCase();
-    if (!validateMarket(chainId, marketId)) {
+    const marketId = transformMarketId(chainId, event.pathParameters.marketId);
+    if (!marketId) {
       throw newHttpError(400, { code: '400.1', message: 'market does not exist' });
     }
 

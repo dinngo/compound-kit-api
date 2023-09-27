@@ -220,7 +220,7 @@ describe('Service', function () {
       },
       {
         chainId: common.ChainId.arbitrum,
-        marketId: logics.compoundv3.MarketId.USDC,
+        marketId: logics.compoundv3.MarketId.USDCe,
         account: '0xA62315902fAADC69F898cc8B85F86FfD1F6aAeD8',
         blockTag: 130619502,
         expected: {
@@ -297,6 +297,88 @@ describe('Service', function () {
             supplyBalance: '0',
             borrowBalance: '0',
             collateralBalances: ['0.000000461031091903', '0', '0', '0'],
+          },
+        },
+      },
+      {
+        chainId: common.ChainId.arbitrum,
+        marketId: logics.compoundv3.MarketId.USDC,
+        account: '0xA62315902fAADC69F898cc8B85F86FfD1F6aAeD8',
+        blockTag: 130619502,
+        expected: {
+          market: {
+            cometAddress: '0x9c4ec768c28520B50860ea7a15bd7213a9fF58bf',
+            baseToken: {
+              chainId: 42161,
+              address: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
+              decimals: 6,
+              symbol: 'USDC',
+              name: 'USD Coin',
+            },
+            baseTokenPriceFeed: '0x50834F3163758fcC1Df9973b6e91f0F0F0434aD3',
+            baseBorrowMin: '0.000001',
+            numAssets: 4,
+            utilization: '330452221932251574',
+            assets: [
+              {
+                asset: {
+                  chainId: 42161,
+                  address: '0x912CE59144191C1204E64559FE8253a0e49E6548',
+                  decimals: 18,
+                  symbol: 'ARB',
+                  name: 'Arbitrum',
+                },
+                priceFeed: '0xb2A824043730FE05F3DA2efaFa1CBbe83fa548D6',
+                borrowCollateralFactor: '0.55',
+                liquidateCollateralFactor: '0.6',
+              },
+              {
+                asset: {
+                  chainId: 42161,
+                  address: '0xfc5A1A6EB076a2C7aD06eD22C90d7E710E35ad0a',
+                  decimals: 18,
+                  symbol: 'GMX',
+                  name: 'GMX',
+                },
+                priceFeed: '0xDB98056FecFff59D032aB628337A4887110df3dB',
+                borrowCollateralFactor: '0.4',
+                liquidateCollateralFactor: '0.45',
+              },
+              {
+                asset: {
+                  chainId: 42161,
+                  address: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
+                  decimals: 18,
+                  symbol: 'WETH',
+                  name: 'Wrapped Ether',
+                },
+                priceFeed: '0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612',
+                borrowCollateralFactor: '0.78',
+                liquidateCollateralFactor: '0.85',
+              },
+              {
+                asset: {
+                  chainId: 42161,
+                  address: '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f',
+                  decimals: 8,
+                  symbol: 'WBTC',
+                  name: 'Wrapped BTC',
+                },
+                priceFeed: '0xd0C7101eACbB49F3deCcCc166d238410D6D46d57',
+                borrowCollateralFactor: '0.7',
+                liquidateCollateralFactor: '0.77',
+              },
+            ],
+          },
+          aprs: { supplyAPR: '0.0107', borrowAPR: '0.0265' },
+          prices: {
+            baseTokenPrice: '0.99996426',
+            assetPrices: ['0.77777613', '31.486851', '1588.58', '25902.87584738'],
+          },
+          userBalances: {
+            supplyBalance: '0',
+            borrowBalance: '550003.795033',
+            collateralBalances: ['0', '0', '0', '40.01'],
           },
         },
       },
