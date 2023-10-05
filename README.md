@@ -8,6 +8,8 @@ Compound Kit empowers developers to rapidly build intent-centric applications an
 
 You can try the API at [SwaggerHub](https://compound-kit-api.protocolink.com/docs) and find more details at [Compound Kit Overview](https://docs.protocolink.com/compound-kit/overview).
 
+If you are looking for integration, check out the [Compound Kit SDK](https://github.com/dinngo/compound-kit-js-sdk).
+
 ## Run Offline
 
 ```sh
