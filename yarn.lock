@@ -1782,14 +1782,14 @@
     bignumber.js "^9.0.2"
     ts-essentials "^9.1.2"
 
-"@protocolink/api@^0.4.2":
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/@protocolink/api/-/api-0.4.2.tgz#e7786c47c79a81f3a78f48423ba8ca04d734a8f5"
-  integrity sha512-74QzUssUCWcZ7pY2glj9iWCAVuo92nIqpWLyAu62AIMG/MKevKbfimBRUyK0cKK3GJPpQZG6lhP5f2F9CZMQIQ==
+"@protocolink/api@^0.4.4":
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/@protocolink/api/-/api-0.4.4.tgz#2a38252e75fc022cd0177df6b4a4950bb6af6c2a"
+  integrity sha512-njAzH9jqyOaajTAOTDS4YkakLJwPSdjWWFh1g6fS3ijrHz99EMhJUa4+oI086TPzyG2N3Ivnss8uCqjbS1/UfQ==
   dependencies:
-    "@protocolink/common" "^0.3.0"
-    "@protocolink/core" "^0.4.1"
-    "@protocolink/logics" "^0.4.2"
+    "@protocolink/common" "^0.3.3"
+    "@protocolink/core" "^0.4.2"
+    "@protocolink/logics" "^0.4.4"
     "@types/lodash" "^4.14.195"
     "@types/uuid" "^9.0.2"
     "@uniswap/permit2-sdk" "^1.2.0"
@@ -1810,36 +1810,49 @@
     type-fest "^3.12.0"
     zksync-web3 "^0.14.3"
 
-"@protocolink/compound-kit@^0.1.6":
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@protocolink/compound-kit/-/compound-kit-0.1.6.tgz#45437bcc249700cc8a4c3ee836ea67a351a95a30"
-  integrity sha512-w+DPUHujMAuVZDxmDnwU0P7BotGW7XGuZ+6Ch7YVO3y758ZggYeAsYNLJkVGgVv8s6vRolLxG8YuR+5NFqE3Dg==
+"@protocolink/common@^0.3.1", "@protocolink/common@^0.3.3":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@protocolink/common/-/common-0.3.3.tgz#63c3e34c9fbf25918847d8402aae5346924da2d4"
+  integrity sha512-izfqCopiNYDs0lafqplNRLIPXu/fbeaX9f2pwANw6LwhshOHBXi603fxmoPXTPYLvEDe6WdUDioclw/YHDKGeg==
   dependencies:
-    "@protocolink/api" "^0.4.2"
-    "@protocolink/common" "^0.3.0"
-    "@protocolink/core" "^0.4.1"
-    "@protocolink/logics" "^0.4.2"
+    "@types/lodash" "^4.14.195"
+    bignumber.js "^9.1.1"
+    ethers "^5.7.2"
+    lodash "^4.17.21"
+    tiny-invariant "^1.3.1"
+    type-fest "^3.12.0"
+    zksync-web3 "^0.14.3"
+
+"@protocolink/compound-kit@^0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@protocolink/compound-kit/-/compound-kit-0.1.8.tgz#bcfed8efaba4038363ced72e2c8a64d4c8f6f63b"
+  integrity sha512-IZ4H8KrQ/Kdz5jM/t7rk8lQt4G0zHM1Nci5+BMwAxHtsmF57MiyQlVDNG0kWVXjLR9CYiuKcjaYula+J7oHzbQ==
+  dependencies:
+    "@protocolink/api" "^0.4.4"
+    "@protocolink/common" "^0.3.3"
+    "@protocolink/core" "^0.4.2"
+    "@protocolink/logics" "^0.4.4"
     axios "^1.3.6"
     axios-retry "^3.5.1"
 
-"@protocolink/core@^0.4.0", "@protocolink/core@^0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@protocolink/core/-/core-0.4.1.tgz#edd14a0de3353baf93e46ea019539d91ed662d28"
-  integrity sha512-WGW4uz4AaSi85gw7qsxlYo7NKOjRWob0YwYgMUkbwZ9Hc2zbITB5a+RsTddZGOAv2XzDl2ogaU1kYscsNfXKsw==
+"@protocolink/core@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@protocolink/core/-/core-0.4.2.tgz#19d07613ce355497eb13db82b3d68a44c3f4691e"
+  integrity sha512-WtapXfFgkb8jjNOYru+i00gCU23x0BR4i/2mGokQsKAGkeyuMymHIUTtsxN+5fL009t1NgrGhZe7Xt62wbX8Ug==
   dependencies:
-    "@protocolink/common" "^0.3.0"
+    "@protocolink/common" "^0.3.1"
     "@uniswap/permit2-sdk" "^1.2.0"
     ethers "^5.7.2"
     tiny-invariant "^1.3.1"
 
-"@protocolink/logics@^0.4.2":
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/@protocolink/logics/-/logics-0.4.2.tgz#2657cc1ea8131b65a46a74e3fccc2a2d48542cc9"
-  integrity sha512-hKlPy266nztLEYiC7lraXP1o4/6W9C1QkPxjRrgKAdSIkNigawlFWtfh9iZcPXUk8tJfntR14HdYeKoTTcCsYA==
+"@protocolink/logics@^0.4.4":
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/@protocolink/logics/-/logics-0.4.4.tgz#723f7918056ef3e1ea5802ece134da098f11d6b6"
+  integrity sha512-HyU0JfId/+pkaG51SH/B3MP6m3tGibLcbkcr0VQJDq+wOAx4d1TGUELfhLiWW/dQ3j3idPLTK8k04F4b3jW7PA==
   dependencies:
     "@paraswap/sdk" "^6.2.2"
-    "@protocolink/common" "^0.3.0"
-    "@protocolink/core" "^0.4.0"
+    "@protocolink/common" "^0.3.3"
+    "@protocolink/core" "^0.4.2"
     "@types/lodash" "^4.14.195"
     "@uniswap/sdk-core" "^3.2.6"
     "@uniswap/token-lists" "^1.0.0-beta.31"
