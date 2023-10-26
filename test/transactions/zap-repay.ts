@@ -26,7 +26,7 @@ describe('Transaction: Zap Repay', function () {
   snapshotAndRevertEach();
 
   it('user zap repay USDC in USDC market', async function () {
-    await claimToken(chainId, user.address, baseToken, '200');
+    await claimToken(chainId, user.address, baseToken, '200', '0xe7804c37c13166fF0b37F5aE0BB07A3aEbb6e245');
 
     // 1. user obtains a quotation for zap repay 100 USDC through the zap repay API
     const srcToken = polygonTokens.USDC;
