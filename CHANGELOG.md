@@ -1,5 +1,17 @@
 # CompoundKit API
 
+## 0.1.6
+
+### Patch Changes
+
+- 1c5fa3f: add mainnet rpc url in unit-test-init.ts
+- af23ec6: Updated dependencies
+  - @protocolink/api@0.4.4
+  - @protocolink/common@0.3.3
+  - @protocolink/compound-kit@0.1.8
+  - @protocolink/logics@0.4.4
+- e3597e5: add custom faucet address for zap-repay.ts
+
 ## 0.1.5
 
 ### Patch Changes
