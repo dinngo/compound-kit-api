@@ -1,5 +1,11 @@
 # CompoundKit API
 
+## 0.1.7
+
+### Patch Changes
+
+- 4c4f1f2: upgrade lambda runtime to nodejs18.x
+
 ## 0.1.6
 
 ### Patch Changes
