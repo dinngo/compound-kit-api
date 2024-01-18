@@ -6,7 +6,7 @@ const serverlessConfiguration: AWS = {
   plugins: ['serverless-esbuild', 'serverless-offline', 'serverless-plugin-warmup'],
   provider: {
     name: 'aws',
-    runtime: 'nodejs16.x',
+    runtime: 'nodejs18.x',
     stage: '${opt:stage}',
     apiName: '${self:service}-${self:provider.stage}',
     apiGateway: {
@@ -33,7 +33,7 @@ const serverlessConfiguration: AWS = {
     },
     warmup: {
       default: {
-        enabled: true,
+        enabled: 'prod',
         timeout: 60,
         prewarm: true,
       },
